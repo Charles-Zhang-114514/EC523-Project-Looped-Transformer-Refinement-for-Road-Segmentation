@@ -52,9 +52,9 @@ Merge into `main` through pull requests only. Develop on individual branches suc
 
 ## Team
 
-- Member 1: TBD
-- Member 2: TBD
-- Member 3: TBD
+- Member 1: Haoran Zhang zhr114@bu.edu
+- Member 2: 
+- Member 3: 
 
 ## AI usage disclosure
 
