@@ -1,0 +1,5 @@
+radius,connected_pairs,total_pairs,pair_rate,images_with_new_bridges,total_images,component_merges
+1,0,60,0.0,0,20,0
+2,0,60,0.0,0,20,0
+4,22,60,0.36666666666666664,16,20,22
+8,60,60,1.0,20,20,60

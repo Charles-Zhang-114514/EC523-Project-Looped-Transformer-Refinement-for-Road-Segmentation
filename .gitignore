@@ -218,3 +218,41 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+# EC523: private inputs, generated artifacts, and course materials
+data/
+*.safetensors
+*.pt
+*.pth
+*.ckpt
+*.npy
+*.npz
+features/
+runs/
+outputs/
+checkpoints/
+cache/
+tmp/
+env/
+*.pdf
+project_a/
+starter/
+*.log
+.env
+auth.json
+
+# The data loader package is source code, not a dataset.
+!src/looproad/data/
+!src/looproad/data/__init__.py
+
+# Additional local credentials and generated benchmark labels/metadata
+.env.*
+.aws/
+.ssh/
+credentials
+credentials.json
+*.pem
+*.key
+env.sh
+**/metadata.json
+**/labels_*.png
