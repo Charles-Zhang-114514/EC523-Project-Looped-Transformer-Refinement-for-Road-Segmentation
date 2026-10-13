@@ -256,3 +256,4 @@ credentials.json
 env.sh
 **/metadata.json
 **/labels_*.png
+results/data_audit/*.png
