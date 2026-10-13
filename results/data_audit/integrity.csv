@@ -1,0 +1,5 @@
+split,domain,images,masks,decoded_images,decoded_masks,valid_paired_masks,anomalies
+Train,Urban,1156,1156,1156,1156,1156,0
+Train,Rural,1366,1366,1366,1366,1366,0
+Val,Urban,677,677,677,677,677,0
+Val,Rural,992,992,992,992,992,0
