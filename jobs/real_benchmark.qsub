@@ -1,0 +1,25 @@
+#!/bin/bash -l
+#$ -N ec523-real-benchmark
+#$ -P ec523kb
+#$ -cwd
+#$ -pe omp 1
+#$ -l h_rt=02:00:00
+#$ -l mem_per_core=4G
+#$ -j y
+#$ -o results/real_benchmark
+
+# Submit from the repository root; env.sh is an ignored local configuration.
+source "${SGE_O_WORKDIR:?Submit from the repository root}/env.sh" || exit 1
+set -euo pipefail
+cd "$SGE_O_WORKDIR"
+: "${EC523_DATA_DIR:?Set EC523_DATA_DIR in env.sh}"
+: "${EC523_STARTER_DIR:?Set EC523_STARTER_DIR in env.sh}"
+export OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 MKL_NUM_THREADS=1
+export CUDA_VISIBLE_DEVICES=""
+
+# N=10 per domain took 310.45 s. Linear N=100 projection: about 52 min.
+# Two hours leaves about 2.3 times the projected wall time. No GPU is requested.
+# Each job uses a fresh numeric output directory; derived PNGs are disabled.
+python analysis/real_benchmark.py \
+    --n "${REAL_BENCHMARK_N:-100}" --seed 523 \
+    --output "results/real_benchmark/n100_job${JOB_ID:?Missing scheduler job ID}"
