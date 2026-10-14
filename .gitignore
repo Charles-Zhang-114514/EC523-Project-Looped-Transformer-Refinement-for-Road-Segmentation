@@ -257,3 +257,6 @@ env.sh
 **/metadata.json
 **/labels_*.png
 results/data_audit/*.png
+# Real-label benchmark outputs must remain numeric; derived examples use tmp/.
+results/real_benchmark/**/*.png
+results/real_benchmark/*.o*

@@ -11,8 +11,7 @@ os.environ.setdefault('OMP_NUM_THREADS', '1')
 os.environ.setdefault('OPENBLAS_NUM_THREADS', '1')
 import numpy as np
 from scipy import ndimage as ndi
-from skimage.morphology import skeletonize
-from PIL import Image, ImageDraw
+from PIL import Image
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.dont_write_bytecode = True
@@ -29,13 +28,10 @@ sys.path.insert(0, str(starter_path))
 from metrics import Counts, image_counts, summarize
 
 KEYS = ['road_iou', 'cldice', 'boundary_iou', 'quality']
-CONNECT = np.ones((3, 3), bool)
-
-
-def draw_line(mask, points, width):
-    image = Image.fromarray(mask.astype('uint8') * 255)
-    ImageDraw.Draw(image).line(points, fill=255, width=int(width))
-    return np.asarray(image) > 0
+sys.path.insert(0, str(ROOT / 'src'))
+from looproad.eval.structured_errors import (
+    CONNECT, analyze, close, draw_line, gap_sites, gaps, connected_at, component_merges, thicken,
+)
 
 
 def generate(seed, size):
@@ -71,72 +67,6 @@ def generate(seed, size):
     if seed % 3 == 0:
         labels[xy(300):xy(335), xy(525):xy(570)] = 0
     return labels, roads, targets, pairs
-
-
-def analyze(mask):
-    skel = skeletonize(mask, method='zhang')
-    degree = ndi.convolve(skel.astype('uint8'), CONNECT.astype('uint8'), mode='constant') - skel
-    endpoints = skel & (degree == 1)
-    junctions = skel & (degree >= 3)
-    distance = ndi.distance_transform_edt(mask)
-    segments, n = ndi.label(skel & ~ndi.binary_dilation(junctions, iterations=2), CONNECT)
-    records = []
-    for ident, sl in enumerate(ndi.find_objects(segments), 1):
-        if sl is None:
-            continue
-        local = segments[sl] == ident
-        widths = 2 * distance[sl][local]
-        records.append(dict(segment=ident, pixels=int(local.sum()), width_min=float(widths.min()),
-                            width_median=float(np.median(widths)), width_max=float(widths.max())))
-    return skel, distance, junctions, dict(endpoints=np.argwhere(endpoints).tolist(),
-        junction_pixels=np.argwhere(junctions).tolist(), segments=records)
-
-
-def gap_sites(skel, distance, junctions, targets, maximum):
-    coords = np.argwhere(skel)
-    jd = ndi.distance_transform_edt(~junctions)
-    sites = []
-    for target in targets:
-        p = coords[np.argmin(np.sum((coords - target) ** 2, axis=1))]
-        near = coords[np.sum((coords-p)**2, axis=1) <= 12**2]
-        _, vectors = np.linalg.eigh(np.cov(near.T))
-        tangent = vectors[:, -1]
-        if tangent[1] < 0:
-            tangent = -tangent
-        width = float(2 * distance[tuple(p)])
-        assert jd[tuple(p)] > maximum / 2 + width + 5
-        sites.append(dict(center=p.tolist(), tangent=tangent.tolist(), width=width))
-    return sites
-
-
-def gaps(mask, sites, length):
-    result = mask.copy()
-    events = []
-    for site in sites:
-        p, t = np.array(site['center']), np.array(site['tangent'])
-        radius = int(np.ceil(length / 2 + site['width'] + 5))
-        lo = np.maximum(p-radius, 0).astype(int)
-        hi = np.minimum(p+radius+1, mask.shape).astype(int)
-        yy, xx = np.mgrid[lo[0]:hi[0], lo[1]:hi[1]]
-        offset = np.stack([yy-p[0], xx-p[1]], axis=-1)
-        along = offset @ t
-        across = offset @ np.array([-t[1], t[0]])
-        cut = (along >= -length/2) & (along < length/2) & (np.abs(across) <= site['width']+2)
-        result[lo[0]:hi[0], lo[1]:hi[1]][cut] = False
-        anchors = [np.rint(p + sign * (length/2+4)*t).astype(int).tolist() for sign in (-1, 1)]
-        events.append(dict(**site, length=length, anchors=anchors, removed_pixels=int((mask[lo[0]:hi[0],lo[1]:hi[1]] & cut).sum())))
-    components, _ = ndi.label(result, CONNECT)
-    for event in events:
-        a, b = event['anchors']
-        assert components[tuple(a)] and components[tuple(b)]
-        assert components[tuple(a)] != components[tuple(b)], 'Gap has an alternate route'
-    return result, events
-
-
-def close(mask, radius):
-    yy, xx = np.mgrid[-radius:radius+1, -radius:radius+1]
-    disk = xx*xx+yy*yy <= radius*radius
-    return ndi.binary_closing(mask, structure=disk)
 
 
 def save_png(path, mask, labels):
@@ -199,11 +129,11 @@ def main():
                 score(f'gap_{length}_close_{radius}',fixed,labels)
                 cc, _ = ndi.label(fixed,CONNECT)
                 key = (length,radius)
-                repaired = sum(bool(cc[tuple(e['anchors'][0])]) and cc[tuple(e['anchors'][0])] == cc[tuple(e['anchors'][1])] for e in events)
+                repaired = sum(connected_at(fixed, e['anchors'], 8, labels_map=cc) for e in events)
                 old = repairs.get(key,[0,0])
                 repairs[key] = [old[0]+repaired,old[1]+len(events)]
                 for event in events:
-                    event.setdefault('repair_by_radius',{})[str(radius)] = bool(cc[tuple(event['anchors'][0])]) and bool(cc[tuple(event['anchors'][0])] == cc[tuple(event['anchors'][1])])
+                    event.setdefault('repair_by_radius',{})[str(radius)] = connected_at(fixed, event['anchors'], 8, labels_map=cc)
                 if i < 2 and length in (8,32) and radius in (4,8):
                     save_png(out/'examples'/f'image_{i}_gap_{length}_close_{radius}.png',fixed,labels)
             if i < 2 and length in (8,32):
@@ -220,7 +150,7 @@ def main():
         _, nearest_centerline = ndi.distance_transform_edt(~skel, return_indices=True)
         local_radius = distance[tuple(nearest_centerline)]
         for k in (1,2,3):
-            pred = background_distance <= k
+            pred = thicken(mask, k, background_distance=background_distance)
             score(f'thicken_k_{k}',pred,labels)
             record['errors'].append(dict(type='thicken',mode='uniform',k=k,added_pixels=int((pred&~mask).sum()),location='all road boundaries'))
         for fraction in (.25,.5):
@@ -235,12 +165,7 @@ def main():
             cc, n = ndi.label(pred,CONNECT)
             merged = sum(cc[tuple(p['a'])] == cc[tuple(p['b'])] for p in pairs)
             # Count merges across every original component, not only designated pairs.
-            groups = {}
-            for component in range(1,original_n+1):
-                memberships = np.unique(cc[original_cc==component])
-                for member in memberships[memberships>0]:
-                    groups.setdefault(int(member),set()).add(component)
-            merges = sum(len(group)-1 for group in groups.values() if len(group)>1)
+            merges = component_merges(mask, pred, 8, original_labels=original_cc, prediction_labels=cc)
             old = bridges.get(radius,[0,0,0,0])
             bridges[radius] = [old[0]+merged,old[1]+len(pairs),old[2]+int(merges>0),old[3]+merges]
             if i < 2 and radius == 8:

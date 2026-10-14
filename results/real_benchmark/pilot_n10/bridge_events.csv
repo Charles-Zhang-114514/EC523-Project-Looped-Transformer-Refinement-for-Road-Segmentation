@@ -1,0 +1,21 @@
+domain,image,bridges,reason,events
+Urban,2179,0,no_eligible_pair,[]
+Urban,1749,0,no_eligible_pair,[]
+Urban,1816,0,fewer_than_two_components,[]
+Urban,1780,2,ok,"[{""a"": [674, 445], ""b"": [622, 446], ""separation"": 52.009614495783374, ""width"": 2.0, ""drawn_width"": 2, ""components"": [1, 3], ""added_pixels"": 66}, {""a"": [606, 852], ""b"": [577, 849], ""separation"": 29.154759474226502, ""width"": 6.0, ""drawn_width"": 6, ""components"": [3, 4], ""added_pixels"": 159}]"
+Urban,1840,0,no_eligible_pair,[]
+Urban,2256,0,fewer_than_two_components,[]
+Urban,2030,0,fewer_than_two_components,[]
+Urban,2332,0,no_eligible_pair,[]
+Urban,2151,0,fewer_than_two_components,[]
+Urban,1646,0,no_eligible_pair,[]
+Rural,138,0,fewer_than_two_components,[]
+Rural,106,0,no_eligible_pair,[]
+Rural,741,0,fewer_than_two_components,[]
+Rural,107,3,ok,"[{""a"": [497, 216], ""b"": [502, 232], ""separation"": 16.76305461424021, ""width"": 2.8284271247461903, ""drawn_width"": 3, ""components"": [2, 3], ""added_pixels"": 36}, {""a"": [889, 48], ""b"": [905, 81], ""separation"": 36.6742416417845, ""width"": 20.0, ""drawn_width"": 20, ""components"": [2, 5], ""added_pixels"": 672}, {""a"": [461, 380], ""b"": [520, 389], ""separation"": 59.682493245507096, ""width"": 2.0, ""drawn_width"": 2, ""components"": [2, 4], ""added_pixels"": 115}]"
+Rural,719,0,fewer_than_two_components,[]
+Rural,182,0,no_eligible_pair,[]
+Rural,30,0,no_eligible_pair,[]
+Rural,130,0,no_eligible_pair,[]
+Rural,32,0,fewer_than_two_components,[]
+Rural,435,0,fewer_than_two_components,[]
