@@ -60,3 +60,22 @@ The pilot is a feasibility check without uncertainty intervals. N=100 has not be
 ## Refactor verification
 
 The original and final shared-code versions were run at N=2, seed 523, 1024x1024. metrics.csv, gap_repair.csv and clean_false_bridges.csv matched byte-for-byte; all accumulated official Counts, seeded geometry, error events and repair outcomes matched exactly. Timing/output-directory fields naturally differed. The final synthetic rerun took approximately 14 seconds. Seven analytical shared-geometry tests passed, including local/global cycles, four/eight connectivity, ignored-pixel protection, component bridging and nested offsets.
+
+## Full N=100 CPU run
+
+The full job `8058984` completed both domains (100 Train masks per domain) and wrote `run_info.json` with `elapsed_seconds=3034.031` (50 minutes 34 seconds). The scheduler output file ends with `Finished 200 Train masks ...`; qstat was unavailable in the later status shell because `SGE_QMASTER_PORT` was unset, so the result files and terminal completion line are the available evidence here. The output has 200 sample rows, 138 pooled metric rows, 9,200 per-image condition rows, and 2,004 gap-event rows. All clean self-score rows are exactly 1.0 for all four metrics.
+
+| All domains, N=100 per domain | Quality drop | Drop per 1000 changed valid pixels |
+| --- | ---: | ---: |
+| Thicken by 1 px | 0.100125 | 0.0001633 |
+| Thin by 1 px | 0.100801 | 0.0001640 |
+| Gap L=8 | 0.016051 | 0.0001233 |
+| Gap L=16 | 0.024781 | 0.0000951 |
+| Gap L=32 | 0.042352 | 0.0000812 |
+| Gap L=64 | 0.077798 | 0.0000745 |
+
+Observed the same ordering at N=100 as the N=10 pilot: a global one-pixel boundary offset has a larger raw pooled quality drop than a localized L=8 gap. Its per-changed-pixel drop is also larger. This differs from the synthetic benchmark's per-pixel ordering, where gap errors were slightly higher than one-pixel outward thickening. These differences describe these masks and perturbations; they do not establish a universal ranking of error severity.
+
+Among 501 valid L=8 gap events under 8-connectivity, closing radius 4 repaired 101 (20.2%), radius 8 repaired 500 (99.8%), and endpoint D=64 repaired 33 (6.6%). The other 21 gap events lacked anchors and were excluded from valid repair-rate denominators. The run recorded 48 false bridges across 33 images; the remaining images had fewer than two components or no accepted candidate. Closing radius 8 introduced 25 component merges under 8-connectivity across the clean sample; endpoint D=64 introduced 10. Component-merge counts omit shortcuts within a pre-existing component.
+
+The 50-minute runtime fits the two-hour qsub allocation. The N=100 numeric output is retained under `n100_job8058984/`; no dataset-derived PNGs were generated or committed.
