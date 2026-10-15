@@ -1,0 +1,46 @@
+#!/bin/bash -l
+#$ -N ec523-linear-probe
+#$ -P ec523kb
+#$ -cwd
+#$ -pe omp 4
+#$ -l gpus=1
+#$ -l gpu_c=8.0
+#$ -l h_rt=06:00:00
+#$ -l mem_per_core=8G
+#$ -j y
+#$ -o results
+
+# Submit from the repository root. Ten epochs use roughly 3,200 optimizer steps per setting.
+# The 8-image CPU pilot took 71 seconds; about 34 seconds covered 37 official image-count
+# calls. Extrapolated to 1,669 Val images and four metric passes per image, that is about
+# 1.7 hours per setting for metrics alone. Six hours budgets both settings plus training/I/O.
+source "${SGE_O_WORKDIR:?Submit from the repository root}/env.sh" || exit 1
+set -euo pipefail
+cd "$SGE_O_WORKDIR"
+: "${EC523_DATA_DIR:?Set EC523_DATA_DIR in env.sh}"
+: "${EC523_STARTER_DIR:?Set EC523_STARTER_DIR in env.sh}"
+export OMP_NUM_THREADS=4 OPENBLAS_NUM_THREADS=1 MKL_NUM_THREADS=1
+
+echo "=== GPU ==="
+nvidia-smi
+echo "=== Python ==="
+which python
+python - <<'PY'
+import importlib.metadata as md
+import torch
+import torchvision
+for package in ("numpy", "scipy", "scikit-image", "Pillow", "safetensors"):
+    print(f"{package}=={md.version(package)}")
+print(f"torch=={torch.__version__}")
+print(f"torchvision=={torchvision.__version__}")
+PY
+
+python scripts/train_linear_probe.py \
+    --encoder resnet50_layer3 --epochs 10 --batch-size 8 --lr 1e-3 \
+    --pos-weight auto --seed 0 --device cuda \
+    --out-dir results/linear_probe/resnet50_layer3/posw_auto
+
+python scripts/train_linear_probe.py \
+    --encoder resnet50_layer3 --epochs 10 --batch-size 8 --lr 1e-3 \
+    --pos-weight 1 --seed 0 --device cuda \
+    --out-dir results/linear_probe/resnet50_layer3/posw_1
