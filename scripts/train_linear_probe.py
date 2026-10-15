@@ -368,6 +368,9 @@ def main():
                      for domain in ("Urban", "Rural")}
     report["val"]["Overall"] = {threshold: metrics.summarize(counts)
                                  for threshold, counts in overall_counts.items()}
+    for group_scores in report["val"].values():
+        for score in group_scores.values():
+            score["A"] = score["quality"]
     report["best_overall_a"] = {"threshold": str(best_threshold),
                                 "score": report["val"]["Overall"][str(best_threshold)]["quality"]}
     report["checkpoint"] = str(checkpoint_path.relative_to(ROOT)) if not args.eval_only else args.ckpt
