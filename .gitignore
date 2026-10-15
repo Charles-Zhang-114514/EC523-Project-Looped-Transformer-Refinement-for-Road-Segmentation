@@ -229,6 +229,8 @@ data/
 *.npz
 features/
 runs/
+runs/logs/
+**/runs/logs/*.o[0-9]*
 outputs/
 checkpoints/
 cache/

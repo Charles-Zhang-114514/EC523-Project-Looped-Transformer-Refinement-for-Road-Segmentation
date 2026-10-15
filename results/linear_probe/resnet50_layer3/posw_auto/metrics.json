@@ -1,0 +1,8640 @@
+{
+  "config": {
+    "encoder": "resnet50_layer3",
+    "epochs": 10,
+    "batch_size": 8,
+    "lr": 0.001,
+    "pos_weight": "auto",
+    "seed": 0,
+    "limit_per_domain": null,
+    "metric_workers": 7,
+    "device": "cuda",
+    "out_dir": "results/linear_probe/resnet50_layer3/posw_auto",
+    "eval_only": false,
+    "ckpt": null
+  },
+  "device": "cuda",
+  "pos_weight": 17.97464709154624,
+  "train_pixels": {
+    "valid_background": 2410756774,
+    "road": 134119839
+  },
+  "encoder_parameters_frozen": 8543296,
+  "trainable_parameters": 1025,
+  "epochs": [
+    {
+      "epoch": 1,
+      "train_loss": 0.7221440647113522,
+      "seconds": 163.758767042018,
+      "seconds_per_image": 0.06493210429897621
+    },
+    {
+      "epoch": 2,
+      "train_loss": 0.5857045059635183,
+      "seconds": 116.79535199695965,
+      "seconds_per_image": 0.04631060745319574
+    },
+    {
+      "epoch": 3,
+      "train_loss": 0.5612839208435767,
+      "seconds": 114.8194746900117,
+      "seconds_per_image": 0.045527150947665226
+    },
+    {
+      "epoch": 4,
+      "train_loss": 0.5454758798007829,
+      "seconds": 114.37632096401649,
+      "seconds_per_image": 0.045351435750997815
+    },
+    {
+      "epoch": 5,
+      "train_loss": 0.5398722176604759,
+      "seconds": 115.06186675897334,
+      "seconds_per_image": 0.04562326199800688
+    },
+    {
+      "epoch": 6,
+      "train_loss": 0.5370604182688798,
+      "seconds": 116.90458492998732,
+      "seconds_per_image": 0.04635391948056595
+    },
+    {
+      "epoch": 7,
+      "train_loss": 0.531270832225125,
+      "seconds": 116.83876020804746,
+      "seconds_per_image": 0.0463278192736112
+    },
+    {
+      "epoch": 8,
+      "train_loss": 0.5331308284418438,
+      "seconds": 118.80310358299175,
+      "seconds_per_image": 0.04710670245162242
+    },
+    {
+      "epoch": 9,
+      "train_loss": 0.5296011780766057,
+      "seconds": 113.51011072704569,
+      "seconds_per_image": 0.045007974118574816
+    },
+    {
+      "epoch": 10,
+      "train_loss": 0.5291297480192192,
+      "seconds": 112.19724210700952,
+      "seconds_per_image": 0.04448740765543597
+    }
+  ],
+  "train_seconds": 1203.065583007061,
+  "val_forward_seconds": 8.798043505579699,
+  "metric_seconds": 557.369629099092,
+  "metric_wall_seconds": 152.06890152598498,
+  "val_pipeline_wall_seconds": 162.24736337299692,
+  "total_gpu_seconds": 1211.8636265126406,
+  "peak_cuda_bytes": 1317799424,
+  "mean_val_seconds_per_image": 0.005271446078837447,
+  "val_image_seconds": [
+    {
+      "domain": "Urban",
+      "image_id": "3514",
+      "seconds": 0.5044055969920009
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3515",
+      "seconds": 0.005005709012039006
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3516",
+      "seconds": 0.00501123396679759
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3517",
+      "seconds": 0.0050509010325185955
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3518",
+      "seconds": 0.004882605979219079
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3519",
+      "seconds": 0.004911814990919083
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3520",
+      "seconds": 0.004935881006531417
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3521",
+      "seconds": 0.004859654989559203
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3522",
+      "seconds": 0.0048533889930695295
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3523",
+      "seconds": 0.004883712972514331
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3524",
+      "seconds": 0.004873899044468999
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3525",
+      "seconds": 0.004943064006511122
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3526",
+      "seconds": 0.0049268550355918705
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3527",
+      "seconds": 0.004940775979775935
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3528",
+      "seconds": 0.004930882016196847
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3529",
+      "seconds": 0.004922644002363086
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3530",
+      "seconds": 0.004938614962156862
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3531",
+      "seconds": 0.004929281014483422
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3532",
+      "seconds": 0.00489227200159803
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3533",
+      "seconds": 0.0049442549934610724
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3534",
+      "seconds": 0.004945147025864571
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3535",
+      "seconds": 0.004923092958051711
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3536",
+      "seconds": 0.004902744956780225
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3537",
+      "seconds": 0.004861427994910628
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3538",
+      "seconds": 0.004959162964951247
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3539",
+      "seconds": 0.004922232998069376
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3540",
+      "seconds": 0.0049245289992541075
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3541",
+      "seconds": 0.0049105200450867414
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3542",
+      "seconds": 0.004887635004706681
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3543",
+      "seconds": 0.004865168011747301
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3544",
+      "seconds": 0.004889916977845132
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3545",
+      "seconds": 0.004851662029977888
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3546",
+      "seconds": 0.004906848014798015
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3547",
+      "seconds": 0.004918912949506193
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3548",
+      "seconds": 0.005020006967242807
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3549",
+      "seconds": 0.004891421995125711
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3550",
+      "seconds": 0.004881213011685759
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3551",
+      "seconds": 0.004910170973744243
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3552",
+      "seconds": 0.004862212983425707
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3553",
+      "seconds": 0.0048893269849941134
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3554",
+      "seconds": 0.004850644967518747
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3555",
+      "seconds": 0.004925035987980664
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3556",
+      "seconds": 0.004878034989815205
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3557",
+      "seconds": 0.0048430730239488184
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3558",
+      "seconds": 0.004867126990575343
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3559",
+      "seconds": 0.0048894769861362875
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3560",
+      "seconds": 0.0048496180097572505
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3561",
+      "seconds": 0.004854041035287082
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3562",
+      "seconds": 0.004895261023193598
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3563",
+      "seconds": 0.004853001970332116
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3564",
+      "seconds": 0.004889768955763429
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3565",
+      "seconds": 0.0049062640173360705
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3566",
+      "seconds": 0.004902446991764009
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3567",
+      "seconds": 0.004891673976089805
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3568",
+      "seconds": 0.0048578380374237895
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3569",
+      "seconds": 0.004956674005370587
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3570",
+      "seconds": 0.00507475296035409
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3571",
+      "seconds": 0.004859172040596604
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3572",
+      "seconds": 0.004869260010309517
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3573",
+      "seconds": 0.004866592003963888
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3574",
+      "seconds": 0.0048655300051905215
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3575",
+      "seconds": 0.004892623983323574
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3576",
+      "seconds": 0.004876305989455432
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3577",
+      "seconds": 0.0048972180229611695
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3578",
+      "seconds": 0.00493074202677235
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3579",
+      "seconds": 0.004924862005282193
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3580",
+      "seconds": 0.00489847402786836
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3581",
+      "seconds": 0.0049658159841783345
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3582",
+      "seconds": 0.004942441009916365
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3583",
+      "seconds": 0.004940012004226446
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3584",
+      "seconds": 0.004906806978397071
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3585",
+      "seconds": 0.0048894460196606815
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3586",
+      "seconds": 0.004878022009506822
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3587",
+      "seconds": 0.004852113022934645
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3588",
+      "seconds": 0.004864006012212485
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3589",
+      "seconds": 0.004915091034490615
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3590",
+      "seconds": 0.0048686740337871015
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3591",
+      "seconds": 0.0048771960427984595
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3592",
+      "seconds": 0.00495166500331834
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3593",
+      "seconds": 0.004855892970226705
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3594",
+      "seconds": 0.004903658991679549
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3595",
+      "seconds": 0.004838130960706621
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3596",
+      "seconds": 0.004880934022367001
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3597",
+      "seconds": 0.004896818019915372
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3598",
+      "seconds": 0.004893962002824992
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3599",
+      "seconds": 0.004913093987852335
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3600",
+      "seconds": 0.004919847007840872
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3601",
+      "seconds": 0.004896675993222743
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3602",
+      "seconds": 0.004831952974200249
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3603",
+      "seconds": 0.004827466967981309
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3604",
+      "seconds": 0.004909129987936467
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3605",
+      "seconds": 0.004845342016778886
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3606",
+      "seconds": 0.004872552992310375
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3607",
+      "seconds": 0.00487595796585083
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3608",
+      "seconds": 0.004850615980103612
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3609",
+      "seconds": 0.0049416120164096355
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3610",
+      "seconds": 0.004834964987821877
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3611",
+      "seconds": 0.004827614990063012
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3612",
+      "seconds": 0.004870917007792741
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3613",
+      "seconds": 0.004839720029849559
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3614",
+      "seconds": 0.004919210041407496
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3615",
+      "seconds": 0.004902123007923365
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3616",
+      "seconds": 0.004878152045421302
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3617",
+      "seconds": 0.00489113200455904
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3618",
+      "seconds": 0.0048581750015728176
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3619",
+      "seconds": 0.004839934001211077
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3620",
+      "seconds": 0.004890131007414311
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3621",
+      "seconds": 0.00488648604368791
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3622",
+      "seconds": 0.004866464005317539
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3623",
+      "seconds": 0.0049742269911803305
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3624",
+      "seconds": 0.004850116034504026
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3625",
+      "seconds": 0.004913525015581399
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3626",
+      "seconds": 0.004884693014901131
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3627",
+      "seconds": 0.0048673240235075355
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3628",
+      "seconds": 0.004871602985076606
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3629",
+      "seconds": 0.004881052998825908
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3630",
+      "seconds": 0.004938631027471274
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3631",
+      "seconds": 0.004897435021121055
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3632",
+      "seconds": 0.004886699025519192
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3633",
+      "seconds": 0.004927211964968592
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3634",
+      "seconds": 0.004897410981357098
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3635",
+      "seconds": 0.004909312003292143
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3636",
+      "seconds": 0.004880434018559754
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3637",
+      "seconds": 0.004887080984190106
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3638",
+      "seconds": 0.004833743034396321
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3639",
+      "seconds": 0.004838594992179424
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3640",
+      "seconds": 0.004858934029471129
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3641",
+      "seconds": 0.004913105978630483
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3642",
+      "seconds": 0.004919478960800916
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3643",
+      "seconds": 0.004904513014480472
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3644",
+      "seconds": 0.004879576037637889
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3645",
+      "seconds": 0.004916360951028764
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3646",
+      "seconds": 0.004907527007162571
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3647",
+      "seconds": 0.004895940015558153
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3648",
+      "seconds": 0.004892439988907427
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3649",
+      "seconds": 0.0049361929995939136
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3650",
+      "seconds": 0.0049325599684379995
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3651",
+      "seconds": 0.004863162990659475
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3652",
+      "seconds": 0.004851115052588284
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3653",
+      "seconds": 0.004961700993590057
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3654",
+      "seconds": 0.005018500029109418
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3655",
+      "seconds": 0.004872681980486959
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3656",
+      "seconds": 0.00493160099722445
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3657",
+      "seconds": 0.004862150002736598
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3658",
+      "seconds": 0.004824328003451228
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3659",
+      "seconds": 0.005030264030210674
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3660",
+      "seconds": 0.004852360987570137
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3661",
+      "seconds": 0.004828648001421243
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3662",
+      "seconds": 0.004866047005634755
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3663",
+      "seconds": 0.004819207999389619
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3664",
+      "seconds": 0.004903151013422757
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3665",
+      "seconds": 0.004953955009113997
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3666",
+      "seconds": 0.0049134319997392595
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3667",
+      "seconds": 0.0049424630124121904
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3668",
+      "seconds": 0.004979674995411187
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3669",
+      "seconds": 0.0049973519635386765
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3670",
+      "seconds": 0.004937838006298989
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3671",
+      "seconds": 0.005024974991101772
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3672",
+      "seconds": 0.005012180015910417
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3673",
+      "seconds": 0.005080620991066098
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3674",
+      "seconds": 0.004973179951775819
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3675",
+      "seconds": 0.005039523006416857
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3676",
+      "seconds": 0.00497281999560073
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3677",
+      "seconds": 0.004968255001585931
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3678",
+      "seconds": 0.004901574982795864
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3679",
+      "seconds": 0.004878647974692285
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3680",
+      "seconds": 0.004858780012000352
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3681",
+      "seconds": 0.004963814979419112
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3682",
+      "seconds": 0.004865166964009404
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3683",
+      "seconds": 0.004881930013652891
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3684",
+      "seconds": 0.004863086040131748
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3685",
+      "seconds": 0.0049077540170401335
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3686",
+      "seconds": 0.0049582310020923615
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3687",
+      "seconds": 0.004855618986766785
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3688",
+      "seconds": 0.004878554027527571
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3689",
+      "seconds": 0.0049126180238090456
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3690",
+      "seconds": 0.004880968015640974
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3691",
+      "seconds": 0.00490632199216634
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3692",
+      "seconds": 0.004855433013290167
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3693",
+      "seconds": 0.0048688509850762784
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3694",
+      "seconds": 0.00482696300605312
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3695",
+      "seconds": 0.004882314009591937
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3696",
+      "seconds": 0.004881959001068026
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3697",
+      "seconds": 0.004850550030823797
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3698",
+      "seconds": 0.004816271015442908
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3699",
+      "seconds": 0.005127880023792386
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3700",
+      "seconds": 0.004909816023427993
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3701",
+      "seconds": 0.004926412017084658
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3702",
+      "seconds": 0.004979629011359066
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3703",
+      "seconds": 0.004888864990789443
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3704",
+      "seconds": 0.00494992797030136
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3705",
+      "seconds": 0.004989722045138478
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3706",
+      "seconds": 0.004984510014764965
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3707",
+      "seconds": 0.004966675012838095
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3708",
+      "seconds": 0.005036651040427387
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3709",
+      "seconds": 0.004889115982223302
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3710",
+      "seconds": 0.005009483022149652
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3711",
+      "seconds": 0.004848523007240146
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3712",
+      "seconds": 0.004852248996030539
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3713",
+      "seconds": 0.004892637021839619
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3714",
+      "seconds": 0.004947825975250453
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3715",
+      "seconds": 0.004857053980231285
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3716",
+      "seconds": 0.004850389959756285
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3717",
+      "seconds": 0.00484671798767522
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3718",
+      "seconds": 0.004925161018036306
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3719",
+      "seconds": 0.004899132007267326
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3720",
+      "seconds": 0.004886794020421803
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3721",
+      "seconds": 0.004920762963593006
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3722",
+      "seconds": 0.004915871017146856
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3723",
+      "seconds": 0.004870387027040124
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3724",
+      "seconds": 0.004885646980255842
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3725",
+      "seconds": 0.004890142998192459
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3726",
+      "seconds": 0.004905648005660623
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3727",
+      "seconds": 0.0049198229680769145
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3728",
+      "seconds": 0.004934003984089941
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3729",
+      "seconds": 0.00490759895183146
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3730",
+      "seconds": 0.004915424971841276
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3731",
+      "seconds": 0.004939605016261339
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3732",
+      "seconds": 0.005081796029116958
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3733",
+      "seconds": 0.004893495002761483
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3734",
+      "seconds": 0.0048283200012519956
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3735",
+      "seconds": 0.004875576007179916
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3736",
+      "seconds": 0.004825184005312622
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3737",
+      "seconds": 0.00487096601864323
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3738",
+      "seconds": 0.004858796019107103
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3739",
+      "seconds": 0.004866149974986911
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3740",
+      "seconds": 0.004846260999329388
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3741",
+      "seconds": 0.0048912110505625606
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3742",
+      "seconds": 0.00488068099366501
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3743",
+      "seconds": 0.004864688031375408
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3744",
+      "seconds": 0.004966778040397912
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3745",
+      "seconds": 0.004962898034136742
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3746",
+      "seconds": 0.00487025995971635
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3747",
+      "seconds": 0.004859331005718559
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3748",
+      "seconds": 0.004867548996116966
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3749",
+      "seconds": 0.004855834995396435
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3750",
+      "seconds": 0.004847306990996003
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3751",
+      "seconds": 0.00485788396326825
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3752",
+      "seconds": 0.004873766039963812
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3753",
+      "seconds": 0.004838507971726358
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3754",
+      "seconds": 0.004896626982372254
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3755",
+      "seconds": 0.004884526017121971
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3756",
+      "seconds": 0.0049627909902483225
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3757",
+      "seconds": 0.00491685199085623
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3758",
+      "seconds": 0.0048656819853931665
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3759",
+      "seconds": 0.004860946966800839
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3760",
+      "seconds": 0.004859762033447623
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3761",
+      "seconds": 0.004924177017528564
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3762",
+      "seconds": 0.004881953005678952
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3763",
+      "seconds": 0.004940383019857109
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3764",
+      "seconds": 0.004847046977374703
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3765",
+      "seconds": 0.00486571597866714
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3766",
+      "seconds": 0.004966755979694426
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3767",
+      "seconds": 0.004895523015875369
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3768",
+      "seconds": 0.004874003992881626
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3769",
+      "seconds": 0.004872461024206132
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3770",
+      "seconds": 0.004877704021055251
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3771",
+      "seconds": 0.004929151036776602
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3772",
+      "seconds": 0.0048838029615581036
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3773",
+      "seconds": 0.0048910879995673895
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3774",
+      "seconds": 0.004820900969207287
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3775",
+      "seconds": 0.004885709029622376
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3776",
+      "seconds": 0.00489481003023684
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3777",
+      "seconds": 0.0049434800166636705
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3778",
+      "seconds": 0.004907824972178787
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3779",
+      "seconds": 0.004873802012298256
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3780",
+      "seconds": 0.004918797989375889
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3781",
+      "seconds": 0.0048700179904699326
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3782",
+      "seconds": 0.004877539002336562
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3783",
+      "seconds": 0.004875615006312728
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3784",
+      "seconds": 0.004898621991742402
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3785",
+      "seconds": 0.0048669069656170905
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3786",
+      "seconds": 0.0048862419789657
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3787",
+      "seconds": 0.004925712011754513
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3788",
+      "seconds": 0.004877175961155444
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3789",
+      "seconds": 0.004807021992746741
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3790",
+      "seconds": 0.00483557500410825
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3791",
+      "seconds": 0.004893810022622347
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3792",
+      "seconds": 0.004881944041699171
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3793",
+      "seconds": 0.0049179510097019374
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3794",
+      "seconds": 0.0048502449644729495
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3795",
+      "seconds": 0.004876715014688671
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3796",
+      "seconds": 0.0048539949930273
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3797",
+      "seconds": 0.004831418977119029
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3798",
+      "seconds": 0.004852104000747204
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3799",
+      "seconds": 0.004876539984252304
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3800",
+      "seconds": 0.004875512036960572
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3801",
+      "seconds": 0.004881869012024254
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3802",
+      "seconds": 0.004906592017505318
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3803",
+      "seconds": 0.004848868993576616
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3804",
+      "seconds": 0.004892244003713131
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3805",
+      "seconds": 0.0048909750184975564
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3806",
+      "seconds": 0.004839667992200702
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3807",
+      "seconds": 0.005023673991672695
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3808",
+      "seconds": 0.0048802869860082865
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3809",
+      "seconds": 0.0049076349823735654
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3810",
+      "seconds": 0.004909857991151512
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3811",
+      "seconds": 0.004930393013637513
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3812",
+      "seconds": 0.004893437959253788
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3813",
+      "seconds": 0.004890664014965296
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3814",
+      "seconds": 0.004836151958443224
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3815",
+      "seconds": 0.004863935988396406
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3816",
+      "seconds": 0.004850852012168616
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3817",
+      "seconds": 0.004910639021545649
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3818",
+      "seconds": 0.004837109008803964
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3819",
+      "seconds": 0.004871926968917251
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3820",
+      "seconds": 0.0048326459946110845
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3821",
+      "seconds": 0.004878162988461554
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3822",
+      "seconds": 0.004863358044531196
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3823",
+      "seconds": 0.004878995998296887
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3824",
+      "seconds": 0.004879045009147376
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3825",
+      "seconds": 0.0049079699674621224
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3826",
+      "seconds": 0.004886251001153141
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3827",
+      "seconds": 0.004894964979030192
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3828",
+      "seconds": 0.004904782981611788
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3829",
+      "seconds": 0.004859214008320123
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3830",
+      "seconds": 0.004858781991060823
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3831",
+      "seconds": 0.004901011998299509
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3832",
+      "seconds": 0.00488065299578011
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3833",
+      "seconds": 0.004854558035731316
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3834",
+      "seconds": 0.004899316991213709
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3835",
+      "seconds": 0.004843314003665
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3836",
+      "seconds": 0.004847471020184457
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3837",
+      "seconds": 0.004943612031638622
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3838",
+      "seconds": 0.0048764070379547775
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3839",
+      "seconds": 0.004835107014514506
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3840",
+      "seconds": 0.004842048976570368
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3841",
+      "seconds": 0.004860712040681392
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3842",
+      "seconds": 0.004862830974161625
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3843",
+      "seconds": 0.0048593219835311174
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3844",
+      "seconds": 0.004923687956761569
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3845",
+      "seconds": 0.004873628029599786
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3846",
+      "seconds": 0.0048721779603511095
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3847",
+      "seconds": 0.0048823870019987226
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3848",
+      "seconds": 0.004957849974744022
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3849",
+      "seconds": 0.004964672029018402
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3850",
+      "seconds": 0.004880152991972864
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3851",
+      "seconds": 0.004843749979045242
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3852",
+      "seconds": 0.004852198995649815
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3853",
+      "seconds": 0.004880267020780593
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3854",
+      "seconds": 0.004847946052905172
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3855",
+      "seconds": 0.004862779984250665
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3856",
+      "seconds": 0.004860927001573145
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3857",
+      "seconds": 0.004877056984696537
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3858",
+      "seconds": 0.00491242395946756
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3859",
+      "seconds": 0.004862273985054344
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3860",
+      "seconds": 0.004836564010474831
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3861",
+      "seconds": 0.004914588003885001
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3862",
+      "seconds": 0.004849821038078517
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3863",
+      "seconds": 0.004912210046313703
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3864",
+      "seconds": 0.004846635041758418
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3865",
+      "seconds": 0.004927570000290871
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3866",
+      "seconds": 0.004874753998592496
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3867",
+      "seconds": 0.004925510962493718
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3868",
+      "seconds": 0.004905426001641899
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3869",
+      "seconds": 0.0048932869685813785
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3870",
+      "seconds": 0.004946105997078121
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3871",
+      "seconds": 0.0049559170147404075
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3872",
+      "seconds": 0.004911780008114874
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3873",
+      "seconds": 0.004918865975923836
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3874",
+      "seconds": 0.004890567972324789
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3875",
+      "seconds": 0.004932093957904726
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3876",
+      "seconds": 0.004910003044642508
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3877",
+      "seconds": 0.004885032016318291
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3878",
+      "seconds": 0.004924854030832648
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3879",
+      "seconds": 0.004939001984894276
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3880",
+      "seconds": 0.004951348004397005
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3881",
+      "seconds": 0.004877991043031216
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3882",
+      "seconds": 0.004856612998992205
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3883",
+      "seconds": 0.004891632997896522
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3884",
+      "seconds": 0.0048725520027801394
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3885",
+      "seconds": 0.004988050030078739
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3886",
+      "seconds": 0.004885750007815659
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3887",
+      "seconds": 0.004869594005867839
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3888",
+      "seconds": 0.00492362497607246
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3889",
+      "seconds": 0.00487326696747914
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3890",
+      "seconds": 0.004940349026583135
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3891",
+      "seconds": 0.004957957018632442
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3892",
+      "seconds": 0.004917518992442638
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3893",
+      "seconds": 0.004892886965535581
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3894",
+      "seconds": 0.004868336021900177
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3895",
+      "seconds": 0.004871088021900505
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3896",
+      "seconds": 0.004901817999780178
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3897",
+      "seconds": 0.004880331049207598
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3898",
+      "seconds": 0.004952099989168346
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3899",
+      "seconds": 0.004872276040259749
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3900",
+      "seconds": 0.0048842490068636835
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3901",
+      "seconds": 0.004918370977975428
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3902",
+      "seconds": 0.0048950460040941834
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3903",
+      "seconds": 0.004951442999299616
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3904",
+      "seconds": 0.004924934008158743
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3905",
+      "seconds": 0.004947019042447209
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3906",
+      "seconds": 0.004929211980197579
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3907",
+      "seconds": 0.004882005043327808
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3908",
+      "seconds": 0.004867567971814424
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3909",
+      "seconds": 0.004886384995188564
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3910",
+      "seconds": 0.004923700995277613
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3911",
+      "seconds": 0.004911554977297783
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3912",
+      "seconds": 0.004879459971562028
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3913",
+      "seconds": 0.004900451982393861
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3914",
+      "seconds": 0.0049246749840676785
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3915",
+      "seconds": 0.004875931015703827
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3916",
+      "seconds": 0.004865671973675489
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3917",
+      "seconds": 0.004880088032223284
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3918",
+      "seconds": 0.004890329029876739
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3919",
+      "seconds": 0.004870554024819285
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3920",
+      "seconds": 0.004935096018016338
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3921",
+      "seconds": 0.004877090977970511
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3922",
+      "seconds": 0.004948483023326844
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3923",
+      "seconds": 0.0049579719780012965
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3924",
+      "seconds": 0.004911656025797129
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3925",
+      "seconds": 0.004917128011584282
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3926",
+      "seconds": 0.004937816003803164
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3927",
+      "seconds": 0.004908005008473992
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3928",
+      "seconds": 0.005059316987171769
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3929",
+      "seconds": 0.004867760988418013
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3930",
+      "seconds": 0.0048679999890737236
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3931",
+      "seconds": 0.004866109986323863
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3932",
+      "seconds": 0.004888342984486371
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3933",
+      "seconds": 0.004880499036516994
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3934",
+      "seconds": 0.004868414020165801
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3935",
+      "seconds": 0.004886863986030221
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3936",
+      "seconds": 0.004862836969550699
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3937",
+      "seconds": 0.004874097008723766
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3938",
+      "seconds": 0.004895151010714471
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3939",
+      "seconds": 0.004862415022216737
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3940",
+      "seconds": 0.0048598890425637364
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3941",
+      "seconds": 0.004894768004305661
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3942",
+      "seconds": 0.004899870022200048
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3943",
+      "seconds": 0.00492143799783662
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3944",
+      "seconds": 0.004903797002043575
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3945",
+      "seconds": 0.004861886030994356
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3946",
+      "seconds": 0.004901194013655186
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3947",
+      "seconds": 0.0048904119757935405
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3948",
+      "seconds": 0.004903314984403551
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3949",
+      "seconds": 0.0049372410285286605
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3950",
+      "seconds": 0.0048840700183063745
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3951",
+      "seconds": 0.004889066971372813
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3952",
+      "seconds": 0.00489926099544391
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3953",
+      "seconds": 0.004901947977486998
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3954",
+      "seconds": 0.004888869007118046
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3955",
+      "seconds": 0.004927083966322243
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3956",
+      "seconds": 0.004873161029536277
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3957",
+      "seconds": 0.004907205002382398
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3958",
+      "seconds": 0.004914061981253326
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3959",
+      "seconds": 0.004936325014568865
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3960",
+      "seconds": 0.005014794005546719
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3961",
+      "seconds": 0.004902572953142226
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3962",
+      "seconds": 0.0048619069857522845
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3963",
+      "seconds": 0.004893623001407832
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3964",
+      "seconds": 0.0049057709984481335
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3965",
+      "seconds": 0.004859634966123849
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3966",
+      "seconds": 0.004934176977258176
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3967",
+      "seconds": 0.004888005962129682
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3968",
+      "seconds": 0.0048636559513397515
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3969",
+      "seconds": 0.004866888048127294
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3970",
+      "seconds": 0.0049005040200427175
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3971",
+      "seconds": 0.004857176973018795
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3972",
+      "seconds": 0.0048749789712019265
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3973",
+      "seconds": 0.004859467968344688
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3974",
+      "seconds": 0.004879338026512414
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3975",
+      "seconds": 0.0048643339541740716
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3976",
+      "seconds": 0.004847835982218385
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3977",
+      "seconds": 0.004894588957540691
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3978",
+      "seconds": 0.004866041010245681
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3979",
+      "seconds": 0.0048902080161497
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3980",
+      "seconds": 0.0048774039605632424
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3981",
+      "seconds": 0.004884140973445028
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3982",
+      "seconds": 0.004860129964072257
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3983",
+      "seconds": 0.004875718033872545
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3984",
+      "seconds": 0.004998018033802509
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3985",
+      "seconds": 0.00489055598154664
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3986",
+      "seconds": 0.00489895703503862
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3987",
+      "seconds": 0.0049081939505413175
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3988",
+      "seconds": 0.0049033090472221375
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3989",
+      "seconds": 0.004929442948196083
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3990",
+      "seconds": 0.0048992380034178495
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3991",
+      "seconds": 0.004880424996372312
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3992",
+      "seconds": 0.004899193008895963
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3993",
+      "seconds": 0.004943992011249065
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3994",
+      "seconds": 0.004905904002953321
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3995",
+      "seconds": 0.004913257027510554
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3996",
+      "seconds": 0.004913648997899145
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3997",
+      "seconds": 0.004930313967633992
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3998",
+      "seconds": 0.004960402031429112
+    },
+    {
+      "domain": "Urban",
+      "image_id": "3999",
+      "seconds": 0.004958299046847969
+    },
+    {
+      "domain": "Urban",
+      "image_id": "4000",
+      "seconds": 0.004919546016026288
+    },
+    {
+      "domain": "Urban",
+      "image_id": "4001",
+      "seconds": 0.004949418012984097
+    },
+    {
+      "domain": "Urban",
+      "image_id": "4002",
+      "seconds": 0.004925086977891624
+    },
+    {
+      "domain": "Urban",
+      "image_id": "4003",
+      "seconds": 0.004917921964079142
+    },
+    {
+      "domain": "Urban",
+      "image_id": "4004",
+      "seconds": 0.004902696993667632
+    },
+    {
+      "domain": "Urban",
+      "image_id": "4005",
+      "seconds": 0.004904022964183241
+    },
+    {
+      "domain": "Urban",
+      "image_id": "4006",
+      "seconds": 0.005112010985612869
+    },
+    {
+      "domain": "Urban",
+      "image_id": "4007",
+      "seconds": 0.004959445970598608
+    },
+    {
+      "domain": "Urban",
+      "image_id": "4008",
+      "seconds": 0.004893070028629154
+    },
+    {
+      "domain": "Urban",
+      "image_id": "4009",
+      "seconds": 0.004925289016682655
+    },
+    {
+      "domain": "Urban",
+      "image_id": "4010",
+      "seconds": 0.004968821012880653
+    },
+    {
+      "domain": "Urban",
+      "image_id": "4011",
+      "seconds": 0.004897288978099823
+    },
+    {
+      "domain": "Urban",
+      "image_id": "4012",
+      "seconds": 0.004882706969510764
+    },
+    {
+      "domain": "Urban",
+      "image_id": "4013",
+      "seconds": 0.004879832966253161
+    },
+    {
+      "domain": "Urban",
+      "image_id": "4014",
+      "seconds": 0.004924540990032256
+    },
+    {
+      "domain": "Urban",
+      "image_id": "4015",
+      "seconds": 0.0049229650176130235
+    },
+    {
+      "domain": "Urban",
+      "image_id": "4016",
+      "seconds": 0.0049338319804519415
+    },
+    {
+      "domain": "Urban",
+      "image_id": "4017",
+      "seconds": 0.004940840997733176
+    },
+    {
+      "domain": "Urban",
+      "image_id": "4018",
+      "seconds": 0.004906604008283466
+    },
+    {
+      "domain": "Urban",
+      "image_id": "4019",
+      "seconds": 0.004887300019618124
+    },
+    {
+      "domain": "Urban",
+      "image_id": "4020",
+      "seconds": 0.004906575020868331
+    },
+    {
+      "domain": "Urban",
+      "image_id": "4021",
+      "seconds": 0.004895209975074977
+    },
+    {
+      "domain": "Urban",
+      "image_id": "4022",
+      "seconds": 0.004914789984468371
+    },
+    {
+      "domain": "Urban",
+      "image_id": "4023",
+      "seconds": 0.004926675988826901
+    },
+    {
+      "domain": "Urban",
+      "image_id": "4024",
+      "seconds": 0.004943121981341392
+    },
+    {
+      "domain": "Urban",
+      "image_id": "4025",
+      "seconds": 0.004912049975246191
+    },
+    {
+      "domain": "Urban",
+      "image_id": "4026",
+      "seconds": 0.005782185005955398
+    },
+    {
+      "domain": "Urban",
+      "image_id": "4027",
+      "seconds": 0.004862866015173495
+    },
+    {
+      "domain": "Urban",
+      "image_id": "4028",
+      "seconds": 0.004901943961158395
+    },
+    {
+      "domain": "Urban",
+      "image_id": "4029",
+      "seconds": 0.004885100992396474
+    },
+    {
+      "domain": "Urban",
+      "image_id": "4030",
+      "seconds": 0.00491912302095443
+    },
+    {
+      "domain": "Urban",
+      "image_id": "4031",
+      "seconds": 0.004895795020274818
+    },
+    {
+      "domain": "Urban",
+      "image_id": "4032",
+      "seconds": 0.004855312989093363
+    },
+    {
+      "domain": "Urban",
+      "image_id": "4033",
+      "seconds": 0.004868810006882995
+    },
+    {
+      "domain": "Urban",
+      "image_id": "4034",
+      "seconds": 0.004858597996644676
+    },
+    {
+      "domain": "Urban",
+      "image_id": "4035",
+      "seconds": 0.00495122600113973
+    },
+    {
+      "domain": "Urban",
+      "image_id": "4036",
+      "seconds": 0.0049430460203439
+    },
+    {
+      "domain": "Urban",
+      "image_id": "4037",
+      "seconds": 0.004920425999443978
+    },
+    {
+      "domain": "Urban",
+      "image_id": "4038",
+      "seconds": 0.004917004029266536
+    },
+    {
+      "domain": "Urban",
+      "image_id": "4039",
+      "seconds": 0.004931716015562415
+    },
+    {
+      "domain": "Urban",
+      "image_id": "4040",
+      "seconds": 0.004986089013982564
+    },
+    {
+      "domain": "Urban",
+      "image_id": "4041",
+      "seconds": 0.004887954972218722
+    },
+    {
+      "domain": "Urban",
+      "image_id": "4042",
+      "seconds": 0.004925690998788923
+    },
+    {
+      "domain": "Urban",
+      "image_id": "4043",
+      "seconds": 0.004946100991219282
+    },
+    {
+      "domain": "Urban",
+      "image_id": "4044",
+      "seconds": 0.004904829023871571
+    },
+    {
+      "domain": "Urban",
+      "image_id": "4045",
+      "seconds": 0.0050177169614471495
+    },
+    {
+      "domain": "Urban",
+      "image_id": "4046",
+      "seconds": 0.004933927964884788
+    },
+    {
+      "domain": "Urban",
+      "image_id": "4047",
+      "seconds": 0.004873356025200337
+    },
+    {
+      "domain": "Urban",
+      "image_id": "4048",
+      "seconds": 0.004903361026663333
+    },
+    {
+      "domain": "Urban",
+      "image_id": "4049",
+      "seconds": 0.0049216499901376665
+    },
+    {
+      "domain": "Urban",
+      "image_id": "4050",
+      "seconds": 0.004908429982606322
+    },
+    {
+      "domain": "Urban",
+      "image_id": "4051",
+      "seconds": 0.004920166975352913
+    },
+    {
+      "domain": "Urban",
+      "image_id": "4052",
+      "seconds": 0.00491571897873655
+    },
+    {
+      "domain": "Urban",
+      "image_id": "4053",
+      "seconds": 0.0048980750143527985
+    },
+    {
+      "domain": "Urban",
+      "image_id": "4054",
+      "seconds": 0.004887040005996823
+    },
+    {
+      "domain": "Urban",
+      "image_id": "4055",
+      "seconds": 0.005031649023294449
+    },
+    {
+      "domain": "Urban",
+      "image_id": "4056",
+      "seconds": 0.004970831039827317
+    },
+    {
+      "domain": "Urban",
+      "image_id": "4057",
+      "seconds": 0.0049119090544991195
+    },
+    {
+      "domain": "Urban",
+      "image_id": "4058",
+      "seconds": 0.0048971440410241485
+    },
+    {
+      "domain": "Urban",
+      "image_id": "4059",
+      "seconds": 0.0048839880037121475
+    },
+    {
+      "domain": "Urban",
+      "image_id": "4060",
+      "seconds": 0.004976913041900843
+    },
+    {
+      "domain": "Urban",
+      "image_id": "4061",
+      "seconds": 0.0048972140066325665
+    },
+    {
+      "domain": "Urban",
+      "image_id": "4062",
+      "seconds": 0.004884367983322591
+    },
+    {
+      "domain": "Urban",
+      "image_id": "4063",
+      "seconds": 0.004912281990982592
+    },
+    {
+      "domain": "Urban",
+      "image_id": "4064",
+      "seconds": 0.004908706003334373
+    },
+    {
+      "domain": "Urban",
+      "image_id": "4065",
+      "seconds": 0.004932764975819737
+    },
+    {
+      "domain": "Urban",
+      "image_id": "4066",
+      "seconds": 0.004949307010974735
+    },
+    {
+      "domain": "Urban",
+      "image_id": "4067",
+      "seconds": 0.004886148031800985
+    },
+    {
+      "domain": "Urban",
+      "image_id": "4068",
+      "seconds": 0.004887241986580193
+    },
+    {
+      "domain": "Urban",
+      "image_id": "4069",
+      "seconds": 0.004947160021401942
+    },
+    {
+      "domain": "Urban",
+      "image_id": "4070",
+      "seconds": 0.0049275209894403815
+    },
+    {
+      "domain": "Urban",
+      "image_id": "4071",
+      "seconds": 0.004903730994556099
+    },
+    {
+      "domain": "Urban",
+      "image_id": "4072",
+      "seconds": 0.004933475982397795
+    },
+    {
+      "domain": "Urban",
+      "image_id": "4073",
+      "seconds": 0.004941625986248255
+    },
+    {
+      "domain": "Urban",
+      "image_id": "4074",
+      "seconds": 0.004954284988343716
+    },
+    {
+      "domain": "Urban",
+      "image_id": "4075",
+      "seconds": 0.004969585046637803
+    },
+    {
+      "domain": "Urban",
+      "image_id": "4076",
+      "seconds": 0.004917832964565605
+    },
+    {
+      "domain": "Urban",
+      "image_id": "4077",
+      "seconds": 0.00487758097006008
+    },
+    {
+      "domain": "Urban",
+      "image_id": "4078",
+      "seconds": 0.004891811986453831
+    },
+    {
+      "domain": "Urban",
+      "image_id": "4079",
+      "seconds": 0.0049402700387872756
+    },
+    {
+      "domain": "Urban",
+      "image_id": "4080",
+      "seconds": 0.004918354039546102
+    },
+    {
+      "domain": "Urban",
+      "image_id": "4081",
+      "seconds": 0.0049229569849558175
+    },
+    {
+      "domain": "Urban",
+      "image_id": "4082",
+      "seconds": 0.0049375060480087996
+    },
+    {
+      "domain": "Urban",
+      "image_id": "4083",
+      "seconds": 0.004876823979429901
+    },
+    {
+      "domain": "Urban",
+      "image_id": "4084",
+      "seconds": 0.0049112249980680645
+    },
+    {
+      "domain": "Urban",
+      "image_id": "4085",
+      "seconds": 0.004921798012219369
+    },
+    {
+      "domain": "Urban",
+      "image_id": "4086",
+      "seconds": 0.004941292980220169
+    },
+    {
+      "domain": "Urban",
+      "image_id": "4087",
+      "seconds": 0.004941497987601906
+    },
+    {
+      "domain": "Urban",
+      "image_id": "4088",
+      "seconds": 0.004866190953180194
+    },
+    {
+      "domain": "Urban",
+      "image_id": "4089",
+      "seconds": 0.004957591008860618
+    },
+    {
+      "domain": "Urban",
+      "image_id": "4090",
+      "seconds": 0.004874892008956522
+    },
+    {
+      "domain": "Urban",
+      "image_id": "4091",
+      "seconds": 0.004868322983384132
+    },
+    {
+      "domain": "Urban",
+      "image_id": "4092",
+      "seconds": 0.004902779008261859
+    },
+    {
+      "domain": "Urban",
+      "image_id": "4093",
+      "seconds": 0.00493258802453056
+    },
+    {
+      "domain": "Urban",
+      "image_id": "4094",
+      "seconds": 0.004939140984788537
+    },
+    {
+      "domain": "Urban",
+      "image_id": "4095",
+      "seconds": 0.004908045986667275
+    },
+    {
+      "domain": "Urban",
+      "image_id": "4096",
+      "seconds": 0.004945927008520812
+    },
+    {
+      "domain": "Urban",
+      "image_id": "4097",
+      "seconds": 0.004916399018839002
+    },
+    {
+      "domain": "Urban",
+      "image_id": "4098",
+      "seconds": 0.004933874006383121
+    },
+    {
+      "domain": "Urban",
+      "image_id": "4099",
+      "seconds": 0.004939716018270701
+    },
+    {
+      "domain": "Urban",
+      "image_id": "4100",
+      "seconds": 0.004965871979948133
+    },
+    {
+      "domain": "Urban",
+      "image_id": "4101",
+      "seconds": 0.005005665007047355
+    },
+    {
+      "domain": "Urban",
+      "image_id": "4102",
+      "seconds": 0.004938682017382234
+    },
+    {
+      "domain": "Urban",
+      "image_id": "4103",
+      "seconds": 0.004928243986796588
+    },
+    {
+      "domain": "Urban",
+      "image_id": "4104",
+      "seconds": 0.0048751700087450445
+    },
+    {
+      "domain": "Urban",
+      "image_id": "4105",
+      "seconds": 0.004904555971734226
+    },
+    {
+      "domain": "Urban",
+      "image_id": "4106",
+      "seconds": 0.004884704016149044
+    },
+    {
+      "domain": "Urban",
+      "image_id": "4107",
+      "seconds": 0.004890999989584088
+    },
+    {
+      "domain": "Urban",
+      "image_id": "4108",
+      "seconds": 0.004868026007898152
+    },
+    {
+      "domain": "Urban",
+      "image_id": "4109",
+      "seconds": 0.004959576006513089
+    },
+    {
+      "domain": "Urban",
+      "image_id": "4110",
+      "seconds": 0.004884347028564662
+    },
+    {
+      "domain": "Urban",
+      "image_id": "4111",
+      "seconds": 0.004871725977864116
+    },
+    {
+      "domain": "Urban",
+      "image_id": "4112",
+      "seconds": 0.004939917998854071
+    },
+    {
+      "domain": "Urban",
+      "image_id": "4113",
+      "seconds": 0.004929793009068817
+    },
+    {
+      "domain": "Urban",
+      "image_id": "4114",
+      "seconds": 0.004894723009783775
+    },
+    {
+      "domain": "Urban",
+      "image_id": "4115",
+      "seconds": 0.004921359999570996
+    },
+    {
+      "domain": "Urban",
+      "image_id": "4116",
+      "seconds": 0.004919702012557536
+    },
+    {
+      "domain": "Urban",
+      "image_id": "4117",
+      "seconds": 0.004917646991088986
+    },
+    {
+      "domain": "Urban",
+      "image_id": "4118",
+      "seconds": 0.004936499986797571
+    },
+    {
+      "domain": "Urban",
+      "image_id": "4119",
+      "seconds": 0.004917117010336369
+    },
+    {
+      "domain": "Urban",
+      "image_id": "4120",
+      "seconds": 0.004916968988254666
+    },
+    {
+      "domain": "Urban",
+      "image_id": "4121",
+      "seconds": 0.004894475976470858
+    },
+    {
+      "domain": "Urban",
+      "image_id": "4122",
+      "seconds": 0.004886195994913578
+    },
+    {
+      "domain": "Urban",
+      "image_id": "4123",
+      "seconds": 0.004981081001460552
+    },
+    {
+      "domain": "Urban",
+      "image_id": "4124",
+      "seconds": 0.004887280985713005
+    },
+    {
+      "domain": "Urban",
+      "image_id": "4125",
+      "seconds": 0.0049038740107789636
+    },
+    {
+      "domain": "Urban",
+      "image_id": "4126",
+      "seconds": 0.004962951003108174
+    },
+    {
+      "domain": "Urban",
+      "image_id": "4127",
+      "seconds": 0.004894724988844246
+    },
+    {
+      "domain": "Urban",
+      "image_id": "4128",
+      "seconds": 0.004884419962763786
+    },
+    {
+      "domain": "Urban",
+      "image_id": "4129",
+      "seconds": 0.004910313000436872
+    },
+    {
+      "domain": "Urban",
+      "image_id": "4130",
+      "seconds": 0.004936735960654914
+    },
+    {
+      "domain": "Urban",
+      "image_id": "4131",
+      "seconds": 0.004892462980933487
+    },
+    {
+      "domain": "Urban",
+      "image_id": "4132",
+      "seconds": 0.004885650996584445
+    },
+    {
+      "domain": "Urban",
+      "image_id": "4133",
+      "seconds": 0.004905943002086133
+    },
+    {
+      "domain": "Urban",
+      "image_id": "4134",
+      "seconds": 0.004949703987222165
+    },
+    {
+      "domain": "Urban",
+      "image_id": "4135",
+      "seconds": 0.004956430988386273
+    },
+    {
+      "domain": "Urban",
+      "image_id": "4136",
+      "seconds": 0.004916330974083394
+    },
+    {
+      "domain": "Urban",
+      "image_id": "4137",
+      "seconds": 0.004883648012764752
+    },
+    {
+      "domain": "Urban",
+      "image_id": "4138",
+      "seconds": 0.0049301739782094955
+    },
+    {
+      "domain": "Urban",
+      "image_id": "4139",
+      "seconds": 0.004911072028335184
+    },
+    {
+      "domain": "Urban",
+      "image_id": "4140",
+      "seconds": 0.004910564981400967
+    },
+    {
+      "domain": "Urban",
+      "image_id": "4141",
+      "seconds": 0.004911849973723292
+    },
+    {
+      "domain": "Urban",
+      "image_id": "4142",
+      "seconds": 0.004917723999824375
+    },
+    {
+      "domain": "Urban",
+      "image_id": "4143",
+      "seconds": 0.004938660014886409
+    },
+    {
+      "domain": "Urban",
+      "image_id": "4144",
+      "seconds": 0.004873993049841374
+    },
+    {
+      "domain": "Urban",
+      "image_id": "4145",
+      "seconds": 0.0049550170078873634
+    },
+    {
+      "domain": "Urban",
+      "image_id": "4146",
+      "seconds": 0.004922597028780729
+    },
+    {
+      "domain": "Urban",
+      "image_id": "4147",
+      "seconds": 0.004928532987833023
+    },
+    {
+      "domain": "Urban",
+      "image_id": "4148",
+      "seconds": 0.0049091739929281175
+    },
+    {
+      "domain": "Urban",
+      "image_id": "4149",
+      "seconds": 0.004907554015517235
+    },
+    {
+      "domain": "Urban",
+      "image_id": "4150",
+      "seconds": 0.004918190010357648
+    },
+    {
+      "domain": "Urban",
+      "image_id": "4151",
+      "seconds": 0.0049460879527032375
+    },
+    {
+      "domain": "Urban",
+      "image_id": "4152",
+      "seconds": 0.004896597994957119
+    },
+    {
+      "domain": "Urban",
+      "image_id": "4153",
+      "seconds": 0.00489819300128147
+    },
+    {
+      "domain": "Urban",
+      "image_id": "4154",
+      "seconds": 0.004916562000289559
+    },
+    {
+      "domain": "Urban",
+      "image_id": "4155",
+      "seconds": 0.004938249010592699
+    },
+    {
+      "domain": "Urban",
+      "image_id": "4156",
+      "seconds": 0.004895824007689953
+    },
+    {
+      "domain": "Urban",
+      "image_id": "4157",
+      "seconds": 0.004934639960993081
+    },
+    {
+      "domain": "Urban",
+      "image_id": "4158",
+      "seconds": 0.004924548964481801
+    },
+    {
+      "domain": "Urban",
+      "image_id": "4159",
+      "seconds": 0.004965872038155794
+    },
+    {
+      "domain": "Urban",
+      "image_id": "4160",
+      "seconds": 0.004969610017724335
+    },
+    {
+      "domain": "Urban",
+      "image_id": "4161",
+      "seconds": 0.00494710699422285
+    },
+    {
+      "domain": "Urban",
+      "image_id": "4162",
+      "seconds": 0.004883968038484454
+    },
+    {
+      "domain": "Urban",
+      "image_id": "4163",
+      "seconds": 0.005658020032569766
+    },
+    {
+      "domain": "Urban",
+      "image_id": "4164",
+      "seconds": 0.004880836000666022
+    },
+    {
+      "domain": "Urban",
+      "image_id": "4165",
+      "seconds": 0.004886914975941181
+    },
+    {
+      "domain": "Urban",
+      "image_id": "4166",
+      "seconds": 0.004884805006440729
+    },
+    {
+      "domain": "Urban",
+      "image_id": "4167",
+      "seconds": 0.004912053991574794
+    },
+    {
+      "domain": "Urban",
+      "image_id": "4168",
+      "seconds": 0.004887564049568027
+    },
+    {
+      "domain": "Urban",
+      "image_id": "4169",
+      "seconds": 0.00488883099751547
+    },
+    {
+      "domain": "Urban",
+      "image_id": "4170",
+      "seconds": 0.004858530999626964
+    },
+    {
+      "domain": "Urban",
+      "image_id": "4171",
+      "seconds": 0.004888199968263507
+    },
+    {
+      "domain": "Urban",
+      "image_id": "4172",
+      "seconds": 0.0048614179831929505
+    },
+    {
+      "domain": "Urban",
+      "image_id": "4173",
+      "seconds": 0.0048351489822380245
+    },
+    {
+      "domain": "Urban",
+      "image_id": "4174",
+      "seconds": 0.00488394103012979
+    },
+    {
+      "domain": "Urban",
+      "image_id": "4175",
+      "seconds": 0.00485034694429487
+    },
+    {
+      "domain": "Urban",
+      "image_id": "4176",
+      "seconds": 0.004850470053497702
+    },
+    {
+      "domain": "Urban",
+      "image_id": "4177",
+      "seconds": 0.004854784987401217
+    },
+    {
+      "domain": "Urban",
+      "image_id": "4178",
+      "seconds": 0.004927417961880565
+    },
+    {
+      "domain": "Urban",
+      "image_id": "4179",
+      "seconds": 0.0049065189668908715
+    },
+    {
+      "domain": "Urban",
+      "image_id": "4180",
+      "seconds": 0.004842952999752015
+    },
+    {
+      "domain": "Urban",
+      "image_id": "4181",
+      "seconds": 0.0048343699891120195
+    },
+    {
+      "domain": "Urban",
+      "image_id": "4182",
+      "seconds": 0.004814796964637935
+    },
+    {
+      "domain": "Urban",
+      "image_id": "4183",
+      "seconds": 0.004835254978388548
+    },
+    {
+      "domain": "Urban",
+      "image_id": "4184",
+      "seconds": 0.004833596991375089
+    },
+    {
+      "domain": "Urban",
+      "image_id": "4185",
+      "seconds": 0.133600433007814
+    },
+    {
+      "domain": "Urban",
+      "image_id": "4186",
+      "seconds": 0.004849511024076492
+    },
+    {
+      "domain": "Urban",
+      "image_id": "4187",
+      "seconds": 0.004855695005971938
+    },
+    {
+      "domain": "Urban",
+      "image_id": "4188",
+      "seconds": 0.0048664670321159065
+    },
+    {
+      "domain": "Urban",
+      "image_id": "4189",
+      "seconds": 0.00482115603517741
+    },
+    {
+      "domain": "Urban",
+      "image_id": "4190",
+      "seconds": 0.004880610038526356
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2522",
+      "seconds": 0.004870908975135535
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2523",
+      "seconds": 0.004870928009040654
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2524",
+      "seconds": 0.004837656975723803
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2525",
+      "seconds": 0.004848244017921388
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2526",
+      "seconds": 0.004820598987862468
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2527",
+      "seconds": 0.004829191952012479
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2528",
+      "seconds": 0.004858767963014543
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2529",
+      "seconds": 0.004849138960707933
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2530",
+      "seconds": 0.004844057955779135
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2531",
+      "seconds": 0.004855862003751099
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2532",
+      "seconds": 0.004824022995308042
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2533",
+      "seconds": 0.00480352999875322
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2534",
+      "seconds": 0.004861253954004496
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2535",
+      "seconds": 0.004848621028941125
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2536",
+      "seconds": 0.004828587989322841
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2537",
+      "seconds": 0.004822124959900975
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2538",
+      "seconds": 0.00484001002041623
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2539",
+      "seconds": 0.0048507380415685475
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2540",
+      "seconds": 0.0048376189661212265
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2541",
+      "seconds": 0.00481915200361982
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2542",
+      "seconds": 0.005003099970053881
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2543",
+      "seconds": 0.004827610973734409
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2544",
+      "seconds": 0.0048353360034525394
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2545",
+      "seconds": 0.004838300053961575
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2546",
+      "seconds": 0.004828663018997759
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2547",
+      "seconds": 0.004852017969824374
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2548",
+      "seconds": 0.004846166993957013
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2549",
+      "seconds": 0.004846888012252748
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2550",
+      "seconds": 0.004960469028446823
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2551",
+      "seconds": 0.004843844973947853
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2552",
+      "seconds": 0.0048438970115967095
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2553",
+      "seconds": 0.004866985022090375
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2554",
+      "seconds": 0.004847383999731392
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2555",
+      "seconds": 0.004852987010963261
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2556",
+      "seconds": 0.004821713955607265
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2557",
+      "seconds": 0.0048076530219987035
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2558",
+      "seconds": 0.004862260015215725
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2559",
+      "seconds": 0.004838761000428349
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2560",
+      "seconds": 0.0048349320422858
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2561",
+      "seconds": 0.004849386983551085
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2562",
+      "seconds": 0.004867599986027926
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2563",
+      "seconds": 0.004823563969694078
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2564",
+      "seconds": 0.004851923033129424
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2565",
+      "seconds": 0.004847109958063811
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2566",
+      "seconds": 0.004890791955403984
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2567",
+      "seconds": 0.00486215902492404
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2568",
+      "seconds": 0.0048280119663104415
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2569",
+      "seconds": 0.004843764996621758
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2570",
+      "seconds": 0.004844224022235721
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2571",
+      "seconds": 0.004837574961129576
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2572",
+      "seconds": 0.004863753041718155
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2573",
+      "seconds": 0.004845286952331662
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2574",
+      "seconds": 0.004846383992116898
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2575",
+      "seconds": 0.004913377983029932
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2576",
+      "seconds": 0.004864394024480134
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2577",
+      "seconds": 0.004870186967309564
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2578",
+      "seconds": 0.004825187032110989
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2579",
+      "seconds": 0.004826061020139605
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2580",
+      "seconds": 0.004853332997299731
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2581",
+      "seconds": 0.004860957968048751
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2582",
+      "seconds": 0.0048605179763399065
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2583",
+      "seconds": 0.004858100961428136
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2584",
+      "seconds": 0.004812771046999842
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2585",
+      "seconds": 0.004832834005355835
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2586",
+      "seconds": 0.004824644012842327
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2587",
+      "seconds": 0.004823129973374307
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2588",
+      "seconds": 0.004859897017013282
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2589",
+      "seconds": 0.004860626999288797
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2590",
+      "seconds": 0.0048652319819666445
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2591",
+      "seconds": 0.004835515981540084
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2592",
+      "seconds": 0.0048571270308457315
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2593",
+      "seconds": 0.004917027021292597
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2594",
+      "seconds": 0.004858437983784825
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2595",
+      "seconds": 0.004900063038803637
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2596",
+      "seconds": 0.0048392610042355955
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2597",
+      "seconds": 0.004937834048178047
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2598",
+      "seconds": 0.0048783920356072485
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2599",
+      "seconds": 0.004869772004894912
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2600",
+      "seconds": 0.004844328970648348
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2601",
+      "seconds": 0.004897201026324183
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2602",
+      "seconds": 0.004910455958452076
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2603",
+      "seconds": 0.004871761018875986
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2604",
+      "seconds": 0.004816828004550189
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2605",
+      "seconds": 0.0048539440031163394
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2606",
+      "seconds": 0.004871021024882793
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2607",
+      "seconds": 0.004834113002289087
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2608",
+      "seconds": 0.004903897002805024
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2609",
+      "seconds": 0.004925751010887325
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2610",
+      "seconds": 0.004880488966591656
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2611",
+      "seconds": 0.004823560011573136
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2612",
+      "seconds": 0.0048310799757018685
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2613",
+      "seconds": 0.004895862017292529
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2614",
+      "seconds": 0.004858774016611278
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2615",
+      "seconds": 0.004833202983718365
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2616",
+      "seconds": 0.0049114960129372776
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2617",
+      "seconds": 0.004840018984396011
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2618",
+      "seconds": 0.004853097023442388
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2619",
+      "seconds": 0.004819674009922892
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2620",
+      "seconds": 0.004837571003008634
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2621",
+      "seconds": 0.004862132947891951
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2622",
+      "seconds": 0.00482753396499902
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2623",
+      "seconds": 0.004811708990018815
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2624",
+      "seconds": 0.004868988995440304
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2625",
+      "seconds": 0.0048838810180313885
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2626",
+      "seconds": 0.004879285988863558
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2627",
+      "seconds": 0.0048945710295811296
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2628",
+      "seconds": 0.004822748014703393
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2629",
+      "seconds": 0.004870401986408979
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2630",
+      "seconds": 0.004842444963287562
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2631",
+      "seconds": 0.004876387014519423
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2632",
+      "seconds": 0.004886263981461525
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2633",
+      "seconds": 0.004861170018557459
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2634",
+      "seconds": 0.00486223102780059
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2635",
+      "seconds": 0.004854350991081446
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2636",
+      "seconds": 0.004888289957307279
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2637",
+      "seconds": 0.004891837015748024
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2638",
+      "seconds": 0.004842774011194706
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2639",
+      "seconds": 0.0048518970143049955
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2640",
+      "seconds": 0.004879994958173484
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2641",
+      "seconds": 0.0048311970313079655
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2642",
+      "seconds": 0.004853317979723215
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2643",
+      "seconds": 0.0049655960174277425
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2644",
+      "seconds": 0.004875547951087356
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2645",
+      "seconds": 0.004879988031461835
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2646",
+      "seconds": 0.00489509804174304
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2647",
+      "seconds": 0.004864868998993188
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2648",
+      "seconds": 0.004863662994466722
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2649",
+      "seconds": 0.004887312010396272
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2650",
+      "seconds": 0.004836153995711356
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2651",
+      "seconds": 0.004860526998527348
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2652",
+      "seconds": 0.004894938960205764
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2653",
+      "seconds": 0.0049178749904967844
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2654",
+      "seconds": 0.0048795470502227545
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2655",
+      "seconds": 0.004877143015619367
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2656",
+      "seconds": 0.004861088003963232
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2657",
+      "seconds": 0.004874893988016993
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2658",
+      "seconds": 0.004864096001256257
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2659",
+      "seconds": 0.00490971899125725
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2660",
+      "seconds": 0.0048606289783492684
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2661",
+      "seconds": 0.004854244994930923
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2662",
+      "seconds": 0.004857130988966674
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2663",
+      "seconds": 0.004821604990866035
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2664",
+      "seconds": 0.004841894959099591
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2665",
+      "seconds": 0.004884599999058992
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2666",
+      "seconds": 0.0048359030042774975
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2667",
+      "seconds": 0.004880259977653623
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2668",
+      "seconds": 0.004812641011085361
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2669",
+      "seconds": 0.004840740002691746
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2670",
+      "seconds": 0.0048472199705429375
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2671",
+      "seconds": 0.004900489002466202
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2672",
+      "seconds": 0.004878149018622935
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2673",
+      "seconds": 0.0048211420071311295
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2674",
+      "seconds": 0.004874264996033162
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2675",
+      "seconds": 0.004836275998968631
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2676",
+      "seconds": 0.0048515970120206475
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2677",
+      "seconds": 0.004863801004830748
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2678",
+      "seconds": 0.0048141590086743236
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2679",
+      "seconds": 0.004877271014265716
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2680",
+      "seconds": 0.00486128602642566
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2681",
+      "seconds": 0.004855237959418446
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2682",
+      "seconds": 0.004886384995188564
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2683",
+      "seconds": 0.004874214995652437
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2684",
+      "seconds": 0.0048360860091634095
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2685",
+      "seconds": 0.004847613978199661
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2686",
+      "seconds": 0.004862225032411516
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2687",
+      "seconds": 0.004944086016621441
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2688",
+      "seconds": 0.004837371991015971
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2689",
+      "seconds": 0.004876016988418996
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2690",
+      "seconds": 0.004899120016489178
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2691",
+      "seconds": 0.004840332025196403
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2692",
+      "seconds": 0.004846286028623581
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2693",
+      "seconds": 0.004841446003410965
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2694",
+      "seconds": 0.004880611028056592
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2695",
+      "seconds": 0.004855629988014698
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2696",
+      "seconds": 0.004837845975998789
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2697",
+      "seconds": 0.004856590996496379
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2698",
+      "seconds": 0.004874668025877327
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2699",
+      "seconds": 0.004881826986093074
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2700",
+      "seconds": 0.004837499000132084
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2701",
+      "seconds": 0.004859531996771693
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2702",
+      "seconds": 0.004889153991825879
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2703",
+      "seconds": 0.0048590609803795815
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2704",
+      "seconds": 0.004868106043431908
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2705",
+      "seconds": 0.004868793999776244
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2706",
+      "seconds": 0.004868826013989747
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2707",
+      "seconds": 0.004845969961024821
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2708",
+      "seconds": 0.0049234440084546804
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2709",
+      "seconds": 0.004872093966696411
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2710",
+      "seconds": 0.004863910027779639
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2711",
+      "seconds": 0.004812129016499966
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2712",
+      "seconds": 0.004826784017495811
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2713",
+      "seconds": 0.004901760956272483
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2714",
+      "seconds": 0.0048771099536679685
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2715",
+      "seconds": 0.0048410960007458925
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2716",
+      "seconds": 0.004857548978179693
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2717",
+      "seconds": 0.004832413978874683
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2718",
+      "seconds": 0.004886255948804319
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2719",
+      "seconds": 0.004822730028536171
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2720",
+      "seconds": 0.0048270439729094505
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2721",
+      "seconds": 0.004841925052460283
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2722",
+      "seconds": 0.00486599700525403
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2723",
+      "seconds": 0.0048948259791359305
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2724",
+      "seconds": 0.004911103984341025
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2725",
+      "seconds": 0.004835808998905122
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2726",
+      "seconds": 0.0048270069528371096
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2727",
+      "seconds": 0.004865369002800435
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2728",
+      "seconds": 0.004911847005132586
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2729",
+      "seconds": 0.004821749986149371
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2730",
+      "seconds": 0.004813503997866064
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2731",
+      "seconds": 0.004816109023522586
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2732",
+      "seconds": 0.004885072004981339
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2733",
+      "seconds": 0.004874092992395163
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2734",
+      "seconds": 0.004852945974562317
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2735",
+      "seconds": 0.004873655969277024
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2736",
+      "seconds": 0.0048473800416104496
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2737",
+      "seconds": 0.004816700995434076
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2738",
+      "seconds": 0.0048535679816268384
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2739",
+      "seconds": 0.004897470993455499
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2740",
+      "seconds": 0.004886595997959375
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2741",
+      "seconds": 0.004860882007051259
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2742",
+      "seconds": 0.004890472977422178
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2743",
+      "seconds": 0.004883705987595022
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2744",
+      "seconds": 0.004932281037326902
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2745",
+      "seconds": 0.004939767997711897
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2746",
+      "seconds": 0.004872427030932158
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2747",
+      "seconds": 0.004886612994596362
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2748",
+      "seconds": 0.004905431007500738
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2749",
+      "seconds": 0.00491323898313567
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2750",
+      "seconds": 0.004906482994556427
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2751",
+      "seconds": 0.004869581025559455
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2752",
+      "seconds": 0.004922442953102291
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2753",
+      "seconds": 0.004907516995444894
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2754",
+      "seconds": 0.004917435988318175
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2755",
+      "seconds": 0.0048691980191506445
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2756",
+      "seconds": 0.004869814962148666
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2757",
+      "seconds": 0.004923605010844767
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2758",
+      "seconds": 0.004877356986980885
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2759",
+      "seconds": 0.0048950089840218425
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2760",
+      "seconds": 0.004872051009442657
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2761",
+      "seconds": 0.004885923000983894
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2762",
+      "seconds": 0.004916110017802566
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2763",
+      "seconds": 0.004866850038524717
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2764",
+      "seconds": 0.004863165959250182
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2765",
+      "seconds": 0.004877626954112202
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2766",
+      "seconds": 0.004864852002356201
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2767",
+      "seconds": 0.004916160018183291
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2768",
+      "seconds": 0.004920538980513811
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2769",
+      "seconds": 0.004907081020064652
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2770",
+      "seconds": 0.004909901996143162
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2771",
+      "seconds": 0.004872793040703982
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2772",
+      "seconds": 0.0049049510271288455
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2773",
+      "seconds": 0.004873263998888433
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2774",
+      "seconds": 0.0048821590025909245
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2775",
+      "seconds": 0.004891612974461168
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2776",
+      "seconds": 0.004887211020104587
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2777",
+      "seconds": 0.004896186001133174
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2778",
+      "seconds": 0.004863612994085997
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2779",
+      "seconds": 0.0048840270028449595
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2780",
+      "seconds": 0.0048924729926511645
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2781",
+      "seconds": 0.004917678015772253
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2782",
+      "seconds": 0.004909823008347303
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2783",
+      "seconds": 0.0048681399784982204
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2784",
+      "seconds": 0.004898618964944035
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2785",
+      "seconds": 0.004951158014591783
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2786",
+      "seconds": 0.004964313004165888
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2787",
+      "seconds": 0.004894167010206729
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2788",
+      "seconds": 0.004939728998579085
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2789",
+      "seconds": 0.004917530983220786
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2790",
+      "seconds": 0.004919092985801399
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2791",
+      "seconds": 0.004925421962980181
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2792",
+      "seconds": 0.004915324039757252
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2793",
+      "seconds": 0.004882849054411054
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2794",
+      "seconds": 0.004892538010608405
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2795",
+      "seconds": 0.004909313982352614
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2796",
+      "seconds": 0.004933916963636875
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2797",
+      "seconds": 0.004889831994660199
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2798",
+      "seconds": 0.004920567967928946
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2799",
+      "seconds": 0.0049358910182490945
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2800",
+      "seconds": 0.0050150309689342976
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2801",
+      "seconds": 0.004902021028101444
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2802",
+      "seconds": 0.0049222459783777595
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2803",
+      "seconds": 0.00490698596695438
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2804",
+      "seconds": 0.004992074973415583
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2805",
+      "seconds": 0.004899288003798574
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2806",
+      "seconds": 0.004838822991587222
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2807",
+      "seconds": 0.004849050019402057
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2808",
+      "seconds": 0.0048453499912284315
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2809",
+      "seconds": 0.004840620968025178
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2810",
+      "seconds": 0.004812046012375504
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2811",
+      "seconds": 0.00480857101501897
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2812",
+      "seconds": 0.004836210049688816
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2813",
+      "seconds": 0.004849674005527049
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2814",
+      "seconds": 0.004855310020502657
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2815",
+      "seconds": 0.004855002975091338
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2816",
+      "seconds": 0.004847603035159409
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2817",
+      "seconds": 0.004831355006899685
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2818",
+      "seconds": 0.004862046975176781
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2819",
+      "seconds": 0.004869822005275637
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2820",
+      "seconds": 0.00480329804122448
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2821",
+      "seconds": 0.0048806670238263905
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2822",
+      "seconds": 0.0048850299790501595
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2823",
+      "seconds": 0.0048557770205661654
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2824",
+      "seconds": 0.004911948984954506
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2825",
+      "seconds": 0.0048490120097994804
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2826",
+      "seconds": 0.00483674299903214
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2827",
+      "seconds": 0.004825352982152253
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2828",
+      "seconds": 0.00484501599567011
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2829",
+      "seconds": 0.004872946999967098
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2830",
+      "seconds": 0.0049323419807478786
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2831",
+      "seconds": 0.005015962990000844
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2832",
+      "seconds": 0.004885231959633529
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2833",
+      "seconds": 0.0048845240380615
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2834",
+      "seconds": 0.004829871992114931
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2835",
+      "seconds": 0.004858757019974291
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2836",
+      "seconds": 0.004856307990849018
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2837",
+      "seconds": 0.004833939019590616
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2838",
+      "seconds": 0.004821218957658857
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2839",
+      "seconds": 0.004857541003730148
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2840",
+      "seconds": 0.004813383973669261
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2841",
+      "seconds": 0.004873052006587386
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2842",
+      "seconds": 0.004828901961445808
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2843",
+      "seconds": 0.004891697957646102
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2844",
+      "seconds": 0.004835247003939003
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2845",
+      "seconds": 0.004829373967368156
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2846",
+      "seconds": 0.0048662410117685795
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2847",
+      "seconds": 0.004806099983397871
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2848",
+      "seconds": 0.004826686054002494
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2849",
+      "seconds": 0.004857931984588504
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2850",
+      "seconds": 0.004909867013338953
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2851",
+      "seconds": 0.004811997001525015
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2852",
+      "seconds": 0.00486765505047515
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2853",
+      "seconds": 0.004851694975513965
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2854",
+      "seconds": 0.004831581027247012
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2855",
+      "seconds": 0.0048574190004728734
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2856",
+      "seconds": 0.00483684497885406
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2857",
+      "seconds": 0.00485908699920401
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2858",
+      "seconds": 0.004878083011135459
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2859",
+      "seconds": 0.00482266501057893
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2860",
+      "seconds": 0.004928825015667826
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2861",
+      "seconds": 0.004840845009312034
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2862",
+      "seconds": 0.004841335001401603
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2863",
+      "seconds": 0.004838266002479941
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2864",
+      "seconds": 0.004873926984146237
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2865",
+      "seconds": 0.004835092986468226
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2866",
+      "seconds": 0.004865584021899849
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2867",
+      "seconds": 0.0048450970207341015
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2868",
+      "seconds": 0.004844037990551442
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2869",
+      "seconds": 0.0048216229770332575
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2870",
+      "seconds": 0.004884941037744284
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2871",
+      "seconds": 0.004887304967269301
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2872",
+      "seconds": 0.004844473965931684
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2873",
+      "seconds": 0.004895897989626974
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2874",
+      "seconds": 0.004837046028114855
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2875",
+      "seconds": 0.004833809973206371
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2876",
+      "seconds": 0.004862175963353366
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2877",
+      "seconds": 0.004907346039544791
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2878",
+      "seconds": 0.004899554012808949
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2879",
+      "seconds": 0.004817144013941288
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2880",
+      "seconds": 0.0048188199871219695
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2881",
+      "seconds": 0.004859837994445115
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2882",
+      "seconds": 0.004864602989982814
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2883",
+      "seconds": 0.004863883019424975
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2884",
+      "seconds": 0.004823463037610054
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2885",
+      "seconds": 0.004908823990263045
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2886",
+      "seconds": 0.004853182006627321
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2887",
+      "seconds": 0.004810138954780996
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2888",
+      "seconds": 0.004879932967014611
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2889",
+      "seconds": 0.004901753971353173
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2890",
+      "seconds": 0.004850221972446889
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2891",
+      "seconds": 0.004854459955822676
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2892",
+      "seconds": 0.0048307430115528405
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2893",
+      "seconds": 0.004840874986257404
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2894",
+      "seconds": 0.00489649100927636
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2895",
+      "seconds": 0.004851900972425938
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2896",
+      "seconds": 0.0049009869690053165
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2897",
+      "seconds": 0.004858721978962421
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2898",
+      "seconds": 0.004885567002929747
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2899",
+      "seconds": 0.004839916015043855
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2900",
+      "seconds": 0.004857324995100498
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2901",
+      "seconds": 0.00486272998386994
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2902",
+      "seconds": 0.0048795490292832255
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2903",
+      "seconds": 0.004830180027056485
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2904",
+      "seconds": 0.004828489036299288
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2905",
+      "seconds": 0.004835048981476575
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2906",
+      "seconds": 0.0048741539940238
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2907",
+      "seconds": 0.004855118982959539
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2908",
+      "seconds": 0.0048471830086782575
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2909",
+      "seconds": 0.004921033978462219
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2910",
+      "seconds": 0.004848526034038514
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2911",
+      "seconds": 0.004852852027397603
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2912",
+      "seconds": 0.00487879995489493
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2913",
+      "seconds": 0.004824516014195979
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2914",
+      "seconds": 0.00483899301616475
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2915",
+      "seconds": 0.00486152502708137
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2916",
+      "seconds": 0.004890358017291874
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2917",
+      "seconds": 0.004837073967792094
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2918",
+      "seconds": 0.004912675998639315
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2919",
+      "seconds": 0.004887353046797216
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2920",
+      "seconds": 0.004913559008855373
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2921",
+      "seconds": 0.00486750400159508
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2922",
+      "seconds": 0.004843580012675375
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2923",
+      "seconds": 0.004859175009187311
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2924",
+      "seconds": 0.004849164979532361
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2925",
+      "seconds": 0.004930758965201676
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2926",
+      "seconds": 0.0048806649865582585
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2927",
+      "seconds": 0.005287075007800013
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2928",
+      "seconds": 0.005251416994724423
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2929",
+      "seconds": 0.005226702021900564
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2930",
+      "seconds": 0.00524977600434795
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2931",
+      "seconds": 0.004942538042087108
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2932",
+      "seconds": 0.004857443040236831
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2933",
+      "seconds": 0.00495576998218894
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2934",
+      "seconds": 0.004885278001893312
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2935",
+      "seconds": 0.004948435991536826
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2936",
+      "seconds": 0.004922610009089112
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2937",
+      "seconds": 0.004897239967249334
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2938",
+      "seconds": 0.004905726003926247
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2939",
+      "seconds": 0.004876193008385599
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2940",
+      "seconds": 0.004891721997410059
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2941",
+      "seconds": 0.00490477099083364
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2942",
+      "seconds": 0.0049180290079675615
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2943",
+      "seconds": 0.0049556869780644774
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2944",
+      "seconds": 0.00498132302891463
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2945",
+      "seconds": 0.004881555039901286
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2946",
+      "seconds": 0.004947195993736386
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2947",
+      "seconds": 0.004926894034724683
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2948",
+      "seconds": 0.004935269011184573
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2949",
+      "seconds": 0.005000589007977396
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2950",
+      "seconds": 0.0048981530126184225
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2951",
+      "seconds": 0.004870528005994856
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2952",
+      "seconds": 0.004883316985797137
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2953",
+      "seconds": 0.0048988949856720865
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2954",
+      "seconds": 0.00486612698296085
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2955",
+      "seconds": 0.0048805479891598225
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2956",
+      "seconds": 0.00487150700064376
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2957",
+      "seconds": 0.004862172994762659
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2958",
+      "seconds": 0.00487992400303483
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2959",
+      "seconds": 0.004948251997120678
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2960",
+      "seconds": 0.004911965981591493
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2961",
+      "seconds": 0.0048850339953787625
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2962",
+      "seconds": 0.004853321996051818
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2963",
+      "seconds": 0.004875514016021043
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2964",
+      "seconds": 0.004833896004129201
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2965",
+      "seconds": 0.004913201031740755
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2966",
+      "seconds": 0.0049125750083476305
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2967",
+      "seconds": 0.004909787967335433
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2968",
+      "seconds": 0.004905387002509087
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2969",
+      "seconds": 0.004950899048708379
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2970",
+      "seconds": 0.004861216992139816
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2971",
+      "seconds": 0.00493205402744934
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2972",
+      "seconds": 0.004868522984907031
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2973",
+      "seconds": 0.004874570993706584
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2974",
+      "seconds": 0.0048623099573887885
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2975",
+      "seconds": 0.005096066975966096
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2976",
+      "seconds": 0.0048730490379966795
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2977",
+      "seconds": 0.004865618015173823
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2978",
+      "seconds": 0.004858146014157683
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2979",
+      "seconds": 0.004849418008234352
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2980",
+      "seconds": 0.004850193974561989
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2981",
+      "seconds": 0.0049245760310441256
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2982",
+      "seconds": 0.004908020026050508
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2983",
+      "seconds": 0.004928101028781384
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2984",
+      "seconds": 0.004891082004178315
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2985",
+      "seconds": 0.004911906959023327
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2986",
+      "seconds": 0.0048965850146487355
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2987",
+      "seconds": 0.004866217961534858
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2988",
+      "seconds": 0.004909584007691592
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2989",
+      "seconds": 0.00484663899987936
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2990",
+      "seconds": 0.004888822964858264
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2991",
+      "seconds": 0.004859032982494682
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2992",
+      "seconds": 0.004870699951425195
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2993",
+      "seconds": 0.004948604037053883
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2994",
+      "seconds": 0.0049027829663828015
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2995",
+      "seconds": 0.004901413049083203
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2996",
+      "seconds": 0.004916394012980163
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2997",
+      "seconds": 0.004925858986098319
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2998",
+      "seconds": 0.004906291957013309
+    },
+    {
+      "domain": "Rural",
+      "image_id": "2999",
+      "seconds": 0.004918076971080154
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3000",
+      "seconds": 0.004939456004649401
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3001",
+      "seconds": 0.004926691006403416
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3002",
+      "seconds": 0.00486692797858268
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3003",
+      "seconds": 0.004937138000968844
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3004",
+      "seconds": 0.004912195960059762
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3005",
+      "seconds": 0.004884751979261637
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3006",
+      "seconds": 0.0049186290125362575
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3007",
+      "seconds": 0.004848655022215098
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3008",
+      "seconds": 0.004908823000732809
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3009",
+      "seconds": 0.004914609016850591
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3010",
+      "seconds": 0.0049074089620262384
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3011",
+      "seconds": 0.005098702968098223
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3012",
+      "seconds": 0.004883058019913733
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3013",
+      "seconds": 0.004868577991146594
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3014",
+      "seconds": 0.004883002024143934
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3015",
+      "seconds": 0.004854855011217296
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3016",
+      "seconds": 0.0048178170109167695
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3017",
+      "seconds": 0.0048524190206080675
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3018",
+      "seconds": 0.0048632120015099645
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3019",
+      "seconds": 0.004819990019313991
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3020",
+      "seconds": 0.004815393011085689
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3021",
+      "seconds": 0.0048496980452910066
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3022",
+      "seconds": 0.0048759899800643325
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3023",
+      "seconds": 0.004838196968194097
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3024",
+      "seconds": 0.004891231015790254
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3025",
+      "seconds": 0.00487687299028039
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3026",
+      "seconds": 0.0048839549999684095
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3027",
+      "seconds": 0.004912824020721018
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3028",
+      "seconds": 0.0049673140165396035
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3029",
+      "seconds": 0.004930148948915303
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3030",
+      "seconds": 0.0049300609971396625
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3031",
+      "seconds": 0.004919254977721721
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3032",
+      "seconds": 0.004957347002346069
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3033",
+      "seconds": 0.004878066014498472
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3034",
+      "seconds": 0.00492817402118817
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3035",
+      "seconds": 0.004899049992673099
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3036",
+      "seconds": 0.004884378984570503
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3037",
+      "seconds": 0.004885434987954795
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3038",
+      "seconds": 0.0048954159719869494
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3039",
+      "seconds": 0.004872880992479622
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3040",
+      "seconds": 0.004925107001326978
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3041",
+      "seconds": 0.004902165033854544
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3042",
+      "seconds": 0.004929669026751071
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3043",
+      "seconds": 0.0049177680048160255
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3044",
+      "seconds": 0.004908159025944769
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3045",
+      "seconds": 0.0048985229805111885
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3046",
+      "seconds": 0.00491113995667547
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3047",
+      "seconds": 0.004859376000240445
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3048",
+      "seconds": 0.004972052993252873
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3049",
+      "seconds": 0.004890516982413828
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3050",
+      "seconds": 0.004895505961030722
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3051",
+      "seconds": 0.004850043042097241
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3052",
+      "seconds": 0.004863510956056416
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3053",
+      "seconds": 0.004937701974995434
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3054",
+      "seconds": 0.004853568971157074
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3055",
+      "seconds": 0.004867869953159243
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3056",
+      "seconds": 0.004890506039373577
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3057",
+      "seconds": 0.004869824042543769
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3058",
+      "seconds": 0.004892800003290176
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3059",
+      "seconds": 0.0048886260483413935
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3060",
+      "seconds": 0.00486694200662896
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3061",
+      "seconds": 0.00490940798772499
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3062",
+      "seconds": 0.004934971977490932
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3063",
+      "seconds": 0.004881002998445183
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3064",
+      "seconds": 0.004966126987710595
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3065",
+      "seconds": 0.004873852012678981
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3066",
+      "seconds": 0.004918575985357165
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3067",
+      "seconds": 0.004920865991152823
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3068",
+      "seconds": 0.004936582990922034
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3069",
+      "seconds": 0.004861881025135517
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3070",
+      "seconds": 0.004888263007160276
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3071",
+      "seconds": 0.00490245595574379
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3072",
+      "seconds": 0.004930032009724528
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3073",
+      "seconds": 0.004905635956674814
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3074",
+      "seconds": 0.004885708971414715
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3075",
+      "seconds": 0.004890131007414311
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3076",
+      "seconds": 0.00491240801056847
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3077",
+      "seconds": 0.004890537995379418
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3078",
+      "seconds": 0.004946389002725482
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3079",
+      "seconds": 0.0048836530186235905
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3080",
+      "seconds": 0.004880326974671334
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3081",
+      "seconds": 0.005002031975891441
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3082",
+      "seconds": 0.0049365690210834146
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3083",
+      "seconds": 0.004947389999870211
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3084",
+      "seconds": 0.004883020999841392
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3085",
+      "seconds": 0.004902373009826988
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3086",
+      "seconds": 0.004912609001621604
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3087",
+      "seconds": 0.0049397730035707355
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3088",
+      "seconds": 0.004952884977683425
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3089",
+      "seconds": 0.0048842080286704
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3090",
+      "seconds": 0.004926712019369006
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3091",
+      "seconds": 0.004906094982288778
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3092",
+      "seconds": 0.004909873998258263
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3093",
+      "seconds": 0.004958132980391383
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3094",
+      "seconds": 0.004893215023912489
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3095",
+      "seconds": 0.004921939980704337
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3096",
+      "seconds": 0.004902360960841179
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3097",
+      "seconds": 0.004935914010275155
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3098",
+      "seconds": 0.004885900008957833
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3099",
+      "seconds": 0.004899858962744474
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3100",
+      "seconds": 0.004904525994788855
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3101",
+      "seconds": 0.004915744008030742
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3102",
+      "seconds": 0.0049021500162780285
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3103",
+      "seconds": 0.00490728800650686
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3104",
+      "seconds": 0.004931919975206256
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3105",
+      "seconds": 0.004904883971903473
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3106",
+      "seconds": 0.004915647965390235
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3107",
+      "seconds": 0.004881653992924839
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3108",
+      "seconds": 0.004921542014926672
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3109",
+      "seconds": 0.004893941979389638
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3110",
+      "seconds": 0.004881559987552464
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3111",
+      "seconds": 0.005068071011919528
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3112",
+      "seconds": 0.004911211028229445
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3113",
+      "seconds": 0.004911930009257048
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3114",
+      "seconds": 0.0049080580356530845
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3115",
+      "seconds": 0.004939038015436381
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3116",
+      "seconds": 0.004923795990180224
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3117",
+      "seconds": 0.004912145028356463
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3118",
+      "seconds": 0.004893174977041781
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3119",
+      "seconds": 0.004912260046694428
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3120",
+      "seconds": 0.004968148015905172
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3121",
+      "seconds": 0.004897859005723149
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3122",
+      "seconds": 0.0049277120269834995
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3123",
+      "seconds": 0.004959175945259631
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3124",
+      "seconds": 0.00504539703251794
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3125",
+      "seconds": 0.004898359999060631
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3126",
+      "seconds": 0.0049562560161575675
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3127",
+      "seconds": 0.0048948890180327
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3128",
+      "seconds": 0.004877794999629259
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3129",
+      "seconds": 0.004938928002957255
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3130",
+      "seconds": 0.00492675497662276
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3131",
+      "seconds": 0.004869619966484606
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3132",
+      "seconds": 0.004913182987365872
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3133",
+      "seconds": 0.004966563021298498
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3134",
+      "seconds": 0.004926146008074284
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3135",
+      "seconds": 0.00512646499555558
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3136",
+      "seconds": 0.004931613046210259
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3137",
+      "seconds": 0.0049375349772162735
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3138",
+      "seconds": 0.00489059800747782
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3139",
+      "seconds": 0.004875676997471601
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3140",
+      "seconds": 0.004902790009509772
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3141",
+      "seconds": 0.004886327951680869
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3142",
+      "seconds": 0.004852616984862834
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3143",
+      "seconds": 0.004882147011812776
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3144",
+      "seconds": 0.0048933629877865314
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3145",
+      "seconds": 0.00485934701282531
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3146",
+      "seconds": 0.004862865025643259
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3147",
+      "seconds": 0.0048672889824956656
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3148",
+      "seconds": 0.004911332973279059
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3149",
+      "seconds": 0.004926557012367994
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3150",
+      "seconds": 0.004884494992438704
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3151",
+      "seconds": 0.004904736008029431
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3152",
+      "seconds": 0.00495158601552248
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3153",
+      "seconds": 0.004950130998622626
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3154",
+      "seconds": 0.004915566009003669
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3155",
+      "seconds": 0.004930142953526229
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3156",
+      "seconds": 0.00488258502446115
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3157",
+      "seconds": 0.004960388003382832
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3158",
+      "seconds": 0.004918768012430519
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3159",
+      "seconds": 0.004903554974589497
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3160",
+      "seconds": 0.004938038997352123
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3161",
+      "seconds": 0.004898551036603749
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3162",
+      "seconds": 0.00488810904789716
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3163",
+      "seconds": 0.004937324032653123
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3164",
+      "seconds": 0.004939045000355691
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3165",
+      "seconds": 0.0049394460511393845
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3166",
+      "seconds": 0.004923975968267769
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3167",
+      "seconds": 0.004910933959763497
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3168",
+      "seconds": 0.004918327962514013
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3169",
+      "seconds": 0.0048869450110942125
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3170",
+      "seconds": 0.0049133599968627095
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3171",
+      "seconds": 0.004948079993482679
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3172",
+      "seconds": 0.004874214006122202
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3173",
+      "seconds": 0.00488486496033147
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3174",
+      "seconds": 0.0048604029580019414
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3175",
+      "seconds": 0.004884794005192816
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3176",
+      "seconds": 0.004900817992165685
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3177",
+      "seconds": 0.00482789397938177
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3178",
+      "seconds": 0.004876505001448095
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3179",
+      "seconds": 0.004889787989668548
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3180",
+      "seconds": 0.004904026980511844
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3181",
+      "seconds": 0.004869455995503813
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3182",
+      "seconds": 0.0049152730498462915
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3183",
+      "seconds": 0.0048402699758298695
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3184",
+      "seconds": 0.004910984018351883
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3185",
+      "seconds": 0.004873290017712861
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3186",
+      "seconds": 0.004836842999793589
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3187",
+      "seconds": 0.004830441030208021
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3188",
+      "seconds": 0.0048745679669082165
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3189",
+      "seconds": 0.004894328012596816
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3190",
+      "seconds": 0.004835803003516048
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3191",
+      "seconds": 0.004835541942156851
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3192",
+      "seconds": 0.004891390970442444
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3193",
+      "seconds": 0.004909612005576491
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3194",
+      "seconds": 0.004908901988528669
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3195",
+      "seconds": 0.00485457299510017
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3196",
+      "seconds": 0.004837760992813855
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3197",
+      "seconds": 0.004878339008428156
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3198",
+      "seconds": 0.004888670053333044
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3199",
+      "seconds": 0.004905465000774711
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3200",
+      "seconds": 0.004874946956988424
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3201",
+      "seconds": 0.00490960298338905
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3202",
+      "seconds": 0.0048787620035000145
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3203",
+      "seconds": 0.0049052860122174025
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3204",
+      "seconds": 0.004895283025689423
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3205",
+      "seconds": 0.004880558990407735
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3206",
+      "seconds": 0.004870704957284033
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3207",
+      "seconds": 0.00494865101063624
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3208",
+      "seconds": 0.004862083005718887
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3209",
+      "seconds": 0.00482392602134496
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3210",
+      "seconds": 0.004869476018939167
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3211",
+      "seconds": 0.004867635958362371
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3212",
+      "seconds": 0.004867226991336793
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3213",
+      "seconds": 0.004886014969088137
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3214",
+      "seconds": 0.004840945010073483
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3215",
+      "seconds": 0.00482049398124218
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3216",
+      "seconds": 0.004880986001808196
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3217",
+      "seconds": 0.00485470297280699
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3218",
+      "seconds": 0.004863080976065248
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3219",
+      "seconds": 0.00489085097797215
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3220",
+      "seconds": 0.004853047023061663
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3221",
+      "seconds": 0.004871194018051028
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3222",
+      "seconds": 0.004919306957162917
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3223",
+      "seconds": 0.004886840004473925
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3224",
+      "seconds": 0.00485913100419566
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3225",
+      "seconds": 0.004903385997749865
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3226",
+      "seconds": 0.004882858018390834
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3227",
+      "seconds": 0.004852915997616947
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3228",
+      "seconds": 0.004869883006904274
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3229",
+      "seconds": 0.004866634029895067
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3230",
+      "seconds": 0.004901595995761454
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3231",
+      "seconds": 0.0048815960180945694
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3232",
+      "seconds": 0.0048913449863903224
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3233",
+      "seconds": 0.004895053978543729
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3234",
+      "seconds": 0.004903733963146806
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3235",
+      "seconds": 0.00486994901439175
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3236",
+      "seconds": 0.004850986006204039
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3237",
+      "seconds": 0.004855388018768281
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3238",
+      "seconds": 0.004919848986901343
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3239",
+      "seconds": 0.004869372001849115
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3240",
+      "seconds": 0.005126943986397237
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3241",
+      "seconds": 0.0048881719703786075
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3242",
+      "seconds": 0.00487760198302567
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3243",
+      "seconds": 0.004926502995658666
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3244",
+      "seconds": 0.004877823987044394
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3245",
+      "seconds": 0.004880840016994625
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3246",
+      "seconds": 0.004857763997279108
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3247",
+      "seconds": 0.004817526030819863
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3248",
+      "seconds": 0.004903243039734662
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3249",
+      "seconds": 0.0048866759752854705
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3250",
+      "seconds": 0.004842058988288045
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3251",
+      "seconds": 0.0048402269603684545
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3252",
+      "seconds": 0.004884508962277323
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3253",
+      "seconds": 0.004828337987419218
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3254",
+      "seconds": 0.004905342997517437
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3255",
+      "seconds": 0.004860293003730476
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3256",
+      "seconds": 0.004855537961702794
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3257",
+      "seconds": 0.0049017199780792
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3258",
+      "seconds": 0.004840599023737013
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3259",
+      "seconds": 0.004875845974311233
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3260",
+      "seconds": 0.004876841034274548
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3261",
+      "seconds": 0.0048902390408329666
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3262",
+      "seconds": 0.004872355028055608
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3263",
+      "seconds": 0.0048538450500927866
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3264",
+      "seconds": 0.004870885983109474
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3265",
+      "seconds": 0.004930536029860377
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3266",
+      "seconds": 0.00485248101176694
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3267",
+      "seconds": 0.004841174988541752
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3268",
+      "seconds": 0.004846951982472092
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3269",
+      "seconds": 0.004907253023702651
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3270",
+      "seconds": 0.004850747995078564
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3271",
+      "seconds": 0.004885511007159948
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3272",
+      "seconds": 0.004877494997344911
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3273",
+      "seconds": 0.0048649340169504285
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3274",
+      "seconds": 0.004861390974838287
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3275",
+      "seconds": 0.004861146968323737
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3276",
+      "seconds": 0.004907590977381915
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3277",
+      "seconds": 0.004881715984083712
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3278",
+      "seconds": 0.004861311987042427
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3279",
+      "seconds": 0.004884419962763786
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3280",
+      "seconds": 0.004905817040707916
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3281",
+      "seconds": 0.004933224990963936
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3282",
+      "seconds": 0.004874325997661799
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3283",
+      "seconds": 0.0048753179726190865
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3284",
+      "seconds": 0.004885927017312497
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3285",
+      "seconds": 0.004902161017525941
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3286",
+      "seconds": 0.004870659962762147
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3287",
+      "seconds": 0.005067405989393592
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3288",
+      "seconds": 0.00489136204123497
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3289",
+      "seconds": 0.004879227024503052
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3290",
+      "seconds": 0.004879485000856221
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3291",
+      "seconds": 0.0048515149974264205
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3292",
+      "seconds": 0.0048939939588308334
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3293",
+      "seconds": 0.005123727023601532
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3294",
+      "seconds": 0.0048625770141370595
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3295",
+      "seconds": 0.0048846660065464675
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3296",
+      "seconds": 0.0048468500026501715
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3297",
+      "seconds": 0.00485939800273627
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3298",
+      "seconds": 0.004886146984063089
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3299",
+      "seconds": 0.004844669019803405
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3300",
+      "seconds": 0.0048966549802571535
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3301",
+      "seconds": 0.004838727996684611
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3302",
+      "seconds": 0.00487010896904394
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3303",
+      "seconds": 0.004825894022360444
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3304",
+      "seconds": 0.004901216016151011
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3305",
+      "seconds": 0.004874826990999281
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3306",
+      "seconds": 0.005004826991353184
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3307",
+      "seconds": 0.004915209952741861
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3308",
+      "seconds": 0.004922082007396966
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3309",
+      "seconds": 0.004918407998047769
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3310",
+      "seconds": 0.004877934989053756
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3311",
+      "seconds": 0.00490564398933202
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3312",
+      "seconds": 0.00512206502025947
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3313",
+      "seconds": 0.005055242974776775
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3314",
+      "seconds": 0.004894356010481715
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3315",
+      "seconds": 0.005050732987001538
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3316",
+      "seconds": 0.0048997640260495245
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3317",
+      "seconds": 0.004890687006991357
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3318",
+      "seconds": 0.0049343990394845605
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3319",
+      "seconds": 0.004860771994572133
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3320",
+      "seconds": 0.004910913005005568
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3321",
+      "seconds": 0.004866281000431627
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3322",
+      "seconds": 0.004863518988713622
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3323",
+      "seconds": 0.004930036957375705
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3324",
+      "seconds": 0.004908562987111509
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3325",
+      "seconds": 0.00491080799838528
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3326",
+      "seconds": 0.004873050027526915
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3327",
+      "seconds": 0.004885438014753163
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3328",
+      "seconds": 0.004871849960181862
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3329",
+      "seconds": 0.0048873089835979044
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3330",
+      "seconds": 0.004860509012360126
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3331",
+      "seconds": 0.004891666991170496
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3332",
+      "seconds": 0.004868250980507582
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3333",
+      "seconds": 0.004892747034318745
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3334",
+      "seconds": 0.004875898011960089
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3335",
+      "seconds": 0.004926044028252363
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3336",
+      "seconds": 0.0048983010347001255
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3337",
+      "seconds": 0.004898461978882551
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3338",
+      "seconds": 0.004898314015008509
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3339",
+      "seconds": 0.004922358028125018
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3340",
+      "seconds": 0.0050183169660158455
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3341",
+      "seconds": 0.004923950997181237
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3342",
+      "seconds": 0.0049718430382199585
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3343",
+      "seconds": 0.004900305008050054
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3344",
+      "seconds": 0.004922421998344362
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3345",
+      "seconds": 0.0049518459709361196
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3346",
+      "seconds": 0.004901649022940546
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3347",
+      "seconds": 0.004890292009804398
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3348",
+      "seconds": 0.004882545967120677
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3349",
+      "seconds": 0.004863715963438153
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3350",
+      "seconds": 0.004914839984849095
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3351",
+      "seconds": 0.004878636042121798
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3352",
+      "seconds": 0.004896669997833669
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3353",
+      "seconds": 0.004868715011980385
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3354",
+      "seconds": 0.004906248999759555
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3355",
+      "seconds": 0.004889470990747213
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3356",
+      "seconds": 0.004907311988063157
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3357",
+      "seconds": 0.004983339982572943
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3358",
+      "seconds": 0.004913331009447575
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3359",
+      "seconds": 0.004913269018288702
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3360",
+      "seconds": 0.00489043805282563
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3361",
+      "seconds": 0.004875608021393418
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3362",
+      "seconds": 0.004870708042290062
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3363",
+      "seconds": 0.0048813660396263
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3364",
+      "seconds": 0.004880659049376845
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3365",
+      "seconds": 0.004857083025854081
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3366",
+      "seconds": 0.004885921021923423
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3367",
+      "seconds": 0.004867759998887777
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3368",
+      "seconds": 0.004898361978121102
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3369",
+      "seconds": 0.004863152978941798
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3370",
+      "seconds": 0.004911458003334701
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3371",
+      "seconds": 0.004888172028586268
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3372",
+      "seconds": 0.004909086041152477
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3373",
+      "seconds": 0.004878608975559473
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3374",
+      "seconds": 0.004902299959212542
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3375",
+      "seconds": 0.004929691960569471
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3376",
+      "seconds": 0.004904440953396261
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3377",
+      "seconds": 0.004898756043985486
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3378",
+      "seconds": 0.004898623039480299
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3379",
+      "seconds": 0.004871816956438124
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3380",
+      "seconds": 0.00489426200510934
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3381",
+      "seconds": 0.005110229016281664
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3382",
+      "seconds": 0.004922161984723061
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3383",
+      "seconds": 0.004877602972555906
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3384",
+      "seconds": 0.0048588409554213285
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3385",
+      "seconds": 0.004877104016486555
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3386",
+      "seconds": 0.0049094370333477855
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3387",
+      "seconds": 0.004882957029622048
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3388",
+      "seconds": 0.004890682001132518
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3389",
+      "seconds": 0.004974580020643771
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3390",
+      "seconds": 0.004875184968113899
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3391",
+      "seconds": 0.004926043970044702
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3392",
+      "seconds": 0.004908842034637928
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3393",
+      "seconds": 0.0049518069718033075
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3394",
+      "seconds": 0.004957502998877317
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3395",
+      "seconds": 0.004895605961792171
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3396",
+      "seconds": 0.004909556999336928
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3397",
+      "seconds": 0.004870817007031292
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3398",
+      "seconds": 0.004927993984892964
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3399",
+      "seconds": 0.004887768009211868
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3400",
+      "seconds": 0.004960887017659843
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3401",
+      "seconds": 0.004882208013441414
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3402",
+      "seconds": 0.004910750954877585
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3403",
+      "seconds": 0.004945424967445433
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3404",
+      "seconds": 0.005123860028106719
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3405",
+      "seconds": 0.004910012008622289
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3406",
+      "seconds": 0.004898410988971591
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3407",
+      "seconds": 0.004867932992056012
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3408",
+      "seconds": 0.004940150945913047
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3409",
+      "seconds": 0.004973849980160594
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3410",
+      "seconds": 0.004886070964857936
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3411",
+      "seconds": 0.004939926031511277
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3412",
+      "seconds": 0.004907724040094763
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3413",
+      "seconds": 0.004901536973193288
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3414",
+      "seconds": 0.0049364540027454495
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3415",
+      "seconds": 0.004945885972119868
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3416",
+      "seconds": 0.004881083033978939
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3417",
+      "seconds": 0.004935997014399618
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3418",
+      "seconds": 0.004952011979185045
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3419",
+      "seconds": 0.004937254008837044
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3420",
+      "seconds": 0.0049255440244451165
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3421",
+      "seconds": 0.0049219519714824855
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3422",
+      "seconds": 0.004920209001284093
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3423",
+      "seconds": 0.004942075000144541
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3424",
+      "seconds": 0.004901174979750067
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3425",
+      "seconds": 0.004871330980677158
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3426",
+      "seconds": 0.004973946022801101
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3427",
+      "seconds": 0.00494659598916769
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3428",
+      "seconds": 0.005011782981455326
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3429",
+      "seconds": 0.004921005049254745
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3430",
+      "seconds": 0.004895033955108374
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3431",
+      "seconds": 0.004919634957332164
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3432",
+      "seconds": 0.004877101047895849
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3433",
+      "seconds": 0.004894881043583155
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3434",
+      "seconds": 0.004933906020596623
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3435",
+      "seconds": 0.00488368101650849
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3436",
+      "seconds": 0.004963635001331568
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3437",
+      "seconds": 0.004898450046312064
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3438",
+      "seconds": 0.00495134002994746
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3439",
+      "seconds": 0.004919107013847679
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3440",
+      "seconds": 0.00488197902450338
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3441",
+      "seconds": 0.004905720998067409
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3442",
+      "seconds": 0.004920833045616746
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3443",
+      "seconds": 0.004927260975819081
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3444",
+      "seconds": 0.004889770003501326
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3445",
+      "seconds": 0.004871482029557228
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3446",
+      "seconds": 0.004963848041370511
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3447",
+      "seconds": 0.004887134942691773
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3448",
+      "seconds": 0.004941749037243426
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3449",
+      "seconds": 0.004920970008242875
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3450",
+      "seconds": 0.004925793968141079
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3451",
+      "seconds": 0.00490603904472664
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3452",
+      "seconds": 0.004949082969687879
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3453",
+      "seconds": 0.004916538950055838
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3454",
+      "seconds": 0.004956580989528447
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3455",
+      "seconds": 0.004986193962395191
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3456",
+      "seconds": 0.004945241031236947
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3457",
+      "seconds": 0.004918578022625297
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3458",
+      "seconds": 0.004930651979520917
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3459",
+      "seconds": 0.0049185139941982925
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3460",
+      "seconds": 0.004906107031274587
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3461",
+      "seconds": 0.004925807996187359
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3462",
+      "seconds": 0.0048756610485725105
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3463",
+      "seconds": 0.004872318997513503
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3464",
+      "seconds": 0.004937446035910398
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3465",
+      "seconds": 0.004874336998909712
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3466",
+      "seconds": 0.004939239996019751
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3467",
+      "seconds": 0.004970378999132663
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3468",
+      "seconds": 0.00490301800891757
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3469",
+      "seconds": 0.005027888983022422
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3470",
+      "seconds": 0.004896818019915372
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3471",
+      "seconds": 0.004852593003306538
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3472",
+      "seconds": 0.004855688952375203
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3473",
+      "seconds": 0.004894007986877114
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3474",
+      "seconds": 0.004854083992540836
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3475",
+      "seconds": 0.004872757999692112
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3476",
+      "seconds": 0.0051011189934797585
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3477",
+      "seconds": 0.0049160830094479024
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3478",
+      "seconds": 0.004894830984994769
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3479",
+      "seconds": 0.004906532005406916
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3480",
+      "seconds": 0.004856401996221393
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3481",
+      "seconds": 0.00487667799461633
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3482",
+      "seconds": 0.00492834800388664
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3483",
+      "seconds": 0.004876608029007912
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3484",
+      "seconds": 0.004849686985835433
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3485",
+      "seconds": 0.004848904034588486
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3486",
+      "seconds": 0.004893048026133329
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3487",
+      "seconds": 0.0048772619920782745
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3488",
+      "seconds": 0.004871373006608337
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3489",
+      "seconds": 0.0048954589874483645
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3490",
+      "seconds": 0.004888090013992041
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3491",
+      "seconds": 0.004922038991935551
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3492",
+      "seconds": 0.004915244004223496
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3493",
+      "seconds": 0.004918676044326276
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3494",
+      "seconds": 0.004902457003481686
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3495",
+      "seconds": 0.00484327896265313
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3496",
+      "seconds": 0.00492873799521476
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3497",
+      "seconds": 0.004923881962895393
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3498",
+      "seconds": 0.004879631043877453
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3499",
+      "seconds": 0.004876299004536122
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3500",
+      "seconds": 0.004931688017677516
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3501",
+      "seconds": 0.004902629007119685
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3502",
+      "seconds": 0.004878668987657875
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3503",
+      "seconds": 0.004873244964983314
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3504",
+      "seconds": 0.004892340046353638
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3505",
+      "seconds": 0.004871812998317182
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3506",
+      "seconds": 0.004879178013652563
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3507",
+      "seconds": 0.004899355990346521
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3508",
+      "seconds": 0.004854127008002251
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3509",
+      "seconds": 0.004925439017824829
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3510",
+      "seconds": 0.004894195997621864
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3511",
+      "seconds": 0.004850991012062877
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3512",
+      "seconds": 0.004875641025137156
+    },
+    {
+      "domain": "Rural",
+      "image_id": "3513",
+      "seconds": 0.004836304986383766
+    }
+  ],
+  "sanity_gt_self_5_images": {
+    "road_iou": 1.0,
+    "cldice": 1.0,
+    "boundary_iou": 1.0,
+    "skeleton_precision": 1.0,
+    "skeleton_recall": 1.0,
+    "quality": 1.0,
+    "counts": {
+      "valid": 4684861,
+      "intersection": 327362,
+      "union": 327362,
+      "predicted_skeleton": 5544,
+      "true_skeleton": 5544,
+      "skeleton_precision_hits": 5544,
+      "skeleton_recall_hits": 5544,
+      "boundary_intersection": 31272,
+      "boundary_union": 31272
+    }
+  },
+  "val": {
+    "Urban": {
+      "0.3": {
+        "road_iou": 0.2213787933527368,
+        "cldice": 0.2749775342871666,
+        "boundary_iou": 0.011227116716656202,
+        "skeleton_precision": 0.16149997952900388,
+        "skeleton_recall": 0.9247526831522692,
+        "quality": 0.19542808030584963,
+        "counts": {
+          "valid": 682354901,
+          "intersection": 50117748,
+          "union": 226389110,
+          "predicted_skeleton": 7107617,
+          "true_skeleton": 1066749,
+          "skeleton_precision_hits": 1147880,
+          "skeleton_recall_hits": 986479,
+          "boundary_intersection": 541979,
+          "boundary_union": 48274104
+        }
+      },
+      "0.5": {
+        "road_iou": 0.300403729065799,
+        "cldice": 0.3592795363374605,
+        "boundary_iou": 0.020445481493949983,
+        "skeleton_precision": 0.22670325304575928,
+        "skeleton_recall": 0.8653188332025622,
+        "quality": 0.2620748217329277,
+        "counts": {
+          "valid": 682354901,
+          "intersection": 47629351,
+          "union": 158551131,
+          "predicted_skeleton": 5107183,
+          "true_skeleton": 1066749,
+          "skeleton_precision_hits": 1157815,
+          "skeleton_recall_hits": 923078,
+          "boundary_intersection": 793649,
+          "boundary_union": 38817819
+        }
+      },
+      "0.7": {
+        "road_iou": 0.394017849143295,
+        "cldice": 0.4593949227308307,
+        "boundary_iou": 0.03326362370711487,
+        "skeleton_precision": 0.32622386938242715,
+        "skeleton_recall": 0.7762932048682493,
+        "quality": 0.3414801261323197,
+        "counts": {
+          "valid": 682354901,
+          "intersection": 43599406,
+          "union": 110653378,
+          "predicted_skeleton": 3505562,
+          "true_skeleton": 1066749,
+          "skeleton_precision_hits": 1143598,
+          "skeleton_recall_hits": 828110,
+          "boundary_intersection": 982390,
+          "boundary_union": 29533463
+        }
+      }
+    },
+    "Rural": {
+      "0.3": {
+        "road_iou": 0.16858312093997538,
+        "cldice": 0.2606708313889469,
+        "boundary_iou": 0.02049997760470322,
+        "skeleton_precision": 0.15556276756550946,
+        "skeleton_recall": 0.8037045695831397,
+        "quality": 0.1665928054076124,
+        "counts": {
+          "valid": 1021941370,
+          "intersection": 21670170,
+          "union": 128542940,
+          "predicted_skeleton": 4643489,
+          "true_skeleton": 988077,
+          "skeleton_precision_hits": 722354,
+          "skeleton_recall_hits": 794122,
+          "boundary_intersection": 787218,
+          "boundary_union": 38400920
+        }
+      },
+      "0.5": {
+        "road_iou": 0.23863063190919515,
+        "cldice": 0.3479285793175979,
+        "boundary_iou": 0.03259223841358174,
+        "skeleton_precision": 0.2338294118674562,
+        "skeleton_recall": 0.6794936022192603,
+        "quality": 0.23021233743259328,
+        "counts": {
+          "valid": 1021941370,
+          "intersection": 18885899,
+          "union": 79142811,
+          "predicted_skeleton": 2862450,
+          "true_skeleton": 988077,
+          "skeleton_precision_hits": 669325,
+          "skeleton_recall_hits": 671392,
+          "boundary_intersection": 881093,
+          "boundary_union": 27033829
+        }
+      },
+      "0.7": {
+        "road_iou": 0.3060565372911164,
+        "cldice": 0.41344620726897213,
+        "boundary_iou": 0.045508281096160376,
+        "skeleton_precision": 0.33996229278522133,
+        "skeleton_recall": 0.5274578803068991,
+        "quality": 0.28616378704548195,
+        "counts": {
+          "valid": 1021941370,
+          "intersection": 15559103,
+          "union": 50837349,
+          "predicted_skeleton": 1672359,
+          "true_skeleton": 988077,
+          "skeleton_precision_hits": 568539,
+          "skeleton_recall_hits": 521169,
+          "boundary_intersection": 850241,
+          "boundary_union": 18683215
+        }
+      }
+    },
+    "Overall": {
+      "0.3": {
+        "road_iou": 0.2022582012528877,
+        "cldice": 0.26891715726418597,
+        "boundary_iou": 0.015335409656188846,
+        "skeleton_precision": 0.15915387028250788,
+        "skeleton_recall": 0.8665458778504846,
+        "quality": 0.18487132973693743,
+        "counts": {
+          "valid": 1704296271,
+          "intersection": 71787918,
+          "union": 354932050,
+          "predicted_skeleton": 11751106,
+          "true_skeleton": 2054826,
+          "skeleton_precision_hits": 1870234,
+          "skeleton_recall_hits": 1780601,
+          "boundary_intersection": 1329197,
+          "boundary_union": 86675024
+        }
+      },
+      "0.5": {
+        "road_iou": 0.2798356972850406,
+        "cldice": 0.35394922923621935,
+        "boundary_iou": 0.02543204385712564,
+        "skeleton_precision": 0.229262752751601,
+        "skeleton_recall": 0.7759635122389925,
+        "quality": 0.2511890261848112,
+        "counts": {
+          "valid": 1704296271,
+          "intersection": 66515250,
+          "union": 237693942,
+          "predicted_skeleton": 7969633,
+          "true_skeleton": 2054826,
+          "skeleton_precision_hits": 1827140,
+          "skeleton_recall_hits": 1594470,
+          "boundary_intersection": 1674742,
+          "boundary_union": 65851648
+        }
+      },
+      "0.7": {
+        "road_iou": 0.3663275910572871,
+        "cldice": 0.43983582187983605,
+        "boundary_iou": 0.03800823856010985,
+        "skeleton_precision": 0.3306610896535501,
+        "skeleton_recall": 0.6566390536230319,
+        "quality": 0.32271618980461636,
+        "counts": {
+          "valid": 1704296271,
+          "intersection": 59158509,
+          "union": 161490727,
+          "predicted_skeleton": 5177921,
+          "true_skeleton": 2054826,
+          "skeleton_precision_hits": 1712137,
+          "skeleton_recall_hits": 1349279,
+          "boundary_intersection": 1832631,
+          "boundary_union": 48216678
+        }
+      }
+    }
+  },
+  "checkpoint": "runs/linear_probe/checkpoints/posw_auto.pt"
+}
