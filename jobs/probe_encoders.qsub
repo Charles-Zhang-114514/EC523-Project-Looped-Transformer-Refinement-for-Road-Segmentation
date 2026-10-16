@@ -5,20 +5,20 @@
 #$ -pe omp 8
 #$ -l gpus=1
 #$ -l gpu_c=8.0
-#$ -l h_rt=24:00:00
+#$ -l h_rt=06:00:00
 #$ -l mem_per_core=8G
 #$ -j y
 #$ -m ea
 #$ -o runs/logs/
 
 # Submit from the repository root. Training uses 7 loader workers + main; eval
-# uses 1 loader worker + 6 metric workers + main. CPU smoke forward-time ratios
-# versus ResNet-50 are approximately 18.6x, 20.1x, 1.6x, and 5.9x for the
-# encoders below. Applying these ratios to ResNet's 58 seconds per Train epoch
-# gives about 7.4 hours for four 10-epoch training runs. Applying them to the
-# 10-minute ResNet Val estimate gives about 7.7 hours for four validations.
-# Combined estimate is 15.1 hours; h_rt=24h leaves about 59% margin for GPU
-# variance, model loading, and filesystem overhead. These are CPU-ratio estimates.
+# uses 1 loader worker + 6 metric workers + main. For each epoch, estimate
+# max(23 ms/image decode, GPU forward/image) * 2522 images. Use 60 ms/image
+# for each ViT-L, 30 ms/image for ConvNeXt and SAM, and 5 ms/image for ResNet:
+# ten epochs total about 1.42 hours across the five encoders. Validation is
+# about 10 minutes of CPU metrics per encoder plus GPU forward * 1669 images;
+# that totals about 55 minutes. Combined estimate is about 2.35 hours. The
+# 6-hour limit leaves about 2.6x margin for model loading, variance, and I/O.
 source "${SGE_O_WORKDIR:?Submit from the repository root}/env.sh" || exit 1
 set -uo pipefail
 cd "$SGE_O_WORKDIR"
@@ -37,10 +37,10 @@ run_encoder() {
     echo "===== START encoder=${encoder} time=$(date --iso-8601=seconds) ====="
     if python scripts/train_linear_probe.py \
         --encoder "$encoder" --epochs 10 --batch-size 8 --lr 1e-3 \
-        --pos-weight 4 --seed 0 --device cuda \
+        --pos-weight 4 --seed 0 --device cuda --head bn_linear \
         --loader-workers 7 --eval-loader-workers 1 --metric-workers 6 \
         --thresholds "$THRESHOLDS" \
-        --out-dir "results/linear_probe/${encoder}/posw_4"; then
+        --out-dir "results/linear_probe/${encoder}/bn_posw_4"; then
         status=SUCCESS
     else
         status="FAILED(exit=$?)"
@@ -56,6 +56,7 @@ run_encoder dinov3_vitl16_sat
 run_encoder dinov3_vitl16_web
 run_encoder dinov3_convnext_small
 run_encoder sam_vitb
+run_encoder resnet50_layer3
 
 echo "===== ENCODER JOB SUMMARY ====="
 for line in "${STATUS_LINES[@]}"; do

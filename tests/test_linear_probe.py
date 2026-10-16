@@ -4,7 +4,7 @@ import unittest
 
 from looproad.data.road_dataset import map_raw_labels
 from looproad.encoders.resnet import build_encoder
-from looproad.models.linear_probe import masked_bce_with_logits
+from looproad.models.linear_probe import LinearProbe, masked_bce_with_logits
 
 
 class LinearProbeTests(unittest.TestCase):
@@ -33,6 +33,16 @@ class LinearProbeTests(unittest.TestCase):
         expected = torch.nn.functional.binary_cross_entropy_with_logits(
             torch.tensor([0.0, 2.0]), torch.tensor([0.0, 1.0])).mean()
         torch.testing.assert_close(actual, expected)
+
+    def test_bn_linear_eval_output_is_independent_of_batch_neighbors(self):
+        torch.manual_seed(17)
+        head = LinearProbe(4, head_type="bn_linear").eval()
+        target = torch.randn(1, 4, 8, 8)
+        neighbor = torch.randn(1, 4, 8, 8) * 100
+        with torch.no_grad():
+            alone = head(target)
+            batched = head(torch.cat((target, neighbor), dim=0))[0:1]
+        torch.testing.assert_close(alone, batched, rtol=0, atol=0)
 
 
 if __name__ == "__main__":
