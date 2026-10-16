@@ -144,7 +144,9 @@ def parse_thresholds(value):
 
 def build_parser():
     parser = argparse.ArgumentParser()
-    parser.add_argument("--encoder", default="resnet50_layer3")
+    parser.add_argument("--encoder", default="resnet50_layer3",
+                        choices=("resnet50_layer3", "dinov3_vitl16_sat", "dinov3_vitl16_web",
+                                 "dinov3_convnext_small", "sam_vitb"))
     parser.add_argument("--epochs", type=int, default=10)
     parser.add_argument("--batch-size", type=int, default=8)
     parser.add_argument("--lr", type=float, default=1e-3)
@@ -217,7 +219,7 @@ def main():
     head = LinearProbe(encoder.out_channels).to(device)
     encoder_params = sum(p.numel() for p in encoder.parameters())
     trainable = sum(p.numel() for p in head.parameters() if p.requires_grad)
-    if trainable != 1025 or any(p.requires_grad for p in encoder.parameters()):
+    if trainable != encoder.out_channels + 1 or any(p.requires_grad for p in encoder.parameters()):
         raise RuntimeError("Encoder freeze or linear-head parameter invariant failed")
 
     background_pixels = road_pixels = 0
@@ -239,14 +241,31 @@ def main():
     optimizer = torch.optim.AdamW(head.parameters(), lr=args.lr, weight_decay=0) if not args.eval_only else None
     out_dir = Path(args.out_dir)
     out_dir.mkdir(parents=True, exist_ok=True)
-    run_name = out_dir.name
-    checkpoint_path = ROOT / "runs" / "linear_probe" / "checkpoints" / f"{run_name}.pt"
+    weight_tag = format(pos_weight, ".8g") if pos_weight is not None else "unknown"
+    checkpoint_path = (ROOT / "runs" / "linear_probe" / "checkpoints" /
+                       f"{args.encoder}_posw{weight_tag}.pt")
     checkpoint_path.parent.mkdir(parents=True, exist_ok=True)
     epoch_logs = []
     total_gpu_seconds = 0.0
+    feature_value_sum = 0.0
+    feature_square_sum = 0.0
+    feature_value_count = 0
+    checkpoint_encoder_name = args.encoder
+    checkpoint_pos_weight = pos_weight if pos_weight is not None else "unknown"
+    if device.type == "cuda":
+        torch.cuda.reset_peak_memory_stats(device)
     if args.eval_only:
-        state = torch.load(args.ckpt, map_location="cpu", weights_only=True)
-        head.load_state_dict(state)
+        checkpoint = torch.load(args.ckpt, map_location="cpu", weights_only=True)
+        if isinstance(checkpoint, dict) and "state_dict" in checkpoint:
+            head.load_state_dict(checkpoint["state_dict"])
+            checkpoint_encoder_name = checkpoint.get("encoder", "unknown")
+            checkpoint_pos_weight = checkpoint.get("pos_weight", "unknown")
+            if checkpoint_encoder_name != "unknown" and checkpoint_encoder_name != args.encoder:
+                raise ValueError(f"Checkpoint encoder {checkpoint_encoder_name!r} does not match {args.encoder!r}")
+        else:
+            head.load_state_dict(checkpoint)
+            checkpoint_encoder_name = "unknown"
+            checkpoint_pos_weight = "unknown"
     else:
         for epoch in range(args.epochs):
             encoder.eval()
@@ -259,6 +278,10 @@ def main():
                                           for value in (images, targets, valid))
                 optimizer.zero_grad(set_to_none=True)
                 features = encoder(images)
+                if epoch == 0:
+                    feature_value_sum += float(features.sum().item())
+                    feature_square_sum += float(features.square().sum().item())
+                    feature_value_count += features.numel()
                 logits = head(features)
                 loss = masked_bce_with_logits(logits, targets, valid, pos_weight)
                 loss.backward()
@@ -270,7 +293,8 @@ def main():
             epoch_logs.append({"epoch": epoch + 1, "train_loss": total_loss / seen,
                                "seconds": elapsed, "seconds_per_image": elapsed / seen})
             print(f"epoch={epoch + 1} loss={total_loss / seen:.6f} seconds={elapsed:.2f}", flush=True)
-        torch.save(head.state_dict(), checkpoint_path)
+        torch.save({"encoder": args.encoder, "pos_weight": pos_weight,
+                    "state_dict": head.state_dict()}, checkpoint_path)
     del train_loader
     del train_data, train_sets
 
@@ -311,7 +335,12 @@ def main():
             for image, target, valid, sample_id, raw_labels in loader:
                 started = time.perf_counter()
                 with torch.no_grad():
-                    probability = torch.sigmoid(head(encoder(as_device_tensor(image, device)))).squeeze().cpu().numpy()
+                    features = encoder(as_device_tensor(image, device))
+                    if feature_value_count == 0:
+                        feature_value_sum += float(features.sum().item())
+                        feature_square_sum += float(features.square().sum().item())
+                        feature_value_count += features.numel()
+                    probability = torch.sigmoid(head(features)).squeeze().cpu().numpy()
                 elapsed = time.perf_counter() - started
                 per_image_seconds.append(elapsed)
                 image_timings.append({"domain": domain, "image_id": sample_id[0], "seconds": elapsed})
@@ -337,6 +366,10 @@ def main():
                            if metric_worker_started is not None else 0.0)
     val_pipeline_wall_seconds = time.perf_counter() - metric_started
     val_forward_seconds = float(sum(per_image_seconds))
+    feature_mean = feature_value_sum / feature_value_count if feature_value_count else None
+    feature_variance = (max(0.0, feature_square_sum / feature_value_count - feature_mean ** 2)
+                        if feature_mean is not None else None)
+    feature_std = feature_variance ** 0.5 if feature_variance is not None else None
     if device.type == "cuda":
         total_gpu_seconds += val_forward_seconds
     clean_score = score_group(metrics, clean_checks, 0.5)
@@ -349,18 +382,27 @@ def main():
         for threshold in args.thresholds}
     best_threshold = max(args.thresholds, key=lambda threshold: report_score(
         metrics, metric_counts["Urban"][str(threshold)] + metric_counts["Rural"][str(threshold)]))
+    peak_memory = torch.cuda.max_memory_allocated(device) if device.type == "cuda" else None
+    mean_val_seconds = float(np.mean(per_image_seconds)) if per_image_seconds else None
     report = {"config": vars(args), "device": str(device), "pos_weight": pos_weight,
+              "encoder": args.encoder, "encoder_parameters": encoder_params,
+              "feature_channels": int(encoder.out_channels),
+              "feature_mean": feature_mean, "feature_std": feature_std,
+              "checkpoint_encoder": checkpoint_encoder_name,
+              "checkpoint_pos_weight": checkpoint_pos_weight,
               "train_pixels": {"valid_background": background_pixels, "road": road_pixels},
               "encoder_parameters_frozen": encoder_params, "trainable_parameters": trainable,
               "epochs": epoch_logs,
+              "epoch_times_seconds": [float(entry["seconds"]) for entry in epoch_logs],
               "train_seconds": float(sum(entry["seconds"] for entry in epoch_logs)),
               "val_forward_seconds": val_forward_seconds,
               "metric_seconds": metric_worker_seconds,
               "metric_wall_seconds": metric_wall_seconds,
               "val_pipeline_wall_seconds": val_pipeline_wall_seconds,
               "total_gpu_seconds": total_gpu_seconds,
-              "peak_cuda_bytes": torch.cuda.max_memory_allocated(device) if device.type == "cuda" else None,
-              "mean_val_seconds_per_image": float(np.mean(per_image_seconds)) if per_image_seconds else None,
+              "peak_cuda_bytes": peak_memory, "peak_memory_bytes": peak_memory,
+              "mean_val_seconds_per_image": mean_val_seconds,
+              "val_forward_mean_seconds_per_image": mean_val_seconds,
               "val_image_seconds": image_timings,
               "sanity_gt_self_5_images": clean_score, "val": {}}
     report["val"] = {domain: {threshold: metrics.summarize(counts)
@@ -376,8 +418,9 @@ def main():
     report["checkpoint"] = str(checkpoint_path.relative_to(ROOT)) if not args.eval_only else args.ckpt
     with (out_dir / "metrics.json").open("w") as handle:
         json.dump(report, handle, indent=2)
-    lines = ["# ResNet-50 Layer3 Linear Probe", "",
+    lines = [f"# {args.encoder} Linear Probe", "",
              f"Device: `{device}`; pos_weight: `{pos_weight if pos_weight is None else format(pos_weight, '.8g')}`.",
+             f"Checkpoint encoder: `{checkpoint_encoder_name}`; checkpoint pos_weight: `{checkpoint_pos_weight}`.",
              "", "Official metrics are computed by summing per-image `Counts` before `summarize`.",
              "", "## Validation at threshold 0.5", "", "| Group | Road IoU | clDice | Boundary IoU | A |", "|---|---:|---:|---:|---:|"]
     for group in ("Urban", "Rural", "Overall"):
