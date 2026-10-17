@@ -144,7 +144,10 @@ def parse_thresholds(value):
 
 def build_parser():
     parser = argparse.ArgumentParser()
-    parser.add_argument("--encoder", default="resnet50_layer3")
+    parser.add_argument("--encoder", default="resnet50_layer3",
+                        choices=("resnet50_layer3", "dinov3_vitl16_sat", "dinov3_vitl16_web",
+                                 "dinov3_convnext_small", "sam_vitb"))
+    parser.add_argument("--head", choices=("linear", "bn_linear"), default="linear")
     parser.add_argument("--epochs", type=int, default=10)
     parser.add_argument("--batch-size", type=int, default=8)
     parser.add_argument("--lr", type=float, default=1e-3)
@@ -213,11 +216,28 @@ def main():
                               pin_memory=True, persistent_workers=data_loader_workers > 0,
                               worker_init_fn=initialize_data_worker if data_loader_workers > 0 else None,
                               collate_fn=collate_numpy_batch) if train_data else None
+    checkpoint = None
+    effective_head_type = args.head
+    checkpoint_encoder_name = args.encoder
+    checkpoint_pos_weight = "unknown"
+    if args.eval_only:
+        checkpoint = torch.load(args.ckpt, map_location="cpu", weights_only=True)
+        if isinstance(checkpoint, dict) and "state_dict" in checkpoint:
+            effective_head_type = checkpoint.get("head", "linear")
+            checkpoint_encoder_name = checkpoint.get("encoder", "unknown")
+            checkpoint_pos_weight = checkpoint.get("pos_weight", "unknown")
+            if checkpoint_encoder_name != "unknown" and checkpoint_encoder_name != args.encoder:
+                raise ValueError(f"Checkpoint encoder {checkpoint_encoder_name!r} does not match {args.encoder!r}")
+        else:
+            checkpoint_encoder_name = "unknown"
     encoder = build_encoder(args.encoder).to(device).eval()
-    head = LinearProbe(encoder.out_channels).to(device)
+    head = LinearProbe(encoder.out_channels, head_type=effective_head_type).to(device)
     encoder_params = sum(p.numel() for p in encoder.parameters())
     trainable = sum(p.numel() for p in head.parameters() if p.requires_grad)
-    if trainable != 1025 or any(p.requires_grad for p in encoder.parameters()):
+    expected_trainable = encoder.out_channels + 1
+    if effective_head_type == "bn_linear":
+        expected_trainable += 2 * encoder.out_channels
+    if trainable != expected_trainable or any(p.requires_grad for p in encoder.parameters()):
         raise RuntimeError("Encoder freeze or linear-head parameter invariant failed")
 
     background_pixels = road_pixels = 0
@@ -239,14 +259,25 @@ def main():
     optimizer = torch.optim.AdamW(head.parameters(), lr=args.lr, weight_decay=0) if not args.eval_only else None
     out_dir = Path(args.out_dir)
     out_dir.mkdir(parents=True, exist_ok=True)
-    run_name = out_dir.name
-    checkpoint_path = ROOT / "runs" / "linear_probe" / "checkpoints" / f"{run_name}.pt"
+    weight_tag = format(pos_weight, ".8g") if pos_weight is not None else "unknown"
+    head_tag = "bn" if effective_head_type == "bn_linear" else "linear"
+    checkpoint_path = (ROOT / "runs" / "linear_probe" / "checkpoints" /
+                       f"{args.encoder}_{head_tag}_posw{weight_tag}.pt")
     checkpoint_path.parent.mkdir(parents=True, exist_ok=True)
     epoch_logs = []
     total_gpu_seconds = 0.0
+    feature_value_sum = 0.0
+    feature_square_sum = 0.0
+    feature_value_count = 0
+    if not args.eval_only:
+        checkpoint_pos_weight = pos_weight if pos_weight is not None else "unknown"
+    if device.type == "cuda":
+        torch.cuda.reset_peak_memory_stats(device)
     if args.eval_only:
-        state = torch.load(args.ckpt, map_location="cpu", weights_only=True)
-        head.load_state_dict(state)
+        if isinstance(checkpoint, dict) and "state_dict" in checkpoint:
+            head.load_state_dict(checkpoint["state_dict"])
+        else:
+            head.load_state_dict(checkpoint)
     else:
         for epoch in range(args.epochs):
             encoder.eval()
@@ -259,6 +290,10 @@ def main():
                                           for value in (images, targets, valid))
                 optimizer.zero_grad(set_to_none=True)
                 features = encoder(images)
+                if epoch == 0:
+                    feature_value_sum += float(features.sum().item())
+                    feature_square_sum += float(features.square().sum().item())
+                    feature_value_count += features.numel()
                 logits = head(features)
                 loss = masked_bce_with_logits(logits, targets, valid, pos_weight)
                 loss.backward()
@@ -270,7 +305,9 @@ def main():
             epoch_logs.append({"epoch": epoch + 1, "train_loss": total_loss / seen,
                                "seconds": elapsed, "seconds_per_image": elapsed / seen})
             print(f"epoch={epoch + 1} loss={total_loss / seen:.6f} seconds={elapsed:.2f}", flush=True)
-        torch.save(head.state_dict(), checkpoint_path)
+        torch.save({"encoder": args.encoder, "pos_weight": pos_weight,
+                    "head": effective_head_type,
+                    "state_dict": head.state_dict()}, checkpoint_path)
     del train_loader
     del train_data, train_sets
 
@@ -284,6 +321,8 @@ def main():
     metric_worker_seconds = 0.0
     metric_worker_started = None
     metric_worker_finished = None
+    predicted_road_pixels = {domain: 0 for domain in ("Urban", "Rural")}
+    valid_pixels = {domain: 0 for domain in ("Urban", "Rural")}
     pending = deque()
     max_pending = max(1, 2 * args.metric_workers)
 
@@ -308,14 +347,24 @@ def main():
                                 persistent_workers=args.eval_loader_workers > 0,
                                 worker_init_fn=initialize_data_worker if args.eval_loader_workers > 0 else None,
                                 collate_fn=collate_numpy_batch)
+            encoder.eval()
+            head.eval()
             for image, target, valid, sample_id, raw_labels in loader:
                 started = time.perf_counter()
                 with torch.no_grad():
-                    probability = torch.sigmoid(head(encoder(as_device_tensor(image, device)))).squeeze().cpu().numpy()
+                    features = encoder(as_device_tensor(image, device))
+                    if feature_value_count == 0:
+                        feature_value_sum += float(features.sum().item())
+                        feature_square_sum += float(features.square().sum().item())
+                        feature_value_count += features.numel()
+                    probability = torch.sigmoid(head(features)).squeeze().cpu().numpy()
                 elapsed = time.perf_counter() - started
                 per_image_seconds.append(elapsed)
                 image_timings.append({"domain": domain, "image_id": sample_id[0], "seconds": elapsed})
                 raw = np.asarray(raw_labels).squeeze().astype(np.uint8, copy=False)
+                valid_raw = raw != 0
+                valid_pixels[domain] += int(valid_raw.sum())
+                predicted_road_pixels[domain] += int(((probability >= 0.5) & valid_raw).sum())
                 if len(clean_checks) < 5:
                     clean_probability = (raw == 3).astype(np.float32)
                     clean_checks.append((clean_probability, raw))
@@ -337,6 +386,10 @@ def main():
                            if metric_worker_started is not None else 0.0)
     val_pipeline_wall_seconds = time.perf_counter() - metric_started
     val_forward_seconds = float(sum(per_image_seconds))
+    feature_mean = feature_value_sum / feature_value_count if feature_value_count else None
+    feature_variance = (max(0.0, feature_square_sum / feature_value_count - feature_mean ** 2)
+                        if feature_mean is not None else None)
+    feature_std = feature_variance ** 0.5 if feature_variance is not None else None
     if device.type == "cuda":
         total_gpu_seconds += val_forward_seconds
     clean_score = score_group(metrics, clean_checks, 0.5)
@@ -347,22 +400,39 @@ def main():
     overall_counts = {str(threshold): (
         metric_counts["Urban"][str(threshold)] + metric_counts["Rural"][str(threshold)])
         for threshold in args.thresholds}
+    predicted_road_fraction = {
+        domain: predicted_road_pixels[domain] / valid_pixels[domain]
+        for domain in ("Urban", "Rural")}
+    predicted_road_fraction["Overall"] = (
+        (predicted_road_pixels["Urban"] + predicted_road_pixels["Rural"]) /
+        (valid_pixels["Urban"] + valid_pixels["Rural"]))
     best_threshold = max(args.thresholds, key=lambda threshold: report_score(
         metrics, metric_counts["Urban"][str(threshold)] + metric_counts["Rural"][str(threshold)]))
+    peak_memory = torch.cuda.max_memory_allocated(device) if device.type == "cuda" else None
+    mean_val_seconds = float(np.mean(per_image_seconds)) if per_image_seconds else None
     report = {"config": vars(args), "device": str(device), "pos_weight": pos_weight,
+              "head": effective_head_type,
+              "encoder": args.encoder, "encoder_parameters": encoder_params,
+              "feature_channels": int(encoder.out_channels),
+              "feature_mean": feature_mean, "feature_std": feature_std,
+              "checkpoint_encoder": checkpoint_encoder_name,
+              "checkpoint_pos_weight": checkpoint_pos_weight,
               "train_pixels": {"valid_background": background_pixels, "road": road_pixels},
               "encoder_parameters_frozen": encoder_params, "trainable_parameters": trainable,
               "epochs": epoch_logs,
+              "epoch_times_seconds": [float(entry["seconds"]) for entry in epoch_logs],
               "train_seconds": float(sum(entry["seconds"] for entry in epoch_logs)),
               "val_forward_seconds": val_forward_seconds,
               "metric_seconds": metric_worker_seconds,
               "metric_wall_seconds": metric_wall_seconds,
               "val_pipeline_wall_seconds": val_pipeline_wall_seconds,
               "total_gpu_seconds": total_gpu_seconds,
-              "peak_cuda_bytes": torch.cuda.max_memory_allocated(device) if device.type == "cuda" else None,
-              "mean_val_seconds_per_image": float(np.mean(per_image_seconds)) if per_image_seconds else None,
+              "peak_cuda_bytes": peak_memory, "peak_memory_bytes": peak_memory,
+              "mean_val_seconds_per_image": mean_val_seconds,
+              "val_forward_mean_seconds_per_image": mean_val_seconds,
               "val_image_seconds": image_timings,
               "sanity_gt_self_5_images": clean_score, "val": {}}
+    report["predicted_road_fraction_at_0.5"] = predicted_road_fraction
     report["val"] = {domain: {threshold: metrics.summarize(counts)
                               for threshold, counts in metric_counts[domain].items()}
                      for domain in ("Urban", "Rural")}
@@ -376,13 +446,19 @@ def main():
     report["checkpoint"] = str(checkpoint_path.relative_to(ROOT)) if not args.eval_only else args.ckpt
     with (out_dir / "metrics.json").open("w") as handle:
         json.dump(report, handle, indent=2)
-    lines = ["# ResNet-50 Layer3 Linear Probe", "",
+    lines = [f"# {args.encoder} Linear Probe", "",
              f"Device: `{device}`; pos_weight: `{pos_weight if pos_weight is None else format(pos_weight, '.8g')}`.",
+             f"Head: `{effective_head_type}`; trainable parameters: `{trainable}`.",
+             f"Checkpoint encoder: `{checkpoint_encoder_name}`; checkpoint pos_weight: `{checkpoint_pos_weight}`.",
              "", "Official metrics are computed by summing per-image `Counts` before `summarize`.",
              "", "## Validation at threshold 0.5", "", "| Group | Road IoU | clDice | Boundary IoU | A |", "|---|---:|---:|---:|---:|"]
     for group in ("Urban", "Rural", "Overall"):
         score = report["val"][group]["0.5"]
         lines.append(f"| {group} | {score['road_iou']:.6f} | {score['cldice']:.6f} | {score['boundary_iou']:.6f} | {score['quality']:.6f} |")
+    lines += ["", "Predicted road fraction among valid pixels at threshold 0.5:", "",
+              "| Group | Predicted road / valid pixels |", "|---|---:|"]
+    for group in ("Urban", "Rural", "Overall"):
+        lines.append(f"| {group} | {predicted_road_fraction[group]:.8f} |")
     best_threshold_text = str(best_threshold)
     lines += ["", f"## Validation at best Overall A threshold ({best_threshold_text})",
               "", "Threshold selected on Val; results are optimistically biased.",

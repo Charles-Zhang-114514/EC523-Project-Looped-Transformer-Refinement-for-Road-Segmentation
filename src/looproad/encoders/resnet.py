@@ -43,6 +43,8 @@ class ResNet50Layer3(nn.Module):
 
 
 def build_encoder(name="resnet50_layer3", **kwargs):
-    if name != "resnet50_layer3":
-        raise ValueError(f"Unsupported encoder {name!r}; available: resnet50_layer3")
-    return ResNet50Layer3(**kwargs)
+    if name == "resnet50_layer3":
+        return ResNet50Layer3(**kwargs)
+    from .huggingface import build_huggingface_encoder
+
+    return build_huggingface_encoder(name, **kwargs)

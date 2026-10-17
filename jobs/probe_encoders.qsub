@@ -1,0 +1,67 @@
+#!/bin/bash -l
+#$ -N ec523-encoder-probes
+#$ -P ec523kb
+#$ -cwd
+#$ -pe omp 8
+#$ -l gpus=1
+#$ -l gpu_c=8.0
+#$ -l h_rt=06:00:00
+#$ -l mem_per_core=8G
+#$ -j y
+#$ -m ea
+#$ -o runs/logs/
+
+# Submit from the repository root. Training uses 7 loader workers + main; eval
+# uses 1 loader worker + 6 metric workers + main. For each epoch, estimate
+# max(23 ms/image decode, GPU forward/image) * 2522 images. Use 60 ms/image
+# for each ViT-L, 30 ms/image for ConvNeXt and SAM, and 5 ms/image for ResNet:
+# ten epochs total about 1.42 hours across the five encoders. Validation is
+# about 10 minutes of CPU metrics per encoder plus GPU forward * 1669 images;
+# that totals about 55 minutes. Combined estimate is about 2.35 hours. The
+# 6-hour limit leaves about 2.6x margin for model loading, variance, and I/O.
+source "${SGE_O_WORKDIR:?Submit from the repository root}/env.sh" || exit 1
+set -uo pipefail
+cd "$SGE_O_WORKDIR"
+: "${EC523_DATA_DIR:?Set EC523_DATA_DIR in env.sh}"
+: "${EC523_STARTER_DIR:?Set EC523_STARTER_DIR in env.sh}"
+export OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 MKL_NUM_THREADS=1
+
+THRESHOLDS=0.05,0.1,0.15,0.2,0.25,0.3,0.35,0.4,0.45,0.5,0.55,0.6,0.65,0.7,0.75,0.8,0.85,0.9,0.95
+FAILED=0
+STATUS_LINES=()
+
+run_encoder() {
+    local encoder="$1"
+    local start end elapsed status
+    start=$(date +%s)
+    echo "===== START encoder=${encoder} time=$(date --iso-8601=seconds) ====="
+    if python scripts/train_linear_probe.py \
+        --encoder "$encoder" --epochs 10 --batch-size 8 --lr 1e-3 \
+        --pos-weight 4 --seed 0 --device cuda --head bn_linear \
+        --loader-workers 7 --eval-loader-workers 1 --metric-workers 6 \
+        --thresholds "$THRESHOLDS" \
+        --out-dir "results/linear_probe/${encoder}/bn_posw_4"; then
+        status=SUCCESS
+    else
+        status="FAILED(exit=$?)"
+        FAILED=1
+    fi
+    end=$(date +%s)
+    elapsed=$((end - start))
+    echo "===== END encoder=${encoder} status=${status} elapsed_seconds=${elapsed} ====="
+    STATUS_LINES+=("${encoder}: ${status} (${elapsed}s)")
+}
+
+run_encoder dinov3_vitl16_sat
+run_encoder dinov3_vitl16_web
+run_encoder dinov3_convnext_small
+run_encoder sam_vitb
+run_encoder resnet50_layer3
+
+echo "===== ENCODER JOB SUMMARY ====="
+for line in "${STATUS_LINES[@]}"; do
+    echo "$line"
+done
+if (( FAILED )); then
+    exit 1
+fi
