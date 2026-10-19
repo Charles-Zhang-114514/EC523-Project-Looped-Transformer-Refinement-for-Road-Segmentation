@@ -1,0 +1,33 @@
+#!/bin/bash -l
+#$ -N ec523-y0-analysis
+#$ -P ec523kb
+#$ -cwd
+#$ -pe omp 8
+#$ -l gpus=1
+#$ -l gpu_c=8.0
+#$ -l h_rt=00:30:00
+#$ -l mem_per_core=8G
+#$ -j y
+#$ -m ea
+#$ -o runs/logs/
+
+# Submit from the repository root; create runs/logs before calling qsub.
+# Use one main process + one image loader + six single-thread analysis workers.
+# Four-tile CPU pilot: mean analysis 1.228992 s/tile (range 0.903944-1.678022).
+# Full analysis: 1669 * 1.228992 / 6 = 341.9 s. GPU forward: 1669 * 0.036
+# = 60.1 s. Decode allowance: 1669 * 0.023 = 38.4 s. Conservative serial sum
+# is 440.4 s (7.3 min), although stages overlap. Using the slowest pilot tile
+# instead gives 9.4 min. A 30-minute limit leaves >3x margin for tile complexity,
+# model/worker startup, shared-filesystem delays and the 20 visualization panels.
+source "${SGE_O_WORKDIR:?Submit from the repository root}/env.sh" || exit 1
+set -euo pipefail
+cd "$SGE_O_WORKDIR"
+: "${EC523_DATA_DIR:?Set EC523_DATA_DIR in env.sh}"
+: "${EC523_STARTER_DIR:?Set EC523_STARTER_DIR in env.sh}"
+export OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 MKL_NUM_THREADS=1
+
+python -u analysis/y0_error_analysis.py \
+    --ckpt runs/linear_probe/checkpoints/dinov3_vitl16_web_bn_posw4.pt \
+    --device cuda --seed 0 --loader-workers 1 --metric-workers 6 \
+    --out-dir results/y0_analysis/dinov3_vitl16_web_bn_posw4 \
+    --vis-dir runs/y0_analysis/vis

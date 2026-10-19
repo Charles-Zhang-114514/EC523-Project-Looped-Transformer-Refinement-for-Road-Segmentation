@@ -1,0 +1,772 @@
+{
+  "encoder": "dinov3_vitl16_web",
+  "head": "bn_linear",
+  "pos_weight": 4.0,
+  "checkpoint": "dinov3_vitl16_web_bn_posw4.pt",
+  "threshold": 0.5,
+  "seed": 0,
+  "device": "cuda",
+  "images": 1669,
+  "limit_per_domain": null,
+  "workers": {
+    "main": 1,
+    "loader": 1,
+    "analysis": 6,
+    "threads_each": 1
+  },
+  "full_val_regression": {
+    "expected_A": 0.526507,
+    "observed_A": 0.5265071763406132,
+    "status": "passed"
+  },
+  "groups": {
+    "Urban": {
+      "images": 677,
+      "official": {
+        "road_iou": 0.6647075069689085,
+        "cldice": 0.7055341725221937,
+        "boundary_iou": 0.08449636783476608,
+        "skeleton_precision": 0.7181063815707464,
+        "skeleton_recall": 0.6933946036040343,
+        "quality": 0.5609132788080655,
+        "counts": {
+          "valid": 682354901,
+          "intersection": 42700555,
+          "union": 64239616,
+          "predicted_skeleton": 1299586,
+          "true_skeleton": 1066749,
+          "skeleton_precision_hits": 933241,
+          "skeleton_recall_hits": 739678,
+          "boundary_intersection": 1162505,
+          "boundary_union": 13758047
+        }
+      },
+      "totals": {
+        "valid_pixels": 682354901,
+        "truth_road_pixels": 52956965,
+        "predicted_road_pixels": 53983206,
+        "fp_pixels": 11282651,
+        "fn_pixels": 10256410,
+        "skeleton_pixels": 1066749,
+        "uncovered_skeleton_pixels": 327071,
+        "truth_components": 1196,
+        "predicted_components": 9388
+      },
+      "distance": {
+        "1-2": {
+          "fp_pixels": 1363340,
+          "fn_pixels": 1340788,
+          "fp_fraction_of_all_errors": 0.06329616690346901,
+          "fn_fraction_of_all_errors": 0.06224913890164478
+        },
+        "3-4": {
+          "fp_pixels": 1125093,
+          "fn_pixels": 1133905,
+          "fp_fraction_of_all_errors": 0.05223500690211147,
+          "fn_fraction_of_all_errors": 0.05264412408693211
+        },
+        "5-8": {
+          "fp_pixels": 1499924,
+          "fn_pixels": 1620038,
+          "fp_fraction_of_all_errors": 0.06963739041363039,
+          "fn_fraction_of_all_errors": 0.0752139566344141
+        },
+        "9-16": {
+          "fp_pixels": 1345985,
+          "fn_pixels": 1545674,
+          "fp_fraction_of_all_errors": 0.0624904214719481,
+          "fn_fraction_of_all_errors": 0.07176143843967943
+        },
+        ">16": {
+          "fp_pixels": 5948309,
+          "fn_pixels": 4616005,
+          "fp_fraction_of_all_errors": 0.2761638030552957,
+          "fn_fraction_of_all_errors": 0.21430855319087494
+        }
+      },
+      "segments": {
+        "gap": {
+          "<=8": {
+            "segments": 893,
+            "skeleton_pixels": 3012
+          },
+          "9-16": {
+            "segments": 638,
+            "skeleton_pixels": 7880
+          },
+          "17-32": {
+            "segments": 851,
+            "skeleton_pixels": 19672
+          },
+          "33-64": {
+            "segments": 483,
+            "skeleton_pixels": 21391
+          },
+          ">64": {
+            "segments": 507,
+            "skeleton_pixels": 110069
+          }
+        },
+        "terminal_missing": {
+          "<=8": {
+            "segments": 674,
+            "skeleton_pixels": 2897
+          },
+          "9-16": {
+            "segments": 362,
+            "skeleton_pixels": 4507
+          },
+          "17-32": {
+            "segments": 322,
+            "skeleton_pixels": 7464
+          },
+          "33-64": {
+            "segments": 220,
+            "skeleton_pixels": 9912
+          },
+          ">64": {
+            "segments": 420,
+            "skeleton_pixels": 100335
+          }
+        },
+        "whole_missed": {
+          "<=8": {
+            "segments": 73,
+            "skeleton_pixels": 139
+          },
+          "9-16": {
+            "segments": 22,
+            "skeleton_pixels": 281
+          },
+          "17-32": {
+            "segments": 33,
+            "skeleton_pixels": 764
+          },
+          "33-64": {
+            "segments": 40,
+            "skeleton_pixels": 1874
+          },
+          ">64": {
+            "segments": 128,
+            "skeleton_pixels": 36874
+          }
+        }
+      },
+      "uncovered_skeleton_fraction": 0.3066053963959657,
+      "fragments": {
+        "count": 5630,
+        "total_area": 3496124,
+        "area_quantiles": {
+          "min": 1.0,
+          "p10": 7.0,
+          "p25": 22.0,
+          "p50": 78.0,
+          "p75": 278.0,
+          "p90": 969.0,
+          "max": 62266.0
+        },
+        "fraction_of_fp_pixels": 0.3098672466249288
+      },
+      "image_A_quantiles": {
+        "min": 0.0,
+        "p10": 0.0,
+        "p25": 0.314181877821499,
+        "p50": 0.5394455974773033,
+        "p75": 0.6699752817048592,
+        "p90": 0.7343052418191865,
+        "max": 1.0
+      },
+      "no_truth_road_images": 96,
+      "no_predicted_road_images": 44,
+      "no_truth_with_predicted_road_images": 61,
+      "no_truth_with_predicted_road_fp_pixels": 859368,
+      "worst_images": [
+        {
+          "filename": "3521.png",
+          "road_iou": 0.0,
+          "cldice": 0.0,
+          "boundary_iou": 0.0,
+          "quality": 0.0
+        },
+        {
+          "filename": "3529.png",
+          "road_iou": 0.0,
+          "cldice": 0.0,
+          "boundary_iou": 0.0,
+          "quality": 0.0
+        },
+        {
+          "filename": "3570.png",
+          "road_iou": 0.0,
+          "cldice": 0.0,
+          "boundary_iou": 0.0,
+          "quality": 0.0
+        },
+        {
+          "filename": "3577.png",
+          "road_iou": 0.0,
+          "cldice": 0.0,
+          "boundary_iou": 0.0,
+          "quality": 0.0
+        },
+        {
+          "filename": "3580.png",
+          "road_iou": 0.0,
+          "cldice": 0.0,
+          "boundary_iou": 0.0,
+          "quality": 0.0
+        },
+        {
+          "filename": "3592.png",
+          "road_iou": 0.0,
+          "cldice": 0.0,
+          "boundary_iou": 0.0,
+          "quality": 0.0
+        },
+        {
+          "filename": "3613.png",
+          "road_iou": 0.0,
+          "cldice": 0.0,
+          "boundary_iou": 0.0,
+          "quality": 0.0
+        },
+        {
+          "filename": "3618.png",
+          "road_iou": 0.0,
+          "cldice": 0.0,
+          "boundary_iou": 0.0,
+          "quality": 0.0
+        },
+        {
+          "filename": "3625.png",
+          "road_iou": 0.0,
+          "cldice": 0.0,
+          "boundary_iou": 0.0,
+          "quality": 0.0
+        },
+        {
+          "filename": "3668.png",
+          "road_iou": 0.0,
+          "cldice": 0.0,
+          "boundary_iou": 0.0,
+          "quality": 0.0
+        }
+      ]
+    },
+    "Rural": {
+      "images": 992,
+      "official": {
+        "road_iou": 0.5221361577574497,
+        "cldice": 0.6194334380503643,
+        "boundary_iou": 0.09542762663732143,
+        "skeleton_precision": 0.7807002368907875,
+        "skeleton_recall": 0.5133850904332354,
+        "quality": 0.4659836356212984,
+        "counts": {
+          "valid": 1021941370,
+          "intersection": 16825739,
+          "union": 32224811,
+          "predicted_skeleton": 716786,
+          "true_skeleton": 988077,
+          "skeleton_precision_hits": 559595,
+          "skeleton_recall_hits": 507264,
+          "boundary_intersection": 1054481,
+          "boundary_union": 11050060
+        }
+      },
+      "totals": {
+        "valid_pixels": 1021941370,
+        "truth_road_pixels": 26633535,
+        "predicted_road_pixels": 22417015,
+        "fp_pixels": 5591276,
+        "fn_pixels": 9807796,
+        "skeleton_pixels": 988077,
+        "uncovered_skeleton_pixels": 480813,
+        "truth_components": 1108,
+        "predicted_components": 9777
+      },
+      "distance": {
+        "1-2": {
+          "fp_pixels": 1031543,
+          "fn_pixels": 1001350,
+          "fp_fraction_of_all_errors": 0.06698734832852266,
+          "fn_fraction_of_all_errors": 0.06502664576151082
+        },
+        "3-4": {
+          "fp_pixels": 817273,
+          "fn_pixels": 873588,
+          "fp_fraction_of_all_errors": 0.0530728734822462,
+          "fn_fraction_of_all_errors": 0.05672991203625777
+        },
+        "5-8": {
+          "fp_pixels": 955533,
+          "fn_pixels": 1267551,
+          "fp_fraction_of_all_errors": 0.06205133660002369,
+          "fn_fraction_of_all_errors": 0.0823134666816286
+        },
+        "9-16": {
+          "fp_pixels": 598103,
+          "fn_pixels": 1209756,
+          "fp_fraction_of_all_errors": 0.03884019764307875,
+          "fn_fraction_of_all_errors": 0.07856031843996833
+        },
+        ">16": {
+          "fp_pixels": 2188824,
+          "fn_pixels": 5455551,
+          "fp_fraction_of_all_errors": 0.14213999389054094,
+          "fn_fraction_of_all_errors": 0.35427790713622226
+        }
+      },
+      "segments": {
+        "gap": {
+          "<=8": {
+            "segments": 1466,
+            "skeleton_pixels": 5262
+          },
+          "9-16": {
+            "segments": 1095,
+            "skeleton_pixels": 13366
+          },
+          "17-32": {
+            "segments": 1217,
+            "skeleton_pixels": 28525
+          },
+          "33-64": {
+            "segments": 799,
+            "skeleton_pixels": 36053
+          },
+          ">64": {
+            "segments": 906,
+            "skeleton_pixels": 186267
+          }
+        },
+        "terminal_missing": {
+          "<=8": {
+            "segments": 420,
+            "skeleton_pixels": 1751
+          },
+          "9-16": {
+            "segments": 291,
+            "skeleton_pixels": 3635
+          },
+          "17-32": {
+            "segments": 277,
+            "skeleton_pixels": 6437
+          },
+          "33-64": {
+            "segments": 198,
+            "skeleton_pixels": 9184
+          },
+          ">64": {
+            "segments": 498,
+            "skeleton_pixels": 121013
+          }
+        },
+        "whole_missed": {
+          "<=8": {
+            "segments": 29,
+            "skeleton_pixels": 71
+          },
+          "9-16": {
+            "segments": 10,
+            "skeleton_pixels": 114
+          },
+          "17-32": {
+            "segments": 12,
+            "skeleton_pixels": 302
+          },
+          "33-64": {
+            "segments": 28,
+            "skeleton_pixels": 1407
+          },
+          ">64": {
+            "segments": 166,
+            "skeleton_pixels": 67426
+          }
+        }
+      },
+      "uncovered_skeleton_fraction": 0.4866149095667645,
+      "fragments": {
+        "count": 3898,
+        "total_area": 1754885,
+        "area_quantiles": {
+          "min": 1.0,
+          "p10": 5.0,
+          "p25": 17.0,
+          "p50": 55.5,
+          "p75": 146.0,
+          "p90": 361.0,
+          "max": 74273.0
+        },
+        "fraction_of_fp_pixels": 0.3138612724537297
+      },
+      "image_A_quantiles": {
+        "min": 0.0,
+        "p10": 0.0,
+        "p25": 0.05265958479409521,
+        "p50": 0.41399945286049367,
+        "p75": 0.6546909240824711,
+        "p90": 1.0,
+        "max": 1.0
+      },
+      "no_truth_road_images": 314,
+      "no_predicted_road_images": 202,
+      "no_truth_with_predicted_road_images": 141,
+      "no_truth_with_predicted_road_fp_pixels": 765949,
+      "worst_images": [
+        {
+          "filename": "2524.png",
+          "road_iou": 0.0,
+          "cldice": 0.0,
+          "boundary_iou": 0.0,
+          "quality": 0.0
+        },
+        {
+          "filename": "2526.png",
+          "road_iou": 0.0,
+          "cldice": 0.0,
+          "boundary_iou": 0.0,
+          "quality": 0.0
+        },
+        {
+          "filename": "2530.png",
+          "road_iou": 0.0,
+          "cldice": 0.0,
+          "boundary_iou": 0.0,
+          "quality": 0.0
+        },
+        {
+          "filename": "2531.png",
+          "road_iou": 0.0,
+          "cldice": 0.0,
+          "boundary_iou": 0.0,
+          "quality": 0.0
+        },
+        {
+          "filename": "2533.png",
+          "road_iou": 0.0,
+          "cldice": 0.0,
+          "boundary_iou": 0.0,
+          "quality": 0.0
+        },
+        {
+          "filename": "2538.png",
+          "road_iou": 0.0,
+          "cldice": 0.0,
+          "boundary_iou": 0.0,
+          "quality": 0.0
+        },
+        {
+          "filename": "2541.png",
+          "road_iou": 0.0,
+          "cldice": 0.0,
+          "boundary_iou": 0.0,
+          "quality": 0.0
+        },
+        {
+          "filename": "2545.png",
+          "road_iou": 0.0,
+          "cldice": 0.0,
+          "boundary_iou": 0.0,
+          "quality": 0.0
+        },
+        {
+          "filename": "2551.png",
+          "road_iou": 0.0,
+          "cldice": 0.0,
+          "boundary_iou": 0.0,
+          "quality": 0.0
+        },
+        {
+          "filename": "2552.png",
+          "road_iou": 0.0,
+          "cldice": 0.0,
+          "boundary_iou": 0.0,
+          "quality": 0.0
+        }
+      ]
+    },
+    "Overall": {
+      "images": 1669,
+      "official": {
+        "road_iou": 0.6170802631730762,
+        "cldice": 0.6669798934051253,
+        "boundary_iou": 0.08936538366268736,
+        "skeleton_precision": 0.7403574340449084,
+        "skeleton_recall": 0.6068358099420583,
+        "quality": 0.5265071763406132,
+        "counts": {
+          "valid": 1704296271,
+          "intersection": 59526294,
+          "union": 96464427,
+          "predicted_skeleton": 2016372,
+          "true_skeleton": 2054826,
+          "skeleton_precision_hits": 1492836,
+          "skeleton_recall_hits": 1246942,
+          "boundary_intersection": 2216986,
+          "boundary_union": 24808107
+        }
+      },
+      "totals": {
+        "valid_pixels": 1704296271,
+        "truth_road_pixels": 79590500,
+        "predicted_road_pixels": 76400221,
+        "fp_pixels": 16873927,
+        "fn_pixels": 20064206,
+        "skeleton_pixels": 2054826,
+        "uncovered_skeleton_pixels": 807884,
+        "truth_components": 2304,
+        "predicted_components": 19165
+      },
+      "distance": {
+        "1-2": {
+          "fp_pixels": 2394883,
+          "fn_pixels": 2342138,
+          "fp_fraction_of_all_errors": 0.06483497690584415,
+          "fn_fraction_of_all_errors": 0.0634070487536552
+        },
+        "3-4": {
+          "fp_pixels": 1942366,
+          "fn_pixels": 2007493,
+          "fp_fraction_of_all_errors": 0.05258430359758572,
+          "fn_fraction_of_all_errors": 0.05434744089529376
+        },
+        "5-8": {
+          "fp_pixels": 2455457,
+          "fn_pixels": 2887589,
+          "fp_fraction_of_all_errors": 0.06647485404852486,
+          "fn_fraction_of_all_errors": 0.07817365864159946
+        },
+        "9-16": {
+          "fp_pixels": 1944088,
+          "fn_pixels": 2755430,
+          "fp_fraction_of_all_errors": 0.052630922088022156,
+          "fn_fraction_of_all_errors": 0.07459581132592706
+        },
+        ">16": {
+          "fp_pixels": 8137133,
+          "fn_pixels": 10071556,
+          "fp_fraction_of_all_errors": 0.2202908576889904,
+          "fn_fraction_of_all_errors": 0.27266012605455725
+        }
+      },
+      "segments": {
+        "gap": {
+          "<=8": {
+            "segments": 2359,
+            "skeleton_pixels": 8274
+          },
+          "9-16": {
+            "segments": 1733,
+            "skeleton_pixels": 21246
+          },
+          "17-32": {
+            "segments": 2068,
+            "skeleton_pixels": 48197
+          },
+          "33-64": {
+            "segments": 1282,
+            "skeleton_pixels": 57444
+          },
+          ">64": {
+            "segments": 1413,
+            "skeleton_pixels": 296336
+          }
+        },
+        "terminal_missing": {
+          "<=8": {
+            "segments": 1094,
+            "skeleton_pixels": 4648
+          },
+          "9-16": {
+            "segments": 653,
+            "skeleton_pixels": 8142
+          },
+          "17-32": {
+            "segments": 599,
+            "skeleton_pixels": 13901
+          },
+          "33-64": {
+            "segments": 418,
+            "skeleton_pixels": 19096
+          },
+          ">64": {
+            "segments": 918,
+            "skeleton_pixels": 221348
+          }
+        },
+        "whole_missed": {
+          "<=8": {
+            "segments": 102,
+            "skeleton_pixels": 210
+          },
+          "9-16": {
+            "segments": 32,
+            "skeleton_pixels": 395
+          },
+          "17-32": {
+            "segments": 45,
+            "skeleton_pixels": 1066
+          },
+          "33-64": {
+            "segments": 68,
+            "skeleton_pixels": 3281
+          },
+          ">64": {
+            "segments": 294,
+            "skeleton_pixels": 104300
+          }
+        }
+      },
+      "uncovered_skeleton_fraction": 0.3931641900579416,
+      "fragments": {
+        "count": 9528,
+        "total_area": 5251009,
+        "area_quantiles": {
+          "min": 1.0,
+          "p10": 6.0,
+          "p25": 20.0,
+          "p50": 67.0,
+          "p75": 206.25,
+          "p90": 691.3000000000011,
+          "max": 74273.0
+        },
+        "fraction_of_fp_pixels": 0.3111906908214075
+      },
+      "image_A_quantiles": {
+        "min": 0.0,
+        "p10": 0.0,
+        "p25": 0.1326062532553523,
+        "p50": 0.48835784313725494,
+        "p75": 0.6647189035014677,
+        "p90": 1.0,
+        "max": 1.0
+      },
+      "no_truth_road_images": 410,
+      "no_predicted_road_images": 246,
+      "no_truth_with_predicted_road_images": 202,
+      "no_truth_with_predicted_road_fp_pixels": 1625317,
+      "worst_images": [
+        {
+          "filename": "2524.png",
+          "road_iou": 0.0,
+          "cldice": 0.0,
+          "boundary_iou": 0.0,
+          "quality": 0.0
+        },
+        {
+          "filename": "2526.png",
+          "road_iou": 0.0,
+          "cldice": 0.0,
+          "boundary_iou": 0.0,
+          "quality": 0.0
+        },
+        {
+          "filename": "2530.png",
+          "road_iou": 0.0,
+          "cldice": 0.0,
+          "boundary_iou": 0.0,
+          "quality": 0.0
+        },
+        {
+          "filename": "2531.png",
+          "road_iou": 0.0,
+          "cldice": 0.0,
+          "boundary_iou": 0.0,
+          "quality": 0.0
+        },
+        {
+          "filename": "2533.png",
+          "road_iou": 0.0,
+          "cldice": 0.0,
+          "boundary_iou": 0.0,
+          "quality": 0.0
+        },
+        {
+          "filename": "2538.png",
+          "road_iou": 0.0,
+          "cldice": 0.0,
+          "boundary_iou": 0.0,
+          "quality": 0.0
+        },
+        {
+          "filename": "2541.png",
+          "road_iou": 0.0,
+          "cldice": 0.0,
+          "boundary_iou": 0.0,
+          "quality": 0.0
+        },
+        {
+          "filename": "2545.png",
+          "road_iou": 0.0,
+          "cldice": 0.0,
+          "boundary_iou": 0.0,
+          "quality": 0.0
+        },
+        {
+          "filename": "2551.png",
+          "road_iou": 0.0,
+          "cldice": 0.0,
+          "boundary_iou": 0.0,
+          "quality": 0.0
+        },
+        {
+          "filename": "2552.png",
+          "road_iou": 0.0,
+          "cldice": 0.0,
+          "boundary_iou": 0.0,
+          "quality": 0.0
+        }
+      ]
+    }
+  },
+  "self_checks": {
+    "distance_partitions": true,
+    "skeleton_partition": true,
+    "pooled_counts": true
+  },
+  "visualizations": [
+    "Urban_01_3521.png",
+    "Urban_02_3529.png",
+    "Urban_03_3570.png",
+    "Urban_04_3577.png",
+    "Urban_05_3580.png",
+    "Urban_06_3592.png",
+    "Urban_07_3613.png",
+    "Urban_08_3618.png",
+    "Urban_09_3625.png",
+    "Urban_10_3668.png",
+    "Rural_01_2524.png",
+    "Rural_02_2526.png",
+    "Rural_03_2530.png",
+    "Rural_04_2531.png",
+    "Rural_05_2533.png",
+    "Rural_06_2538.png",
+    "Rural_07_2541.png",
+    "Rural_08_2545.png",
+    "Rural_09_2551.png",
+    "Rural_10_2552.png"
+  ],
+  "definitions": {
+    "distance_bin_upper_bounds": [
+      2,
+      4,
+      8,
+      16,
+      null
+    ],
+    "empty_reference": "all relevant errors enter >16",
+    "ignored": "excluded from predictions, truth and statistics; EDT is not geodesic",
+    "segment_contact_dilation": "3x3 square, 8-connected contact regions",
+    "fragment_tolerance": "Euclidean radius-2 disk",
+    "undefined_descriptive_fraction": null
+  },
+  "timing": {
+    "forward_total": 64.83984283835161,
+    "forward_mean_per_image": 0.03884951638007886,
+    "analysis_worker_total": 360.9320607878035,
+    "analysis_mean_per_image": 0.21625647740431606,
+    "official_metric_worker_total": 139.2523503873963,
+    "wall_including_loading_and_visualization": 165.3820984980557
+  }
+}
