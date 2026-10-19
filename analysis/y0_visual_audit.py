@@ -121,14 +121,19 @@ def save_selection(selected, output_dir):
 
 
 def check_consistency(result, source):
+    """Describe all count deltas without rejecting cross-device predictions."""
     actual = {"fp_pixels": result["fp_pixels"], "fn_pixels": result["fn_pixels"],
               "gap_segments": sum(item["segments"] for item in result["segments"]["gap"].values()),
               "gap_skeleton_pixels": sum(item["skeleton_pixels"] for item in result["segments"]["gap"].values())}
-    differences = {key: {"expected": int(source[key]), "actual": value}
-                   for key, value in actual.items() if value != int(source[key])}
-    if differences:
-        raise RuntimeError(f"Prediction differs from PR #6 for {source['domain']}/{source['filename']}: {differences}")
-    return actual
+    comparisons = {key: {"pr6": int(source[key]), "current": value, "delta": value - int(source[key])}
+                   for key, value in actual.items()}
+    return actual, comparisons
+
+
+def relative_count_difference(comparison):
+    """Absolute delta / PR #6 count; zero/zero is 0, nonzero/zero is infinity."""
+    reference, delta = comparison["pr6"], abs(comparison["delta"])
+    return delta / reference if reference else (float("inf") if delta else 0.)
 
 
 def draw_panel(image, raw, predicted, gaps, row, output_path):
@@ -182,6 +187,8 @@ def render_selected(selected, records, args):
     indices = {domain: {image.name: index for index, (image, _) in enumerate(dataset.pairs)}
                for domain, dataset in datasets.items()}
     forward_seconds, analysis_seconds, drawing_seconds, panels = 0., 0., 0., 0
+    matched, mismatched = 0, 0
+    max_fp_relative_difference, max_fn_relative_difference = 0., 0.
     for (domain, filename), rows in tasks.items():
         dataset = datasets[domain]
         index = indices[domain][filename]
@@ -194,7 +201,19 @@ def render_selected(selected, records, args):
         forward_seconds += time.perf_counter() - phase
         phase = time.perf_counter()
         result = y0.analyze_masks(predicted, raw, return_gap_mask=True)
-        actual = check_consistency(result, sources[(domain, filename)])
+        actual, comparisons = check_consistency(result, sources[(domain, filename)])
+        differs = any(item["delta"] != 0 for item in comparisons.values())
+        if differs:
+            mismatched += 1
+            max_fp_relative_difference = max(max_fp_relative_difference,
+                                             relative_count_difference(comparisons["fp_pixels"]))
+            max_fn_relative_difference = max(max_fn_relative_difference,
+                                             relative_count_difference(comparisons["fn_pixels"]))
+            values = " ".join(f"{key}(pr6={item['pr6']},current={item['current']},delta={item['delta']:+d})"
+                              for key, item in comparisons.items())
+            print(f"DIFF filename={filename} domain={domain} groups={','.join(row['group'] for row in rows)} {values}", flush=True)
+        else:
+            matched += 1
         analysis_seconds += time.perf_counter() - phase
         phase = time.perf_counter()
         with Image.open(dataset.pairs[index][0]) as image_file:
@@ -202,11 +221,17 @@ def render_selected(selected, records, args):
         for row in rows:
             category = "vis_no_gt" if row["group"] == "C" else "vis_gt_road"
             path = args.vis_root / category / f"{domain}_{row['group']}_{row['rank']:02d}_{filename}"
-            draw_panel(original, raw, predicted, result["gap_mask"], row, path)
+            panel_row = dict(row, gap_segments=actual["gap_segments"])
+            draw_panel(original, raw, predicted, result["gap_mask"], panel_row, path)
             panels += 1
         drawing_seconds += time.perf_counter() - phase
-        print(f"PASS {domain}/{filename}: {actual}; panels={len(rows)}", flush=True)
+        status = "DIFF_RENDERED" if differs else "PASS"
+        print(f"{status} {domain}/{filename}: {actual}; panels={len(rows)}", flush=True)
     count = len(tasks)
+    print(f"CONSISTENCY_SUMMARY matched={matched} mismatched={mismatched} "
+          f"max_fp_relative_difference={max_fp_relative_difference:.9f} "
+          f"max_fn_relative_difference={max_fn_relative_difference:.9f} "
+          "(absolute_delta/PR6; zero_reference: 0_if_unchanged_else_inf; unique_images)", flush=True)
     print(f"Completed {count} unique images, {panels} panels; "
           f"forward={forward_seconds:.3f}s analysis={analysis_seconds:.3f}s "
           f"drawing={drawing_seconds:.3f}s wall={time.perf_counter() - started:.3f}s", flush=True)
