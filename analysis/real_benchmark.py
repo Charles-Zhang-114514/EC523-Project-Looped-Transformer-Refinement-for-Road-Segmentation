@@ -273,7 +273,7 @@ def run(args):
                '## Repair rates by length / local width', '', markdown_table([r for r in repair_summary if r['grouping']=='ratio_bin'], ['domain','group','method','parameter','connectivity','events','valid_events','repaired','bypassed','invalid','repair_rate']), '',
                '## False connections on clean masks', '', markdown_table(false_summary, list(false_summary[0])), '',
                '## Skips and reproducibility', '', markdown_table(site_rows,list(site_rows[0])), '', markdown_table([{k:r[k] for k in ('domain','image','bridges','reason')} for r in bridge_rows], ['domain','image','bridges','reason']), '',
-               'Set EC523_DATA_DIR and EC523_STARTER_DIR, source env.sh, then run:', '',
+               'Configure course paths if needed, source scripts/activate_scc.sh, then run:', '',
                f'`python analysis/real_benchmark.py --n {args.n} --seed {args.seed} --output results/real_benchmark/<fresh-run>`', '',
                'Optional `--examples tmp/real_benchmark_examples` saves derived visualizations only in ignored tmp/. No data-derived PNG is written to results or staged in Git. See samples.csv for label hashes, gap_events.csv for exact local windows/anchors/statuses, repair_events.csv for event outcomes, and run_info.json for pooled counts/versions/timing.']
     (out / 'summary.md').write_text('\n'.join(content) + '\n')

@@ -20,11 +20,11 @@
 # that training wall estimate. Replacing its 92-second metric estimate per trained
 # run with 4 full-grid validations (2,320 seconds total) gives about 6h12m.
 # h_rt=8h leaves startup and throughput margin.
-source "${SGE_O_WORKDIR:?Submit from the repository root}/env.sh" || exit 1
+source "${SGE_O_WORKDIR:?Submit from the repository root}/scripts/activate_scc.sh" || exit 1
 set -euo pipefail
 cd "$SGE_O_WORKDIR"
-: "${EC523_DATA_DIR:?Set EC523_DATA_DIR in env.sh}"
-: "${EC523_STARTER_DIR:?Set EC523_STARTER_DIR in env.sh}"
+: "${EC523_DATA_DIR:?Set EC523_DATA_DIR in the optional env.sh override}"
+: "${EC523_STARTER_DIR:?Set EC523_STARTER_DIR in the optional env.sh override}"
 export OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 MKL_NUM_THREADS=1
 
 echo "=== GPU ==="

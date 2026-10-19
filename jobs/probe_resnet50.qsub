@@ -13,11 +13,11 @@
 # Submit from the repository root. Ten epochs use roughly 3,200 optimizer steps per setting.
 # CPU-pilot linear scaling estimates about 2.8 hours per setting (training plus the full
 # validation pipeline); ten hours leaves margin for I/O and unknown GPU throughput.
-source "${SGE_O_WORKDIR:?Submit from the repository root}/env.sh" || exit 1
+source "${SGE_O_WORKDIR:?Submit from the repository root}/scripts/activate_scc.sh" || exit 1
 set -euo pipefail
 cd "$SGE_O_WORKDIR"
-: "${EC523_DATA_DIR:?Set EC523_DATA_DIR in env.sh}"
-: "${EC523_STARTER_DIR:?Set EC523_STARTER_DIR in env.sh}"
+: "${EC523_DATA_DIR:?Set EC523_DATA_DIR in the optional env.sh override}"
+: "${EC523_STARTER_DIR:?Set EC523_STARTER_DIR in the optional env.sh override}"
 export OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 MKL_NUM_THREADS=1
 
 echo "=== GPU ==="

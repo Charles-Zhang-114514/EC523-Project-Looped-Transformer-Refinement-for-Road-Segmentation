@@ -1,3 +1,7 @@
+# Historical course-starter pins, retained for provenance.
+# The supported SCC setup is: source scripts/activate_scc.sh
+# These versions do not describe the shared fall-2026-pyt environment.
+# Do not pip-install this file into the shared environment; see README.md.
 numpy==2.3.5
 Pillow==12.3.0
 torch==2.6.0
