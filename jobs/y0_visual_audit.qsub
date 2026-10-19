@@ -1,0 +1,30 @@
+#!/bin/bash -l
+#$ -N ec523-y0-visual-audit
+#$ -P ec523kb
+#$ -cwd
+#$ -pe omp 4
+#$ -l gpus=1
+#$ -l gpu_c=8.0
+#$ -l h_rt=00:15:00
+#$ -l mem_per_core=8G
+#$ -j y
+#$ -m ea
+#$ -o runs/logs/
+
+# Submit from the repository root; create runs/logs before calling qsub.
+# Budget 70 panels (69 unique images): GPU forward <=70*0.036=2.52 s;
+# serial geometry <=70*1.228992=86.0 s using the previous CPU pilot;
+# input decode <=70*0.023=1.61 s; allow 2 s/panel for PNG reads/drawing/saving
+# (140 s). This is about 230 s (3.8 min), before model startup and I/O variance.
+# h_rt=15 min leaves startup/filesystem margin. Native/Torch threads are capped
+# at one; the four-slot allocation bounds CPU use without oversubscription.
+source "${SGE_O_WORKDIR:?Submit from the repository root}/env.sh" || exit 1
+set -euo pipefail
+cd "$SGE_O_WORKDIR"
+: "${EC523_DATA_DIR:?Set EC523_DATA_DIR in env.sh}"
+export OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 MKL_NUM_THREADS=1
+
+python -u analysis/y0_visual_audit.py --device cuda --seed 0 \
+    --per-image-csv results/y0_analysis/dinov3_vitl16_web_bn_posw4/per_image.csv \
+    --ckpt runs/linear_probe/checkpoints/dinov3_vitl16_web_bn_posw4.pt \
+    --vis-root runs/y0_analysis
