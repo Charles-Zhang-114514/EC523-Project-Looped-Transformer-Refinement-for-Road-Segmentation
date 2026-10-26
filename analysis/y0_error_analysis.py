@@ -59,23 +59,14 @@ def empty_segment_table():
                    for length in LENGTH_BINS} for kind in SEGMENT_TYPES}
 
 
-def analyze_masks(prediction, labels):
-    """Return geometry statistics, restricted to valid pixels, for one tile."""
-    target, valid = map_raw_labels(labels)
-    prediction = np.asarray(prediction, dtype=bool)
-    if prediction.shape != valid.shape:
-        raise ValueError("Prediction and label shapes must match")
-    predicted = prediction & valid
-    truth = target.astype(bool) & valid
-    fp, fn = predicted & ~truth, truth & ~predicted
-    fp_bins = distance_error_bins(fp, truth)
-    fn_bins = distance_error_bins(fn, predicted)
-
-    skeleton = skeletonize(truth, method="zhang") & valid
+def classify_skeleton_segments(truth, predicted, return_gap_mask=False):
+    """Share the original contact-region classifier with optional gap geometry."""
+    skeleton = skeletonize(truth, method="zhang")
     covered = skeleton & predicted
     uncovered = skeleton & ~predicted
     uncovered_labels, _ = label(uncovered, connectivity=2, return_num=True)
     segments = empty_segment_table()
+    gap_mask = np.zeros_like(truth, dtype=bool) if return_gap_mask else None
     for segment_id, bounds in enumerate(ndi.find_objects(uncovered_labels), start=1):
         if bounds is None:
             continue
@@ -90,6 +81,24 @@ def analyze_masks(prediction, labels):
         length_bin = LENGTH_BINS[int(np.searchsorted((8, 16, 32, 64), length, side="left"))]
         segments[kind][length_bin]["segments"] += 1
         segments[kind][length_bin]["skeleton_pixels"] += length
+        if return_gap_mask and kind == "gap":
+            gap_mask[region] |= segment
+    return skeleton, uncovered, segments, gap_mask
+
+
+def analyze_masks(prediction, labels, return_gap_mask=False):
+    """Return geometry statistics; optional gap pixels are never saved by default."""
+    target, valid = map_raw_labels(labels)
+    prediction = np.asarray(prediction, dtype=bool)
+    if prediction.shape != valid.shape:
+        raise ValueError("Prediction and label shapes must match")
+    predicted = prediction & valid
+    truth = target.astype(bool) & valid
+    fp, fn = predicted & ~truth, truth & ~predicted
+    fp_bins = distance_error_bins(fp, truth)
+    fn_bins = distance_error_bins(fn, predicted)
+    skeleton, uncovered, segments, gap_mask = classify_skeleton_segments(
+        truth, predicted, return_gap_mask=return_gap_mask)
 
     _, truth_components = label(truth, connectivity=2, return_num=True)
     predicted_labels, predicted_components = label(predicted, connectivity=2, return_num=True)
@@ -116,6 +125,8 @@ def analyze_masks(prediction, labels):
         raise AssertionError("Segment types do not partition uncovered skeleton pixels")
     if sum(fragment_areas) > result["fp_pixels"]:
         raise AssertionError("False-positive fragment area exceeds total FP area")
+    if return_gap_mask:
+        result["gap_mask"] = gap_mask
     return result
 
 
@@ -311,6 +322,21 @@ def save_visualizations(worst, datasets, vis_dir):
     return paths
 
 
+def load_frozen_probe(checkpoint_path, device):
+    """Load the selected checkpoint exactly as in the original analysis runner."""
+    checkpoint = torch.load(checkpoint_path, map_location="cpu", weights_only=True)
+    if checkpoint.get("encoder") != ENCODER or checkpoint.get("head") != "bn_linear":
+        raise ValueError("Expected the selected dinov3_vitl16_web + bn_linear checkpoint")
+    if float(checkpoint.get("pos_weight", -1)) != 4:
+        raise ValueError("Expected a checkpoint trained with pos_weight=4")
+    encoder = probe.build_encoder(ENCODER).to(device).eval()
+    head = probe.LinearProbe(encoder.out_channels, head_type=checkpoint["head"]).to(device).eval()
+    head.load_state_dict(checkpoint["state_dict"])
+    if encoder.training or head.training or any(p.requires_grad for p in encoder.parameters()):
+        raise RuntimeError("The encoder must be frozen and both modules must be in eval mode")
+    return encoder, head, checkpoint
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--ckpt", type=Path, default=ROOT / "runs/linear_probe/checkpoints/dinov3_vitl16_web_bn_posw4.pt")
@@ -347,16 +373,7 @@ def main():
         raise RuntimeError("CUDA was requested but is unavailable")
     started = time.perf_counter()
     metrics = probe.official_metrics()
-    checkpoint = torch.load(args.ckpt, map_location="cpu", weights_only=True)
-    if checkpoint.get("encoder") != ENCODER or checkpoint.get("head") != "bn_linear":
-        raise ValueError("Expected the selected dinov3_vitl16_web + bn_linear checkpoint")
-    if float(checkpoint.get("pos_weight", -1)) != 4:
-        raise ValueError("Expected a checkpoint trained with pos_weight=4")
-    encoder = probe.build_encoder(ENCODER).to(device).eval()
-    head = probe.LinearProbe(encoder.out_channels, head_type=checkpoint["head"]).to(device).eval()
-    head.load_state_dict(checkpoint["state_dict"])
-    if encoder.training or head.training or any(p.requires_grad for p in encoder.parameters()):
-        raise RuntimeError("The encoder must be frozen and both modules must be in eval mode")
+    encoder, head, checkpoint = load_frozen_probe(args.ckpt, device)
     datasets = {domain: probe.RoadDataset("Val", domain, limit=args.limit_per_domain,
                                          seed=args.seed + i + 10) for i, domain in enumerate(GROUPS[:2])}
     if any(len(dataset) == 0 for dataset in datasets.values()):
