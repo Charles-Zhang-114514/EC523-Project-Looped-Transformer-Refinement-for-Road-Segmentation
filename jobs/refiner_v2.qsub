@@ -1,0 +1,64 @@
+#!/bin/bash -l
+#$ -N ec523-refiner-v2
+#$ -P ec523kb
+#$ -cwd
+#$ -pe omp 8
+#$ -l gpus=1
+#$ -l gpu_c=8.0
+#$ -l mem_per_core=8G
+#$ -l h_rt=06:00:00
+#$ -m ea
+#$ -j y
+#$ -o runs/logs/
+
+# Submit from repository root after creating runs/logs. V1 on A40 used
+# ~328 s/epoch (191 s encoder/probe, 133 s refiner), ~2.5 h end to end.
+# CPU epoch-1 refiner forward/backward: patch 8.243 s, conv 11.129 s,
+# ratio 1.35 at batch 4/K=2. This is only a rough GPU/K=4 estimate:
+# CPU/GPU convolution kernels and activation costs need not scale alike.
+# Extra training: 20*133*(1.35-1)=931 s (~15.5 min).
+# Selection: 20*(200*(0.076+0.02*1.35)+4*200*0.11/6)=705 s (~11.8 min).
+# Add another full-Val checkpoint evaluation (~10 min) and diagnostics
+# (~16 min measured + ~1 min extra Train threshold scan).
+# Total ~2.5 h + 15.5+11.8+10+17 min = 3.41 h. Request 6 h for variance,
+# unmeasured GPU conv costs and I/O; this estimate remains below six hours.
+# Train: 7 loaders + main. Evaluation: 1 loader + 6 spawn workers + main.
+source "${SGE_O_WORKDIR:?Submit from repository root}/env.sh" || exit 1
+set -uo pipefail
+cd "$SGE_O_WORKDIR"
+export PYTHONPATH="$PWD/src${PYTHONPATH:+:$PYTHONPATH}"
+export OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 MKL_NUM_THREADS=1
+python -c 'import torch, numpy, transformers; print("GPU:", torch.cuda.get_device_name(), flush=True); print("Versions:", torch.__version__, numpy.__version__, transformers.__version__, flush=True)'
+git rev-parse HEAD
+FAILED=0
+STATUS_LINES=()
+
+run_stage() {
+    local name="$1" start end status
+    shift
+    start=$(date +%s)
+    echo "START stage=${name}"
+    if "$@"; then
+        status=SUCCESS
+    else
+        status="FAILED(exit=$?)"
+        FAILED=1
+    fi
+    end=$(date +%s)
+    STATUS_LINES+=("${name}: ${status} ($((end-start))s)")
+    echo "END ${STATUS_LINES[-1]}"
+}
+
+run_stage train_and_evaluate python -u scripts/train_refiner.py \
+    --head-type conv_upsample --epochs 20 --batch-size 4 --lr 3e-4 --k-train 4 \
+    --eval-k 1,2,4,6,8 --device cuda --seed 0 \
+    --loader-workers 7 --eval-loader-workers 1 --metric-workers 6 \
+    --monitor-every 5 --monitor-per-domain 50 --select-every 1 --select-per-domain 100 \
+    --out-dir results/refiner/v2 --ckpt-dir runs/refiner/v2/checkpoints
+run_stage diagnose_best python -u analysis/refiner_diagnostics.py \
+    --device cuda --loader-workers 1 --metric-workers 6 \
+    --ckpt runs/refiner/v2/checkpoints/best.pt \
+    --out-dir results/refiner/v2_diagnostics --vis-dir runs/refiner/v2_diagnostics/vis
+echo "JOB STAGE SUMMARY"
+printf '%s\n' "${STATUS_LINES[@]}"
+exit "$FAILED"
