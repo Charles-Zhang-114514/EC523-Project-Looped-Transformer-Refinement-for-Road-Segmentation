@@ -3,6 +3,7 @@
 import argparse
 from collections import deque
 import json
+import hashlib
 import math
 import multiprocessing as mp
 import os
@@ -65,10 +66,14 @@ def initialize_eval_worker(starter):
     probe.initialize_metric_worker(starter, (.5,))
 
 
-def score_image(domain, image_id, predictions, labels, geometry):
+def score_image(domain, image_id, predictions, labels, geometry, eval_extra=False):
     started = time.perf_counter()
     valid = labels != 0
     draft = predictions["y0_draft"].astype(bool)
+    if eval_extra:
+        from analysis import refiner_diagnostics as diagnostics
+        truth = labels == 3
+        gap, terminal, covered = diagnostics.baseline_skeleton_sets(truth, draft & valid)
     outputs, cache = {}, []
     for key, predicted in predictions.items():
         cached = next((item for mask, item in cache if np.array_equal(mask, predicted)), None)
@@ -87,6 +92,14 @@ def score_image(domain, image_id, predictions, labels, geometry):
         mask = predicted.astype(bool)
         outputs[key] = {**cached, "added": int((mask & ~draft & valid).sum()),
                         "deleted": int((~mask & draft & valid).sum())}
+        if eval_extra:
+            fragments = diagnostics.fragment_shapes(mask, draft, truth, valid)
+            outputs[key]["extra"] = {
+                "changes": diagnostics.change_counts(draft, mask, truth, valid),
+                "tracking": {"gap_total": int(gap.sum()), "gap_covered": int((gap & mask).sum()),
+                             "terminal_total": int(terminal.sum()), "terminal_covered": int((terminal & mask).sum()),
+                             "covered_total": int(covered.sum()), "covered_lost": int((covered & ~mask).sum())},
+                "new_fragments": {"count": len(fragments), "aligned_edges": sum(f["aligned_edges"] for f in fragments)}}
     return domain, image_id, outputs, time.perf_counter() - started
 
 
@@ -97,7 +110,7 @@ def make_loader(dataset, batch_size, workers, shuffle=False, seed=0):
                       worker_init_fn=probe.initialize_data_worker if workers else None)
 
 
-def evaluate(encoder, head, model, datasets, ks, device, loader_workers=1, metric_workers=6, geometry=True):
+def evaluate(encoder, head, model, datasets, ks, device, loader_workers=1, metric_workers=6, geometry=True, eval_extra=False):
     """One streamed trajectory to max(ks); workers receive only uint8 masks."""
     started = time.perf_counter()
     model.eval()
@@ -108,6 +121,7 @@ def evaluate(encoder, head, model, datasets, ks, device, loader_workers=1, metri
             for domain in DOMAINS}
     times = {domain: {key: [] for key in keys} for domain in DOMAINS}
     peaks = {domain: {key: None for key in keys} for domain in DOMAINS}
+    extra_sums = {domain: {key: {} for key in keys} for domain in DOMAINS}
     pending, images = deque(), []
     worker_seconds, encoder_seconds = 0., 0.
 
@@ -123,6 +137,11 @@ def evaluate(encoder, head, model, datasets, ks, device, loader_workers=1, metri
             if geometry:
                 for name in STRUCTURE_KEYS:
                     sums[domain][key][name] += item["structure"][name]
+            if eval_extra:
+                for section, values in item["extra"].items():
+                    target = extra_sums[domain][key].setdefault(section, {})
+                    for name, value in values.items():
+                        target[name] = target.get(name, 0) + value
 
     pool = mp.get_context("spawn").Pool(metric_workers, initializer=initialize_eval_worker,
                                         initargs=(os.environ.get("EC523_STARTER_DIR"),))
@@ -159,7 +178,9 @@ def evaluate(encoder, head, model, datasets, ks, device, loader_workers=1, metri
                                                          torch.cuda.max_memory_allocated(device))
                             predictions[key] = (answer.sigmoid().squeeze() >= .5).cpu().numpy().astype(np.uint8)
                 labels = np.asarray(raw).squeeze().astype(np.uint8, copy=False)
-                pending.append(pool.apply_async(score_image, (domain, image_id[0], predictions, labels, geometry)))
+                pending.append(pool.apply_async(score_image, (domain, image_id[0], predictions, labels, geometry, eval_extra)))
+                if eval_extra:
+                    print(f"EVALUATED {domain} {image_id[0]} K={max(ks)}", flush=True)
                 if len(pending) >= 2 * metric_workers:
                     consume()
             del loader
@@ -191,6 +212,21 @@ def evaluate(encoder, head, model, datasets, ks, device, loader_workers=1, metri
                 "refiner_seconds": sum(durations),
                 "refiner_seconds_per_image": sum(durations) / len(durations),
                 "peak_cuda_bytes": max(memory) if memory else None}
+            if eval_extra:
+                from analysis.refiner_diagnostics import fraction
+                sections = {section: {name: sum(extra_sums[d][key][section][name] for d in domains)
+                                      for name in values} for section, values in extra_sums[domains[0]][key].items()}
+                changes, tracking, fragments = (sections[s] for s in ('changes', 'tracking', 'new_fragments'))
+                changed = sum(changes.values())
+                changes.update(fractions={n: fraction(v, pooled.valid) for n, v in changes.items()},
+                               correct_fraction=fraction(changes['added_correct']+changes['deleted_correct'], changed),
+                               added_correct_fraction=fraction(changes['added_correct'], changes['added_correct']+changes['added_wrong']),
+                               deleted_correct_fraction=fraction(changes['deleted_correct'], changes['deleted_correct']+changes['deleted_wrong']))
+                tracking.update(gap_repair_fraction=fraction(tracking['gap_covered'], tracking['gap_total']),
+                                terminal_coverage_fraction=fraction(tracking['terminal_covered'], tracking['terminal_total']),
+                                new_break_fraction=fraction(tracking['covered_lost'], tracking['covered_total']))
+                fragments['aligned_edge_fraction'] = fraction(fragments['aligned_edges'], 4*fragments['count'])
+                report[domain][key]['extra'] = sections
     return {"groups": report, "images": images, "encoder_seconds": encoder_seconds,
             "metric_geometry_worker_seconds": worker_seconds, "wall_seconds": time.perf_counter() - started}
 
@@ -234,9 +270,38 @@ def restore_rng(state, loader, device):
         torch.cuda.set_rng_state_all([value.cpu() for value in state["cuda"]])
 
 
-def selection_score(scores):
+def parse_selection_ks(text):
+    try:
+        pairs = [value.split(':') for value in text.split(',')]
+        result = {str(int(k)): float(weight) for k, weight in pairs}
+        if len(result) != len(pairs) or any(int(k) < 1 or not math.isfinite(w) or w <= 0 for k, w in result.items()):
+            raise ValueError
+        if not math.isclose(sum(result.values()), 1., abs_tol=1e-9):
+            raise ValueError
+        return dict(sorted(result.items(), key=lambda item: int(item[0])))
+    except (ValueError, TypeError):
+        raise argparse.ArgumentTypeError('Expected unique positive K:weight pairs with finite positive weights summing to one')
+
+
+def protocol_datasets(split, part, limit=None):
+    """Selection and limited report sampling both use seed 0, never training seed."""
+    from scripts.make_val_split import validate_split
+    datasets = {domain: probe.RoadDataset('Val', domain) for domain in DOMAINS}
+    names = {domain: [a.name for a, _ in dataset.pairs] for domain, dataset in datasets.items()}
+    validate_split(split, names)
+    for domain, dataset in datasets.items():
+        allowed = set(split[part][domain])
+        dataset.pairs = [pair for pair in dataset.pairs if pair[0].name in allowed]
+        if limit is not None and len(dataset) > limit:
+            indices = np.sort(np.random.default_rng(0).choice(len(dataset), size=limit, replace=False))
+            dataset.pairs = [dataset.pairs[int(i)] for i in indices]
+    return datasets
+
+
+def selection_score(scores, weights=None):
     """Strict improvements select a checkpoint; ties keep the earlier epoch."""
-    value = .25 * scores["1"] + .25 * scores["2"] + .5 * scores["4"]
+    value = (.25 * scores["1"] + .25 * scores["2"] + .5 * scores["4"] if weights is None
+             else sum(weight * scores[key] for key, weight in weights.items()))
     if not math.isfinite(value):
         raise ValueError("Nonfinite checkpoint selection score")
     return value
@@ -247,6 +312,32 @@ def is_new_best(score, best):
 
 
 def summary_markdown(report):
+    if report.get('protocol') == 'val_sel_rep':
+        primary = dict(report)
+        primary.pop('protocol')
+        text = summary_markdown(primary).replace('# Looped refiner v1', '# Controlled refiner experiment', 1)
+        text = text.replace('Observed results for the final epoch; no Val model selection was performed.',
+                            f"Observed checkpoint at epoch {report['evaluated_epoch']}; selection uses Val-sel only. Final evaluation uses disjoint Val-rep only.", 1)
+        weights = report['config']['selection_ks']
+        keys = list(weights)
+        text += '\n## Val-sel checkpoint selection\n\n'
+        text += '| Epoch | y0 A | ' + ' | '.join('K'+k+' A' for k in keys) + ' | Weighted A | New best |\n'
+        text += '|' + '---|' * (4+len(keys)) + '\n'
+        for row in report['selection_curve']:
+            text += '| ' + ' | '.join([str(row['epoch']), f"{row['y0_draft']:.6f}"] + [f"{row[k]:.6f}" for k in keys] + [f"{row['score']:.6f}", str(row['new_best'])]) + ' |\n'
+        text += f"\nVal split SHA-256: {report['config']['val_split_sha256']}.\n"
+        if report['config']['eval_extra']:
+            text += '\n## Val-rep extra diagnostics\n\n'
+            rows = []
+            for domain, variants in report['evaluation']['groups'].items():
+                for key, item in variants.items():
+                    extra = item['extra']
+                    c, t, f = extra['changes'], extra['tracking'], extra['new_fragments']
+                    rows.append([domain, key, c['added_correct'], c['added_wrong'], c['deleted_correct'], c['deleted_wrong'],
+                                 c['added_correct_fraction'], c['deleted_correct_fraction'], t['gap_repair_fraction'],
+                                 t['terminal_coverage_fraction'], t['new_break_fraction'], f['count'], f['aligned_edge_fraction']])
+            text += '\n'.join(y0.markdown_table(['Group','K/reference','Added correct','Added wrong','Deleted correct','Deleted wrong','Correct/added','Correct/deleted','Gap repair','Terminal completion','New break','New fragments','Aligned edges/all edges'], rows))+'\n'
+        return text
     if "last_evaluation" in report:
         primary = dict(report)
         primary.pop("last_evaluation")
@@ -254,9 +345,10 @@ def summary_markdown(report):
         text = summary_markdown(primary).replace("# Looped refiner v1", "# Looped refiner v2", 1)
         text = text.replace("Observed results for the final epoch; no Val model selection was performed.",
                             f"Observed best checkpoint at epoch {report['best_epoch']}; selected on a Val subset included in full Val, so results are optimistic.", 1)
-        text += "\n## Checkpoint selection\n\n| Epoch | y0 A | K1 A | K2 A | K4 A | Weighted A | New best |\n|---|---:|---:|---:|---:|---:|---|\n"
+        keys = list(report['config'].get('selection_ks', {'1': .25, '2': .25, '4': .5}))
+        text += "\n## Checkpoint selection\n\n| Epoch | y0 A | " + ' | '.join('K'+k+' A' for k in keys) + ' | Weighted A | New best |\n|' + '---|' + '---:|' * (len(keys)+2) + '---|\n'
         for row in report["selection_curve"]:
-            text += f"| {row['epoch']} | {row['y0_draft']:.6f} | {row['1']:.6f} | {row['2']:.6f} | {row['4']:.6f} | {row['score']:.6f} | {row['new_best']} |\n"
+            text += '| ' + ' | '.join([str(row['epoch']), f"{row['y0_draft']:.6f}"] + [f"{row[k]:.6f}" for k in keys] + [f"{row['score']:.6f}", str(row['new_best'])]) + ' |\n'
         last_text = summary_markdown(last)
         text += "\n## Last checkpoint evaluation\n\n" + last_text[last_text.index("## K curves"):last_text.index("## Training epochs")]
         return text
@@ -327,6 +419,9 @@ def build_parser():
     parser.add_argument("--head-type", choices=("patch_linear", "conv_upsample"), default="patch_linear")
     parser.add_argument("--select-every", type=int, default=0, help="Zero preserves final-epoch-only v1 behavior")
     parser.add_argument("--select-per-domain", type=int, default=100)
+    parser.add_argument('--val-split', type=Path)
+    parser.add_argument('--selection-ks', type=parse_selection_ks, default='1:0.25,2:0.25,4:0.5')
+    parser.add_argument('--eval-extra', action='store_true')
     return parser
 
 
@@ -346,11 +441,13 @@ def main():
         if not {"state_dict", "config", "epoch"}.issubset(restored):
             parser.error("Checkpoint lacks refiner weights/config/epoch")
         explicit = {value.split("=", 1)[0] for value in sys.argv[1:] if value.startswith("--")}
-        settings = ["dimension", "layers", "heads", "mlp_ratio", "patch", "no_mask_feedback", "reset_state", "k_train", "head_type"]
+        if '--eval-extra' not in explicit:
+            args.eval_extra = restored['config'].get('eval_extra', False)
+        settings = ["dimension", "layers", "heads", "mlp_ratio", "patch", "no_mask_feedback", "reset_state", "k_train", "head_type", "selection_ks"]
         if args.resume:
             settings += ["batch_size", "lr", "seed", "limit_per_domain", "monitor_every", "monitor_per_domain", "select_every", "select_per_domain"]
         for name in settings:
-            saved = restored["config"].get(name, {"head_type": "patch_linear", "select_every": 0, "select_per_domain": 100}.get(name))
+            saved = restored["config"].get(name, {"head_type": "patch_linear", "select_every": 0, "select_per_domain": 100, 'selection_ks': parse_selection_ks('1:0.25,2:0.25,4:0.5')}.get(name))
             if "--" + name.replace("_", "-") in explicit and getattr(args, name) != saved:
                 parser.error(f"Checkpoint setting {name}={saved!r} conflicts with the requested value")
             setattr(args, name, saved)
@@ -360,6 +457,26 @@ def main():
                 args.seed = restored["config"]["seed"]
         if restored["config"]["probe_ckpt"] != str(args.probe_ckpt.resolve().relative_to(ROOT)):
             parser.error("The frozen probe checkpoint must match the training checkpoint config")
+        saved_split = restored['config'].get('val_split')
+        if saved_split:
+            if args.val_split is not None and args.val_split.resolve() != (ROOT/saved_split).resolve():
+                parser.error('Checkpoint Val split cannot change')
+            args.val_split = ROOT/saved_split
+        elif args.resume and args.val_split is not None:
+            parser.error('Cannot change a legacy training run to the controlled protocol on resume')
+    split = None
+    split_hash = None
+    if args.val_split is not None:
+        if not args.val_split.resolve().is_relative_to(ROOT):
+            parser.error('Val split must be inside the repository')
+        contents = args.val_split.read_bytes()
+        split, split_hash = json.loads(contents), hashlib.sha256(contents).hexdigest()
+        if restored is not None and restored['config'].get('val_split_sha256', split_hash) != split_hash:
+            parser.error('Val split SHA-256 changed since checkpoint creation')
+        if args.select_every == 0:
+            args.select_every = 1
+        if args.select_every != 1 or (args.epochs < 1 and not args.eval_only):
+            parser.error('Controlled training requires positive epochs and selection every epoch')
     if args.epochs < 0 or min(args.batch_size, args.k_train, args.monitor_every, args.monitor_per_domain, args.metric_workers) < 1:
         parser.error("Epochs must be nonnegative; batch/loop/monitor/metric settings must be positive")
     if args.resume and args.epochs < int(restored["epoch"]):
@@ -407,6 +524,8 @@ def main():
               if isinstance(value, Path) else value for key, value in vars(args).items()}
     config.update(weight_decay=.01, warmup_steps=500, clip_grad_norm=1., pos_weight=4.,
                   refiner_dtype="float32", encoder=y0.ENCODER, probe_head=checkpoint["head"])
+    if split is not None:
+        config['val_split_sha256'] = split_hash
     train_sets = ([probe.RoadDataset("Train", domain, limit=args.limit_per_domain, seed=args.seed + i)
                    for i, domain in enumerate(DOMAINS)] if args.epochs and not args.eval_only else [])
     loader = (make_loader(ConcatDataset(train_sets), args.batch_size, args.loader_workers, True, args.seed)
@@ -420,9 +539,12 @@ def main():
     selection_curve = list(restored.get("selection_curve", [])) if restored is not None else []
     best_score = restored.get("best_score") if restored is not None else None
     best_epoch = restored.get("best_epoch") if restored is not None else None
-    selection_sets = ({domain: probe.RoadDataset("Val", domain, limit=args.select_per_domain, seed=0)
-                       for domain in DOMAINS} if args.select_every and not args.eval_only else {})
+    selection_sets = ((protocol_datasets(split, 'Val-sel', args.select_per_domain) if split is not None else
+                       {domain: probe.RoadDataset("Val", domain, limit=args.select_per_domain, seed=0) for domain in DOMAINS})
+                      if args.select_every and not args.eval_only else {})
     selection_files = {domain: [pair[0].name for pair in dataset.pairs] for domain, dataset in selection_sets.items()}
+    if split is not None and not selection_files and restored is not None:
+        selection_files = restored.get('selection_files', {})
     config["scheduler_total_steps"] = (len(loader) * args.epochs if loader else
                                         restored["config"].get("scheduler_total_steps") if restored else None)
     if args.resume:
@@ -485,7 +607,7 @@ def main():
                   "batches": batches}
         epochs.append(record)
         print("EPOCH " + json.dumps({key: value for key, value in record.items() if key != "batches"}), flush=True)
-        if epoch == 0 or (epoch + 1) % args.monitor_every == 0:
+        if split is None and (epoch == 0 or (epoch + 1) % args.monitor_every == 0):
             monitor = {domain: probe.RoadDataset("Val", domain) for domain in DOMAINS}
             for dataset in monitor.values():
                 dataset.pairs = dataset.pairs[:args.monitor_per_domain]
@@ -500,11 +622,11 @@ def main():
         args.ckpt_dir.mkdir(parents=True, exist_ok=True)
         improved = False
         if args.select_every and ((epoch + 1) % args.select_every == 0 or epoch + 1 == args.epochs):
-            selected = evaluate(encoder, head, model, selection_sets, [1, 2, 4], device,
+            selected = evaluate(encoder, head, model, selection_sets, [int(k) for k in args.selection_ks], device,
                                 args.eval_loader_workers, args.metric_workers, geometry=False)
             point = {"epoch": epoch + 1, "seconds": selected["wall_seconds"]}
-            point.update({key: selected["groups"]["Overall"][key]["scores"]["A"] for key in ("y0_draft", "1", "2", "4")})
-            point["score"] = selection_score(point)
+            point.update({key: selected["groups"]["Overall"][key]["scores"]["A"] for key in ('y0_draft', *args.selection_ks)})
+            point["score"] = selection_score(point, args.selection_ks)
             improved = is_new_best(point["score"], best_score)
             point["new_best"] = improved
             if improved:
@@ -521,23 +643,28 @@ def main():
         if improved:
             torch.save(payload, args.ckpt_dir / "best.pt")
     del loader, train_sets
-    datasets = {domain: probe.RoadDataset("Val", domain, limit=args.limit_per_domain, seed=args.seed + i + 10)
-                for i, domain in enumerate(DOMAINS)}
-    if args.limit_per_domain is None and sum(map(len, datasets.values())) != 1669:
+    datasets = (protocol_datasets(split, 'Val-rep', args.limit_per_domain) if split is not None else
+                {domain: probe.RoadDataset("Val", domain, limit=args.limit_per_domain, seed=args.seed + i + 10) for i, domain in enumerate(DOMAINS)})
+    if split is None and args.limit_per_domain is None and sum(map(len, datasets.values())) != 1669:
         raise ValueError("Full Val must contain 1669 images")
+    if split is not None and not args.eval_only:
+        best = torch.load(args.ckpt_dir/'best.pt', map_location='cpu', weights_only=True)
+        model.load_state_dict(best['state_dict'])
     observed = evaluate(encoder, head, model, datasets, args.eval_k, device,
-                        args.eval_loader_workers, args.metric_workers)
+                        args.eval_loader_workers, args.metric_workers, eval_extra=args.eval_extra)
     last_observed = None
-    if args.select_every and not args.eval_only:
+    if split is None and args.select_every and not args.eval_only:
         last_observed = observed
         best = torch.load(args.ckpt_dir / "best.pt", map_location="cpu", weights_only=True)
         model.load_state_dict(best["state_dict"])
         observed = evaluate(encoder, head, model, datasets, args.eval_k, device,
-                            args.eval_loader_workers, args.metric_workers)
+                            args.eval_loader_workers, args.metric_workers, eval_extra=args.eval_extra)
     warnings = []
     draft_a = observed["groups"]["Overall"]["y0_draft"]["scores"]["A"]
     regression = "not checked: CPU or limited subset"
-    if device.type == "cuda" and args.limit_per_domain is None:
+    if split is not None:
+        regression = 'not checked: Val-rep differs from full Val'
+    if split is None and device.type == "cuda" and args.limit_per_domain is None:
         regression = "passed" if f"{draft_a:.6f}" == "0.526507" else "warning"
         if regression == "warning":
             warnings.append(f"GPU y0_draft Overall A@0.5={draft_a:.6f} (actual {draft_a:.12f}), expected 0.526507.")
@@ -554,6 +681,12 @@ def main():
                       selection_curve=selection_curve, selection_files=selection_files,
                       evaluated_epoch=best_epoch,
                       model_selection="best weighted K1/K2/K4 score on fixed Val subset; optimistic full-Val estimate")
+    if split is not None:
+        report.update(protocol='val_sel_rep', best_epoch=best_epoch, best_score=best_score,
+                      selection_curve=selection_curve, selection_files=selection_files,
+                      evaluated_epoch=start_epoch if args.eval_only else best_epoch,
+                      evaluation_files={d: [a.name for a, _ in dataset.pairs] for d, dataset in datasets.items()},
+                      model_selection='loaded checkpoint on Val-rep' if args.eval_only else 'best weighted score on Val-sel; report only on Val-rep')
     args.out_dir.mkdir(parents=True, exist_ok=True)
     (args.out_dir / "metrics.json").write_text(json.dumps(report, indent=2, allow_nan=False) + "\n", encoding="utf-8")
     (args.out_dir / "summary.md").write_text(summary_markdown(report), encoding="utf-8")
