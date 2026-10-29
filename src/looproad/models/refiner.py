@@ -57,10 +57,30 @@ class TransformerBlock(nn.Module):
         return tokens + self.mlp(self.norm2(tokens))
 
 
+class ConvUpsampleHead(nn.Module):
+    """Mix neighboring token features while decoding a smooth full-size delta."""
+    def __init__(self, dimension):
+        super().__init__()
+        self.norm = nn.LayerNorm(dimension)
+        self.project = nn.Linear(dimension, 16)
+        self.conv1 = nn.Conv2d(16, 16, 3, padding=1)
+        self.conv2 = nn.Conv2d(16, 16, 3, padding=1)
+        self.final = nn.Conv2d(16, 1, 1)
+        nn.init.zeros_(self.final.weight)
+        nn.init.zeros_(self.final.bias)
+
+    def forward(self, tokens, grid):
+        values = self.project(self.norm(tokens)).transpose(1, 2).reshape(tokens.shape[0], 16, grid, grid)
+        values = F.interpolate(values, scale_factor=4, mode="bilinear", align_corners=False)
+        values = F.gelu(self.conv1(values))
+        values = F.interpolate(values, scale_factor=4, mode="bilinear", align_corners=False)
+        return self.final(F.gelu(self.conv2(values)))
+
+
 class LoopRefiner(nn.Module):
     def __init__(self, in_channels=1024, dimension=256, layers=1, heads=8,
                  mlp_ratio=4., patch=16, image_size=1024,
-                 no_mask_feedback=False, reset_state=False):
+                 no_mask_feedback=False, reset_state=False, head_type="patch_linear"):
         super().__init__()
         if min(in_channels, dimension, layers, heads, patch, image_size) < 1 or mlp_ratio <= 0:
             raise ValueError("Model dimensions must be positive")
@@ -68,15 +88,21 @@ class LoopRefiner(nn.Module):
             raise ValueError("Incompatible attention dimension or patch grid")
         self.image_size, self.patch = image_size, patch
         self.grid = image_size // patch
+        if head_type not in ("patch_linear", "conv_upsample") or (head_type == "conv_upsample" and patch != 16):
+            raise ValueError("Unknown head type or conv_upsample patch size other than 16")
+        self.head_type = head_type
         self.no_mask_feedback, self.reset_state = no_mask_feedback, reset_state
         self.feature_projection = nn.Linear(in_channels, dimension)
         self.answer_projection = nn.Linear(patch * patch, dimension)
         self.initializer = nn.Linear(dimension, dimension)
         self.register_buffer("position_encoding", sine_position_encoding(self.grid, dimension))
         self.core = nn.Sequential(*(TransformerBlock(dimension, heads, mlp_ratio) for _ in range(layers)))
-        self.output_head = nn.Sequential(nn.LayerNorm(dimension), nn.Linear(dimension, patch * patch))
-        nn.init.zeros_(self.output_head[-1].weight)
-        nn.init.zeros_(self.output_head[-1].bias)
+        if head_type == "patch_linear":
+            self.output_head = nn.Sequential(nn.LayerNorm(dimension), nn.Linear(dimension, patch * patch))
+            nn.init.zeros_(self.output_head[-1].weight)
+            nn.init.zeros_(self.output_head[-1].bias)
+        else:
+            self.output_head = ConvUpsampleHead(dimension)
         self._initial_state = None
         self.parameter_counts()
 
@@ -102,7 +128,8 @@ class LoopRefiner(nn.Module):
         feedback = (torch.zeros_like(feature_tokens) if self.no_mask_feedback
                     else self.answer_tokens(answer))
         next_state = self.core(state + feature_tokens + feedback + self.position_encoding)
-        correction = unpatchify(self.output_head(next_state), self.image_size, self.image_size, self.patch)
+        correction = (unpatchify(self.output_head(next_state), self.image_size, self.image_size, self.patch)
+                      if self.head_type == "patch_linear" else self.output_head(next_state, self.grid))
         return next_state, answer + correction
 
     def parameter_counts(self):

@@ -98,7 +98,7 @@ def process_image(split, domain, filename, probabilities, binary, labels):
               "valid_pixels": int(valid.sum()), "gt_has_road": bool((truth & valid).any()),
               "counts": {}, "scores": {}, "changes": {}, "tracking": {}, "fragments": {}}
     for key in KEYS:
-        thresholds = THRESHOLDS if split == "Val" and key in probabilities else (.5,)
+        thresholds = THRESHOLDS if (split == "Val" and key in probabilities) or (split == "Train" and key in ("y0_draft", "1")) else (.5,)
         result["counts"][key], result["scores"][key] = {}, {}
         for threshold in thresholds:
             mask = probabilities[key] >= threshold if key in probabilities else binary[key]
@@ -136,7 +136,7 @@ def fraction(value, total):
 def aggregate(records, metrics):
     valid = sum(row["valid_pixels"] for row in records)
     out = {"images": len(records), "valid_pixels": valid, "scores": {}, "changes": {},
-           "tracking": {}, "fragments": {}, "best_thresholds": {}}
+           "tracking": {}, "fragments": {}, "best_thresholds": {}, "threshold_scan_best": {}}
     for key in KEYS:
         tags = records[0]["counts"][key].keys()
         out["scores"][key] = {}
@@ -146,7 +146,10 @@ def aggregate(records, metrics):
                 counts = counts + metrics.Counts(**row["counts"][key][tag])
             out["scores"][key][tag] = {"counts": asdict(counts), **metrics.summarize(counts)}
         best = max(out["scores"][key], key=lambda tag: out["scores"][key][tag]["quality"])
-        out["best_thresholds"][key] = {"threshold": float(best), "A": out["scores"][key][best]["quality"]}
+        out["threshold_scan_best"][key] = {"threshold": float(best), "A": out["scores"][key][best]["quality"]}
+        # Keep the pre-existing Train metadata at its original single threshold.
+        legacy_best = "0.5" if records[0]["split"] == "Train" else best
+        out["best_thresholds"][key] = {"threshold": float(legacy_best), "A": out["scores"][key][legacy_best]["quality"]}
     if records[0]["split"] == "Val":
         for key in KEYS[1:]:
             changes = {name: sum(row["changes"][key][name] for row in records) for name in CHANGE_KEYS}
@@ -197,10 +200,11 @@ def csv_row(record):
     return row
 
 
-def rankings(records):
+def rankings(records, gt_only=False):
     out = {}
     for domain in runner.DOMAINS:
-        rows = sorted((csv_row(row) for row in records if row["split"] == "Val" and row["domain"] == domain),
+        rows = sorted((csv_row(row) for row in records if row["split"] == "Val" and row["domain"] == domain
+                       and (not gt_only or row["gt_has_road"])),
                       key=lambda row: (row["delta_A_1"], row["filename"]))
         out[domain] = {"worst": rows[:10], "best": list(reversed(rows[-10:]))}
     return out
@@ -283,6 +287,13 @@ def markdown(report):
             best_rows.append([group, key, best["threshold"], best["A"]])
     table("Val threshold scan (selected on Val; optimistic)", ("Group", "K/reference", "Threshold", "A"), rows)
     table("Best thresholds (selected on Val; optimistic)", ("Group", "K/reference", "Threshold", "A"), best_rows)
+    comparison = []
+    for group in (*runner.DOMAINS, "Overall"):
+        for key in ("y0_draft", "1"):
+            train = report["groups"]["Train"][group]["threshold_scan_best"][key]
+            val = report["groups"]["Val"][group]["best_thresholds"][key]
+            comparison.append([group, key, train["threshold"], train["A"], val["threshold"], val["A"]])
+    table("Train vs Val best thresholds (split-selected; optimistic)", ("Group", "K/reference", "Train threshold", "Train A", "Val threshold", "Val A"), comparison)
     rows, track_rows, shape_rows = [], [], []
     for group in (*runner.DOMAINS, "Overall"):
         data = report["groups"]["Val"][group]
@@ -311,6 +322,10 @@ def markdown(report):
         for category, rows in ranks.items():
             table(f"{domain}: {category} delta A(K1-y0)", ("Filename", "GT road", "y0 A", "K1 A", "Delta A", "Largest flip category"),
                   [[row["filename"], str(row["gt_has_road"]), row["y0_draft_A"], row["1_A"], row["delta_A_1"], row["main_change_K1"]] for row in rows])
+    for domain, ranks in report["rankings_gt_road"].items():
+        for category, rows in ranks.items():
+            table(f"{domain}: {category} delta A(K1-y0), GT-road images only", ("Filename", "y0 A", "K1 A", "Delta A", "Largest flip category"),
+                  [[row["filename"], row["y0_draft_A"], row["1_A"], row["delta_A_1"], row["main_change_K1"]] for row in rows])
     lines.extend(["Coverage is exact skeleton-pixel intersection, with no dilation or distance tolerance.",
                   "Skeletons and gap categories use the original shared Zhang/8-connectivity classifier; baseline sets stay fixed across K.",
                   "New fragments require zero exact overlap with y0 and GT (no two-pixel tolerance). Bounding maxima are inclusive.",
@@ -349,7 +364,7 @@ def main():
     head.requires_grad_(False).eval()
     model = runner.LoopRefiner(encoder.out_channels, config["dimension"], config["layers"], config["heads"],
                                config["mlp_ratio"], config["patch"], no_mask_feedback=config["no_mask_feedback"],
-                               reset_state=config["reset_state"]).to(device=device, dtype=torch.float32)
+                               reset_state=config["reset_state"], head_type=config.get("head_type", "patch_linear")).to(device=device, dtype=torch.float32)
     model.load_state_dict(saved["state_dict"])
     model.requires_grad_(False).eval()
     print(f"LOADED epoch={saved['epoch']} device={device}; no training", flush=True)
@@ -367,7 +382,7 @@ def main():
         if packed is not None:
             identity = (result["domain"], result["filename"])
             candidates[identity] = packed
-            selected = {(domain, row["filename"]) for domain, groups in rankings(records).items()
+            selected = {(domain, row["filename"]) for domain, groups in rankings(records, gt_only=True).items()
                         for rows in groups.values() for row in rows}
             for old in list(candidates):
                 if old not in selected:
@@ -417,14 +432,16 @@ def main():
         groups[split] = {domain: aggregate([row for row in records if row["split"] == split and (domain == "Overall" or row["domain"] == domain)], metrics)
                          for domain in (*runner.DOMAINS, "Overall")}
     ranks = rankings(records)
-    for domain, categories in ranks.items():
+    ranks_gt = rankings(records, gt_only=True)
+    for domain, categories in ranks_gt.items():
         for category, rows in categories.items():
             for rank, row in enumerate(rows, 1):
                 render_triptych(row, candidates[(domain, row["filename"])], paths[(domain, row["filename"])],
                                 args.vis_dir / f"{domain}_{category}_{rank:02d}_{row['filename']}")
     report = {"checkpoint": str(args.ckpt.resolve().relative_to(ROOT)), "epoch": saved["epoch"],
               "device": str(device), "limit_per_domain": args.limit_per_domain, "thresholds": THRESHOLDS,
-              "groups": groups, "rankings": ranks, "inference_seconds": inference_seconds,
+              "groups": groups, "rankings": ranks, "rankings_gt_road": ranks_gt,
+              "head_type": config.get("head_type", "patch_linear"), "inference_seconds": inference_seconds,
               "worker_seconds": sum(row["worker_seconds"] for row in records),
               "wall_seconds": time.perf_counter() - started,
               "self_checks": "All Val flips and 0.5 Counts equal train_refiner.score_image; baseline geometry totals match shared classifier"}

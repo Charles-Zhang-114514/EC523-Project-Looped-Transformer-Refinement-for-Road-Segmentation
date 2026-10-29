@@ -234,7 +234,32 @@ def restore_rng(state, loader, device):
         torch.cuda.set_rng_state_all([value.cpu() for value in state["cuda"]])
 
 
+def selection_score(scores):
+    """Strict improvements select a checkpoint; ties keep the earlier epoch."""
+    value = .25 * scores["1"] + .25 * scores["2"] + .5 * scores["4"]
+    if not math.isfinite(value):
+        raise ValueError("Nonfinite checkpoint selection score")
+    return value
+
+
+def is_new_best(score, best):
+    return best is None or score > best
+
+
 def summary_markdown(report):
+    if "last_evaluation" in report:
+        primary = dict(report)
+        primary.pop("last_evaluation")
+        last = dict(primary, evaluation=report["last_evaluation"])
+        text = summary_markdown(primary).replace("# Looped refiner v1", "# Looped refiner v2", 1)
+        text = text.replace("Observed results for the final epoch; no Val model selection was performed.",
+                            f"Observed best checkpoint at epoch {report['best_epoch']}; selected on a Val subset included in full Val, so results are optimistic.", 1)
+        text += "\n## Checkpoint selection\n\n| Epoch | y0 A | K1 A | K2 A | K4 A | Weighted A | New best |\n|---|---:|---:|---:|---:|---:|---|\n"
+        for row in report["selection_curve"]:
+            text += f"| {row['epoch']} | {row['y0_draft']:.6f} | {row['1']:.6f} | {row['2']:.6f} | {row['4']:.6f} | {row['score']:.6f} | {row['new_best']} |\n"
+        last_text = summary_markdown(last)
+        text += "\n## Last checkpoint evaluation\n\n" + last_text[last_text.index("## K curves"):last_text.index("## Training epochs")]
+        return text
     lines = [*("WARNING: " + warning for warning in report["warnings"]),
              "# Looped refiner v1", "", "Observed results for the final epoch; no Val model selection was performed.",
              "The y0_draft row is a reference, not a legal loop count. Threshold is fixed at 0.5.", "",
@@ -299,6 +324,9 @@ def build_parser():
     parser.add_argument("--patch", type=int, default=16)
     parser.add_argument("--no-mask-feedback", action="store_true")
     parser.add_argument("--reset-state", action="store_true")
+    parser.add_argument("--head-type", choices=("patch_linear", "conv_upsample"), default="patch_linear")
+    parser.add_argument("--select-every", type=int, default=0, help="Zero preserves final-epoch-only v1 behavior")
+    parser.add_argument("--select-per-domain", type=int, default=100)
     return parser
 
 
@@ -318,11 +346,11 @@ def main():
         if not {"state_dict", "config", "epoch"}.issubset(restored):
             parser.error("Checkpoint lacks refiner weights/config/epoch")
         explicit = {value.split("=", 1)[0] for value in sys.argv[1:] if value.startswith("--")}
-        settings = ["dimension", "layers", "heads", "mlp_ratio", "patch", "no_mask_feedback", "reset_state", "k_train"]
+        settings = ["dimension", "layers", "heads", "mlp_ratio", "patch", "no_mask_feedback", "reset_state", "k_train", "head_type"]
         if args.resume:
-            settings += ["batch_size", "lr", "seed", "limit_per_domain", "monitor_every", "monitor_per_domain"]
+            settings += ["batch_size", "lr", "seed", "limit_per_domain", "monitor_every", "monitor_per_domain", "select_every", "select_per_domain"]
         for name in settings:
-            saved = restored["config"][name]
+            saved = restored["config"].get(name, {"head_type": "patch_linear", "select_every": 0, "select_per_domain": 100}.get(name))
             if "--" + name.replace("_", "-") in explicit and getattr(args, name) != saved:
                 parser.error(f"Checkpoint setting {name}={saved!r} conflicts with the requested value")
             setattr(args, name, saved)
@@ -338,6 +366,8 @@ def main():
         parser.error("--epochs is the total target and cannot precede the saved epoch")
     if args.lr <= 0 or min(args.loader_workers, args.eval_loader_workers) < 0:
         parser.error("Learning rate must be positive and loader workers nonnegative")
+    if args.select_every < 0 or args.select_per_domain < 1:
+        parser.error("Selection interval must be nonnegative and subset size positive")
     if args.limit_per_domain is not None and args.limit_per_domain < 1:
         parser.error("--limit-per-domain must be positive")
     slots = int(os.environ.get("NSLOTS", "0"))
@@ -349,6 +379,8 @@ def main():
         parser.error("Refusing to overwrite existing reports; choose a fresh --out-dir")
     if args.epochs and not args.resume and not args.eval_only and (args.ckpt_dir / "last.pt").exists():
         parser.error("Refusing to overwrite a checkpoint from an earlier run")
+    if args.select_every and not args.resume and not args.eval_only and (args.ckpt_dir / "best.pt").exists():
+        parser.error("Refusing to overwrite an existing best checkpoint")
     probe.initialize_data_worker(0)
     random.seed(args.seed)
     np.random.seed(args.seed)
@@ -362,7 +394,7 @@ def main():
     encoder.requires_grad_(False).eval()
     model = LoopRefiner(encoder.out_channels, args.dimension, args.layers, args.heads,
                         args.mlp_ratio, args.patch, no_mask_feedback=args.no_mask_feedback,
-                        reset_state=args.reset_state).to(device=device, dtype=torch.float32)
+                        reset_state=args.reset_state, head_type=args.head_type).to(device=device, dtype=torch.float32)
     if restored is not None:
         model.load_state_dict(restored["state_dict"])
     parameters = model.parameter_counts()
@@ -385,6 +417,12 @@ def main():
     start_epoch = int(restored["epoch"]) if restored is not None else 0
     epochs = list(restored.get("epochs", [])) if restored is not None else []
     curve = list(restored.get("train_curve", [])) if restored is not None else []
+    selection_curve = list(restored.get("selection_curve", [])) if restored is not None else []
+    best_score = restored.get("best_score") if restored is not None else None
+    best_epoch = restored.get("best_epoch") if restored is not None else None
+    selection_sets = ({domain: probe.RoadDataset("Val", domain, limit=args.select_per_domain, seed=0)
+                       for domain in DOMAINS} if args.select_every and not args.eval_only else {})
+    selection_files = {domain: [pair[0].name for pair in dataset.pairs] for domain, dataset in selection_sets.items()}
     config["scheduler_total_steps"] = (len(loader) * args.epochs if loader else
                                         restored["config"].get("scheduler_total_steps") if restored else None)
     if args.resume:
@@ -460,9 +498,28 @@ def main():
             curve.append(point)
             print("MONITOR " + json.dumps(point), flush=True)
         args.ckpt_dir.mkdir(parents=True, exist_ok=True)
-        torch.save({"state_dict": model.state_dict(), "optimizer": optimizer.state_dict(),
+        improved = False
+        if args.select_every and ((epoch + 1) % args.select_every == 0 or epoch + 1 == args.epochs):
+            selected = evaluate(encoder, head, model, selection_sets, [1, 2, 4], device,
+                                args.eval_loader_workers, args.metric_workers, geometry=False)
+            point = {"epoch": epoch + 1, "seconds": selected["wall_seconds"]}
+            point.update({key: selected["groups"]["Overall"][key]["scores"]["A"] for key in ("y0_draft", "1", "2", "4")})
+            point["score"] = selection_score(point)
+            improved = is_new_best(point["score"], best_score)
+            point["new_best"] = improved
+            if improved:
+                best_score, best_epoch = point["score"], epoch + 1
+            selection_curve.append(point)
+            print("SELECTION " + json.dumps(point), flush=True)
+        payload = {"state_dict": model.state_dict(), "optimizer": optimizer.state_dict(),
                     "scheduler": scheduler.state_dict(), "epoch": epoch + 1, "config": config,
-                    "epochs": epochs, "train_curve": curve, "rng": capture_rng(loader)}, args.ckpt_dir / "last.pt")
+                    "epochs": epochs, "train_curve": curve, "rng": capture_rng(loader)}
+        if args.select_every:
+            payload.update(selection_curve=selection_curve, best_score=best_score, best_epoch=best_epoch,
+                           selection_files=selection_files)
+        torch.save(payload, args.ckpt_dir / "last.pt")
+        if improved:
+            torch.save(payload, args.ckpt_dir / "best.pt")
     del loader, train_sets
     datasets = {domain: probe.RoadDataset("Val", domain, limit=args.limit_per_domain, seed=args.seed + i + 10)
                 for i, domain in enumerate(DOMAINS)}
@@ -470,6 +527,13 @@ def main():
         raise ValueError("Full Val must contain 1669 images")
     observed = evaluate(encoder, head, model, datasets, args.eval_k, device,
                         args.eval_loader_workers, args.metric_workers)
+    last_observed = None
+    if args.select_every and not args.eval_only:
+        last_observed = observed
+        best = torch.load(args.ckpt_dir / "best.pt", map_location="cpu", weights_only=True)
+        model.load_state_dict(best["state_dict"])
+        observed = evaluate(encoder, head, model, datasets, args.eval_k, device,
+                            args.eval_loader_workers, args.metric_workers)
     warnings = []
     draft_a = observed["groups"]["Overall"]["y0_draft"]["scores"]["A"]
     regression = "not checked: CPU or limited subset"
@@ -485,6 +549,11 @@ def main():
               "loaded_epoch": start_epoch if restored is not None else None,
               "evaluated_epoch": epochs[-1]["epoch"] if epochs else start_epoch,
               "model_selection": "loaded checkpoint" if args.eval_only else "final epoch only; monitor scores never select weights"}
+    if last_observed is not None:
+        report.update(last_evaluation=last_observed, best_epoch=best_epoch, best_score=best_score,
+                      selection_curve=selection_curve, selection_files=selection_files,
+                      evaluated_epoch=best_epoch,
+                      model_selection="best weighted K1/K2/K4 score on fixed Val subset; optimistic full-Val estimate")
     args.out_dir.mkdir(parents=True, exist_ok=True)
     (args.out_dir / "metrics.json").write_text(json.dumps(report, indent=2, allow_nan=False) + "\n", encoding="utf-8")
     (args.out_dir / "summary.md").write_text(summary_markdown(report), encoding="utf-8")
