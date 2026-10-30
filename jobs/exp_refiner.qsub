@@ -1,0 +1,27 @@
+#!/bin/bash -l
+#$ -N ec523-controlled
+#$ -P ec523kb
+#$ -cwd
+#$ -pe omp 8
+#$ -l gpus=1
+#$ -l gpu_c=8.0
+#$ -l mem_per_core=8G
+#$ -l h_rt=02:00:00
+#$ -m ea
+#$ -j y
+#$ -o runs/logs/
+
+# V2 on L40S: ~212 s/epoch; V1 on A40: ~328 s/epoch.
+# Ten training epochs therefore take ~35-55 min. Selection adds
+# ~40 s/epoch (~6.7 min); Val-rep (~835 images) with extra geometry
+# takes ~10 min. Budget ~52-72 min and request 2 h for startup/I/O variance.
+# Train: 7 single-thread loaders + main. Eval: 1 loader + 6 spawn workers
+# + main. Every experiment setting is supplied by the caller through "$@".
+source "${SGE_O_WORKDIR:?Submit from repository root}/env.sh" || exit 1
+set -euo pipefail
+cd "$SGE_O_WORKDIR"
+export PYTHONPATH="$PWD/src${PYTHONPATH:+:$PYTHONPATH}"
+export OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 MKL_NUM_THREADS=1
+python -c 'import torch, numpy, transformers; print("GPU:", torch.cuda.get_device_name(), flush=True); print("Versions:", torch.__version__, numpy.__version__, transformers.__version__, flush=True)'
+git rev-parse HEAD
+python -u scripts/train_refiner.py "$@"
