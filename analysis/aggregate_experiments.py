@@ -14,6 +14,12 @@ COLUMNS = ('experiment', 'seed', 'status', 'best_epoch', 'y0_A', 'A_K1', 'A_K2',
 TABLE1_COLUMNS = ('experiment', 'status', 'A_K1', 'A_K2', 'A_K4', 'A_K6', 'A_K8', 'proxy',
                   'Urban_A_K4', 'Rural_A_K4', 'gap_repair_K1', 'gap_repair_K4',
                   'new_break_K1', 'new_break_K4', 'correct_added_K1', 'correct_deleted_K1', 'best_epochs')
+INFER_MODES = ('none', 'reset-state', 'no-mask-feedback')
+INFER_COLUMNS = ('seed', 'mode', 'status', 'epoch', 'y0_A', 'A_K1', 'A_K2', 'A_K4', 'A_K6', 'A_K8',
+                 'Urban_A_K4', 'Rural_A_K4', 'added_fraction_K4', 'added_fraction_K8',
+                 'correct_added_K4', 'correct_added_K8', 'gap_repair_K4', 'gap_repair_K8',
+                 'new_break_K4', 'new_break_K8', 'delta_IoU_K4', 'delta_clDice_K4', 'delta_BIoU_K4',
+                 'delta_none_A_K1', 'delta_none_A_K2', 'delta_none_A_K4', 'delta_none_A_K8')
 
 
 def read_run(name, path):
@@ -124,14 +130,86 @@ def aggregate_directory(directory):
             'observations': 'Observed Val-rep results. Unfinished runs are missing; no conclusions are inferred.'}
 
 
+def read_inference_row(data, seed, mode):
+    missing = {'seed': seed, 'mode': mode, 'status': 'missing'}
+    try:
+        if data['config']['seed'] != seed or data['protocol'] != 'val_sel_rep':
+            return missing
+        ablations = data['evaluation']['ablations']
+        groups = ablations[mode]['groups']
+        overall = groups['Overall']
+        baseline = overall['y0_draft']['scores']
+        row = dict(missing, status='complete', epoch=data['evaluated_epoch'], y0_A=baseline['A'])
+        for k in (1, 2, 4, 6, 8):
+            row[f'A_K{k}'] = overall[str(k)]['scores']['A']
+        for domain in ('Urban', 'Rural'):
+            row[f'{domain}_A_K4'] = groups[domain]['4']['scores']['A']
+        for k in (4, 8):
+            item = overall[str(k)]
+            row[f'added_fraction_K{k}'] = item['added_road_fraction']
+            row[f'correct_added_K{k}'] = item['extra']['changes']['added_correct_fraction']
+            row[f'gap_repair_K{k}'] = item['extra']['tracking']['gap_repair_fraction']
+            row[f'new_break_K{k}'] = item['extra']['tracking']['new_break_fraction']
+        for column, metric in (('IoU', 'road_iou'), ('clDice', 'cldice'), ('BIoU', 'boundary_iou')):
+            row[f'delta_{column}_K4'] = overall['4']['scores'][metric] - baseline[metric]
+        reference = ablations.get('none')
+        for k in (1, 2, 4, 8):
+            row[f'delta_none_A_K{k}'] = (row[f'A_K{k}'] - reference['groups']['Overall'][str(k)]['scores']['A']
+                                          if reference is not None else None)
+        return row
+    except (KeyError, TypeError):
+        return missing
+
+
+def aggregate_inference(directory):
+    rows = []
+    for seed in (0, 1, 2):
+        try:
+            data = json.loads((directory/f'e0_v2_s{seed}'/'metrics.json').read_text())
+        except (OSError, ValueError):
+            data = {}
+        rows += [read_inference_row(data, seed, mode) for mode in INFER_MODES]
+    aggregates = []
+    for mode in INFER_MODES:
+        selected = [r for r in rows if r['mode'] == mode and r['status'] == 'complete']
+        aggregate = {'seed': '0,1,2', 'mode': f'{mode} mean ± std (3 seeds)',
+                     'status': 'complete' if len(selected) == 3 else 'incomplete'}
+        if len(selected) == 3:
+            for key in INFER_COLUMNS[3:]:
+                values = [r[key] for r in selected]
+                aggregate[key] = ({'mean': statistics.mean(values), 'std': statistics.stdev(values)}
+                                  if all(value is not None for value in values) else None)
+        aggregates.append(aggregate)
+    return {'rows': rows + aggregates, 'standard_deviation': 'sample standard deviation (ddof=1)',
+            'observations': 'Observed inference interventions on the same checkpoints and Val-rep split; no retraining.',
+            'difference_definitions': 'Component deltas compare K4 with y0; delta_none_A compares with none for the same seed and K.'}
+
+
+def write_inference_summary(directory, out_dir):
+    report = aggregate_inference(directory)
+    lines = ['# Inference interventions', '', report['observations'], '', report['difference_definitions'], '',
+             'Means require all three seeds; standard deviations use ddof=1. Missing runs are missing; partial aggregates are incomplete.', '',
+             '| ' + ' | '.join(INFER_COLUMNS) + ' |', '|' + '---|'*len(INFER_COLUMNS)]
+    lines += ['| ' + ' | '.join(display(row.get(key)) for key in INFER_COLUMNS) + ' |' for row in report['rows']]
+    out_dir.mkdir(parents=True, exist_ok=True)
+    (out_dir/'summary.json').write_text(json.dumps(report, indent=2, allow_nan=False)+'\n', encoding='utf-8')
+    (out_dir/'summary.md').write_text('\n'.join(lines)+'\n', encoding='utf-8')
+    print('Observed inference summary written to summary.md and summary.json', flush=True)
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('--results-dir', type=Path, default=ROOT/'results/exp')
+    parser.add_argument('--results-dir', type=Path)
     parser.add_argument('--out-dir', type=Path)
+    parser.add_argument('--infer', action='store_true', help='Read inference intervention reports instead of retrained experiments')
     args = parser.parse_args()
+    args.results_dir = args.results_dir or ROOT/('results/exp_infer' if args.infer else 'results/exp')
     out_dir = args.out_dir or args.results_dir
     if not out_dir.resolve().is_relative_to(ROOT):
         parser.error('Output must stay inside the repository')
+    if args.infer:
+        write_inference_summary(args.results_dir, out_dir)
+        return
     report = aggregate_directory(args.results_dir)
     lines = ['# Controlled experiments', '', report['observations'], '',
              'Each experiment aggregate requires seeds 0, 1 and 2 and uses sample standard deviation (ddof=1); otherwise it is incomplete.', '',

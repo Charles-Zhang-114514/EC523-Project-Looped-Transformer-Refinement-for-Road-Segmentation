@@ -1,0 +1,25 @@
+#!/bin/bash -l
+#$ -N ec523-infer-ablation
+#$ -P ec523kb
+#$ -cwd
+#$ -pe omp 8
+#$ -l gpus=1
+#$ -l gpu_c=8.0
+#$ -l mem_per_core=8G
+#$ -l h_rt=01:00:00
+#$ -m ea
+#$ -j y
+#$ -o runs/logs/
+
+# Prior L40S Val-rep evaluation with extra diagnostics: budget ~10 min.
+# Three modes share one encoder/probe pass. Refiner and metric/geometry
+# workloads grow to about 3x; ~30 min plus model loading/I/O variance fits 1 h.
+# Evaluation uses one loader + six single-thread spawn metric workers + main.
+source "${SGE_O_WORKDIR:?Submit from repository root}/env.sh" || exit 1
+set -euo pipefail
+cd "$SGE_O_WORKDIR"
+export PYTHONPATH="$PWD/src${PYTHONPATH:+:$PYTHONPATH}"
+export OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 MKL_NUM_THREADS=1
+python -c 'import torch, numpy, transformers; print("GPU:", torch.cuda.get_device_name(), flush=True); print("Versions:", torch.__version__, numpy.__version__, transformers.__version__, flush=True)'
+git rev-parse HEAD
+python -u scripts/train_refiner.py "$@"
