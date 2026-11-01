@@ -1,4 +1,32 @@
-# EC523 midway submission: frozen DINOv3 and looped road refiner
+# Quick start
+
+Unzip into an empty folder and run from that folder. Prepare dependencies on
+a network-enabled machine first; inference itself is completely offline.
+
+```bash
+unzip midway.zip -d midway
+cd midway
+mkdir -p .cache/pip .cache/hf .cache/torch .cache/xdg
+export PIP_CACHE_DIR="$PWD/.cache/pip" HF_HOME="$PWD/.cache/hf"
+export TORCH_HOME="$PWD/.cache/torch" XDG_CACHE_HOME="$PWD/.cache/xdg"
+export TMPDIR="${TMPDIR:-/tmp}"  # must be outside this extracted folder
+python -m venv .venv
+source .venv/bin/activate
+python -m pip install torch==2.6.0 torchvision==0.21.0 --index-url https://download.pytorch.org/whl/cu124
+python -m pip install -r requirements.txt
+export HF_HUB_OFFLINE=1 TRANSFORMERS_OFFLINE=1
+python submission/predict.py --checkpoint submission/model.safetensors \
+  --baseline submission/baseline.safetensors --encoder-dir submission/encoder \
+  --input /path/to/images --output /path/to/new-output --steps 4 --device cuda
+```
+
+**The TA-required result folder is `<output>/road_masks/`: one PNG per image,
+uint8, 1 = road and 0 = non-road, with exactly the input H x W dimensions.**
+For CPU, prepare CPU wheels and use `--device cpu`. The default two-phase path
+needs about 16 MiB of temporary disk per image, outside the package/output.
+No labels are needed. No resizing is performed; non-1024 x 1024 inputs fail.
+
+## EC523 midway submission: frozen DINOv3 and looped road refiner
 
 This package performs image-only, offline inference. It never opens annotation
 files. Submit one checkpoint for every loop count; do not ensemble the seeds.
@@ -13,7 +41,7 @@ disconnecting the machine from the network. For CUDA 12.4:
 
 ```bash
 mkdir -p .cache/pip .cache/tmp .cache/xdg .cache/torch .cache/hf
-export PIP_CACHE_DIR="$PWD/.cache/pip" TMPDIR="$PWD/.cache/tmp"
+export PIP_CACHE_DIR="$PWD/.cache/pip" TMPDIR="${TMPDIR:-/tmp}"
 export XDG_CACHE_HOME="$PWD/.cache/xdg" TORCH_HOME="$PWD/.cache/torch"
 export HF_HOME="$PWD/.cache/hf"
 python -m venv .venv
@@ -49,6 +77,7 @@ submission/
     config.json
     preprocessor_config.json
     model.safetensors        # frozen facebook/dinov3-vitl16-pretrain-lvd1689m
+    LICENSE.md               # upstream license, when present locally
 ```
 
 The encoder files must be actual readable files, not dangling symlinks into a
@@ -56,6 +85,11 @@ developer's HF cache. The input argument `--encoder-dir` is an explicit local
 directory: it is never interpreted as a Hugging Face repository ID. Loading
 uses `local_files_only=True`. Normalization mean/std are read from the supplied
 preprocessor configuration; the image processor is never applied to images.
+The encoder is DINOv3 ViT-L/16, model ID
+`facebook/dinov3-vitl16-pretrain-lvd1689m`, subject to the DINOv3 License.
+This author's local snapshot includes LICENSE.md, which is included in the
+package. If another local snapshot lacks a LICENSE file, the model remains
+subject to the DINOv3 License; the model ID identifies the upstream release.
 
 The author prepares the two small files using trusted local training artifacts:
 
@@ -70,7 +104,25 @@ excluded. Deterministic position encoding and BN buffers remain because strict
 model loading requires them. Exports are ignored by git and are distributed
 separately. The preparation tool refuses to overwrite existing exports.
 
-## Inference commands
+## Two-phase execution and inference commands
+
+By default, phase 1 loads the encoder and probe, then encodes all images and
+saves the original float32 [1,1024,64,64] features as temporary NPY files. It
+does not quantize or downcast them. After encoding finishes, the encoder is
+deleted, Python garbage collection runs, and the CUDA allocator cache is
+emptied. Only the probe remains when refiner weights are loaded. Phase 2 reads
+one cached tensor at a time, recomputes y0 with the frozen probe and runs the
+externally controlled loop. This prevents encoder/refiner GPU co-residency.
+
+Temporary storage is approximately 16 MiB/image plus NPY headers and margin
+(about 13.1 GiB for 835 images). Free disk space is checked before model loading.
+The default cache parent is `$TMPDIR`, or the system temporary directory when
+unset. It must be outside this source/package tree and the output directory.
+`--cache-dir /path/to/scratch` chooses a parent for a unique cache subdirectory;
+only that subdirectory is removed. A try/finally removes it on success or
+failure. `--keep-cache` retains it for debugging and prints its location.
+`--single-pass` restores image-at-a-time inference with encoder and refiner
+co-resident and needs no feature cache. Its predictions are identical.
 
 Set the offline environment for every invocation:
 
@@ -135,11 +187,14 @@ For directory input `images/urban/001.png`:
 predictions/k4/
   probabilities/urban/001.npy  # finite float32 HxW probabilities in [0,1]
   masks/urban/001.png          # uint8 0/255, probability >= 0.5
+  road_masks/urban/001.png     # TA output: uint8 0/1, same threshold and shape
   trace/k0/urban/001.npy       # only with --save-trace; all k0 ... k4
   run.json
 ```
 
-The evaluator consumes probabilities, not PNGs or logits. The final probability
+The TA consumes road_masks; probabilities and 0/255 masks remain optional
+compatibility outputs. The reference evaluator consumes probabilities, not
+PNGs or logits. The final probability
 map equals trace/kK when traces are requested. Duplicate relative IDs, unsupported
 or empty inputs, nonfinite logits and occupied output directories are rejected.
 The core is counted and parameter identity/storage is checked at every update.
@@ -149,13 +204,17 @@ It adds encoder file/bundle hashes, image count and per-image peak allocated
 CUDA bytes. `baseline_sha256` hashes the explicit probe safetensors file;
 encoder hashes separately identify the remaining frozen baseline. The source
 hash covers submission and reused project Python sources. CPU peak CUDA memory
-is null. Inference times include encoder/probe, updates and every-step CPU trace
-transfer, but exclude model loading and file writes; there is no warmup.
+is null. `mode`, `phases`, `encoder_release` and cache-size/cleanup fields record
+two-phase or single-pass execution. Phase times include model loading and the
+respective phase's I/O; per-image times sum that image's encoding and
+probe/refiner/CPU trace transfer, excluding cache/output writes and loading.
+Single-pass phase times aggregate interleaved encoding/refinement work.
+Encoder release records allocated and reserved CUDA bytes before and after
+deletion/collection/empty_cache. No warmup is applied.
 
 The course `evaluate.py` requires both a probability directory and run.json.
-The full check job creates documented trace-prefix views for k1/k2/k4/k8,
-retaining source K8 call counts/timings separately, then invokes the unchanged
-official evaluator. Trace-prefix timing is not claimed as standalone latency.
+The new full check runs each requested K separately without traces, calls the
+unchanged evaluator immediately and deletes probabilities before the next run.
 
 ## Model and training provenance
 
@@ -207,8 +266,28 @@ mkdir -p runs/logs
 qsub -v EC523_ENCODER_DIR="$PWD/submission/encoder" jobs/submission_check.qsub
 ```
 
-Run this manually from the repository root. The job uses 835 read-only
-Val-rep image symlinks, no HF cache, two K8 trajectories (none/reset-state),
-all traces and ten official evaluation reports. Reserve at least 80 GiB of
-free/quota space; NPY files alone need approximately 65.3 GiB. Do not include
-these check outputs or the job log in the submission package.
+Run this manually from the repository root. The job captures SGE's original
+node-local TMPDIR before sourcing env.sh, and puts all links, feature caches,
+predictions, package ZIP and independent extraction there. It evaluates none
+at K1/2/4/8 and reset-state at K8, without traces. After every evaluation it
+deletes probabilities; only K4 road masks remain temporarily for comparison
+against an independently unpacked K4 run with no repository PYTHONPATH.
+Only report JSONs, run.json files and job.log persist under
+`runs/submission_check/<JOB_ID>/`. Reserve 32 GiB of node-local free space.
+All scratch work is removed even if the job fails.
+
+## Build a standalone ZIP
+
+```bash
+python scripts/package_submission.py --out runs/submission_packages/midway
+```
+
+This creates the copied directory and `runs/submission_packages/midway.zip`.
+All symlinks are dereferenced. The allowlist includes only inference Python
+sources, documentation, requirements, tensor weights, encoder configs and any
+local LICENSE files. It excludes env.sh, datasets, runtime runs, course code,
+bytecode and personal paths. Source modules named data contain only Python
+code, not dataset files. Each payload file's size/SHA-256 and the ZIP's size
+and SHA-256 are printed. `--out` must be outside the repository or under ignored
+runs/. Include the generated ZIP in the hand-in, not a git archive that omits
+the ignored weights. Do not place feature caches inside the copied package.

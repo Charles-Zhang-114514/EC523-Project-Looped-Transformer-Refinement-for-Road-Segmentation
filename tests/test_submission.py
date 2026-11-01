@@ -125,20 +125,22 @@ class SubmissionTests(unittest.TestCase):
             feature_channels = 8
 
             def forward(self, image):
-                return image[:, :1, ::4, ::4].repeat(1, 8, 1, 1), image[:, :1] - .5
+                return image[:, :1, ::16, ::16].repeat(1, 8, 1, 1), image[:, :1] - .5
 
         with tempfile.TemporaryDirectory(dir=ROOT/'runs/submission_tests') as directory:
             root = Path(directory)
             (root/'images').mkdir()
-            pixels = np.random.default_rng(7).integers(0, 256, (16, 16, 3), dtype=np.uint8)
+            pixels = np.random.default_rng(7).integers(0, 256, (1024, 1024, 3), dtype=np.uint8)
             Image.fromarray(pixels).save(root/'images/tile.png')
             (root/'encoder').mkdir()
             for name in ('config.json', 'preprocessor_config.json', 'model.safetensors'):
                 (root/'encoder'/name).write_bytes(b'unit test encoder placeholder')
             (root/'probe.safetensors').write_bytes(b'unit test probe placeholder')
-            save_file(self.model.state_dict(), str(root/'model.safetensors'), metadata={'config': json.dumps(SMALL)})
+            config = dict(dimension=16, heads=4, image_size=1024, patch=16, head_type='conv_upsample')
+            model = refiner_from_config(8, config)
+            save_file(model.state_dict(), str(root/'model.safetensors'), metadata={'config': json.dumps(config)})
             common = ['--checkpoint', str(root/'model.safetensors'), '--baseline', str(root/'probe.safetensors'),
-                      '--encoder-dir', str(root/'encoder'), '--steps', '4', '--save-trace', '--device', 'cpu']
+                      '--encoder-dir', str(root/'encoder'), '--steps', '4', '--save-trace', '--device', 'cpu', '--single-pass']
             with patch.object(predict, 'load_baseline', return_value=TinyBaseline()):
                 for name, source in [('single', root/'images/tile.png'), ('folder', root/'images')]:
                     report = predict.main(common+['--input', str(source), '--output', str(root/name)])
