@@ -141,7 +141,8 @@ class SubmissionTests(unittest.TestCase):
             save_file(model.state_dict(), str(root/'model.safetensors'), metadata={'config': json.dumps(config)})
             common = ['--checkpoint', str(root/'model.safetensors'), '--baseline', str(root/'probe.safetensors'),
                       '--encoder-dir', str(root/'encoder'), '--steps', '4', '--save-trace', '--device', 'cpu', '--single-pass']
-            with patch.object(predict, 'load_baseline', return_value=TinyBaseline()):
+            fixture_hashes = {name: predict.sha256(root/'encoder'/name) for name in ('config.json', 'preprocessor_config.json', 'model.safetensors')}
+            with patch.object(predict, 'load_baseline', return_value=TinyBaseline()), patch.dict('submission.fetch_encoder.EXPECTED_SHA256', fixture_hashes, clear=True):
                 for name, source in [('single', root/'images/tile.png'), ('folder', root/'images')]:
                     report = predict.main(common+['--input', str(source), '--output', str(root/name)])
                     self.assertEqual(report['images'][0]['id'], 'tile')

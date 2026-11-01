@@ -29,6 +29,7 @@ sys.path.insert(0, str(ROOT))
 sys.path.insert(0, str(ROOT/'src'))
 from submission.baseline import ENCODER_FILES, load_baseline
 from submission.model import load_refiner
+from submission.fetch_encoder import verify_encoder
 
 PROTOCOL = 'ec523-project-a-v1-draft'  # Public format identifier: common.py:8.
 MODES = ('none', 'reset-state', 'no-mask-feedback')
@@ -233,7 +234,7 @@ def main(argv=None):
     device = torch.device(args.device)
     if device.type == 'cuda' and not torch.cuda.is_available():
         raise RuntimeError('CUDA was requested but is unavailable')
-    encoder_hashes = {name: sha256(args.encoder_dir/name) for name in ENCODER_FILES}
+    encoder_hashes = verify_encoder(args.encoder_dir)
     records, peaks, cache, required, cache_bytes = [], [], None, 0, 0
     phases = {name: dict(seconds=0., peak_cuda_allocated_bytes=None) for name in ('encoding', 'refinement')}
     release = None
