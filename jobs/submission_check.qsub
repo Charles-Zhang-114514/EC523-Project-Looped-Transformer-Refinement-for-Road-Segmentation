@@ -1,0 +1,118 @@
+#!/bin/bash -l
+#$ -N ec523-submission-check
+#$ -P ec523kb
+#$ -cwd
+#$ -pe omp 8
+#$ -l gpus=1
+#$ -l gpu_c=8.0
+#$ -l mem_per_core=8G
+#$ -l h_rt=01:30:00
+#$ -m ea
+#$ -j y
+#$ -o runs/logs/
+
+# Budget: 2*835 images at the prior A40 encoder/probe+K8 measurement
+# (0.076+0.035 s/image) is ~185 s of GPU inference. Ten official serial
+# evaluations use the CPU trial's measured ~0.125 s/image (4 images in
+# 0.500 s): 10*835*0.125 = ~1044 s. Trace/final NPY output is ~65.3 GiB
+# before PNGs; allow ~20 min for shared-filesystem I/O and ~10 min startup.
+# Total planning budget ~50 min; request 90 min for filesystem/host variance.
+# CPU trial measurements and their limits are documented in the worklog.
+source "${SGE_O_WORKDIR:?Submit from repository root}/env.sh" || exit 1
+set -euo pipefail
+cd "$SGE_O_WORKDIR"
+export PYTHONPATH="$PWD/src:$PWD${PYTHONPATH:+:$PYTHONPATH}"
+export OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1
+: "${EC523_DATA_DIR:?Set the read-only dataset directory}"
+: "${EC523_STARTER_DIR:?Set the official cli directory}"
+: "${EC523_ENCODER_DIR:?Set an explicit local encoder directory before submission}"
+export CHECK_RUN_ROOT="$PWD/runs/submission_check/${JOB_ID:?Run as an SGE job}"
+mkdir -p "$CHECK_RUN_ROOT"
+export HF_HOME="$CHECK_RUN_ROOT/empty_hf"
+export HF_HUB_CACHE="$HF_HOME/hub" HUGGINGFACE_HUB_CACHE="$HF_HOME/hub"
+export HF_HUB_OFFLINE=1 TRANSFORMERS_OFFLINE=1 HF_HUB_DISABLE_TELEMETRY=1
+unset TRANSFORMERS_CACHE
+mkdir "$HF_HOME"
+test -z "$(ls -A "$HF_HOME")"
+python -c 'import torch; print("GPU:", torch.cuda.get_device_name(), flush=True)'
+git rev-parse HEAD
+
+# Preparation/evaluation can see annotations. submission/predict.py receives
+# only image symlinks and explicit weight directories and never reads them.
+python - <<'PY'
+import json, os, shutil
+from pathlib import Path
+root = Path(os.environ['CHECK_RUN_ROOT'])
+if shutil.disk_usage(root).free < 80 * 1024**3:
+    raise RuntimeError('At least 80 GiB free space is required for the full trace check')
+split = json.loads(Path('configs/val_split_seed0.json').read_text())['Val-rep']
+rows = []
+for domain, names in split.items():
+    for name in names:
+        original = Path(os.environ['EC523_DATA_DIR'])/'Val'/domain/'images_png'/name
+        destination = root/'images'/domain.lower()/name
+        destination.parent.mkdir(parents=True, exist_ok=True)
+        destination.symlink_to(original.resolve(strict=True))
+        rows.append(dict(id=f'{domain.lower()}/{Path(name).stem}', image=str(destination),
+                         label=str((original.parent.parent/'masks_png'/name).resolve(strict=True)),
+                         domain=domain.lower(), condition='ordinary'))
+assert len(rows) == 835
+(root/'manifest.json').write_text(json.dumps(rows, indent=2)+'\n')
+print('PREPARED', len(rows), 'read-only image symlinks', flush=True)
+PY
+
+for mode in none reset-state; do
+    python -u submission/predict.py --checkpoint submission/model.safetensors \
+      --baseline submission/baseline.safetensors --encoder-dir "$EC523_ENCODER_DIR" \
+      --input "$CHECK_RUN_ROOT/images" --output "$CHECK_RUN_ROOT/$mode" \
+      --steps 8 --save-trace --device cuda --seed 0 --ablation "$mode"
+done
+
+# evaluate.py requires a complete run directory rather than a bare trace/kK.
+# Create explicitly documented prefix views; retain original K8 call counts
+# as source_core_calls and record the source manifest hash. No timing for a
+# prefix is inferred from the full-run timing; original manifests stay intact.
+python - <<'PY'
+import hashlib, json, os
+from pathlib import Path
+root = Path(os.environ['CHECK_RUN_ROOT'])
+for mode in ('none', 'reset-state'):
+    source = root/mode
+    original = json.loads((source/'run.json').read_text())
+    assert original['steps'] == 8 and all(row['core_calls'] == 8 for row in original['images'])
+    for k in (1, 2, 4, 8):
+        view = root/'views'/f'{mode}_k{k}'
+        view.mkdir(parents=True)
+        probabilities = source/'trace'/f'k{k}'
+        assert all((probabilities/(row['id']+'.npy')).is_file() for row in original['images'])
+        (view/'probabilities').symlink_to(probabilities, target_is_directory=True)
+        data = dict(original, steps=k, trace_source_steps=8,
+                    trace_source_run_sha256=hashlib.sha256((source/'run.json').read_bytes()).hexdigest(),
+                    timing_note='Trace-prefix view; timings and memory belong to the source K8 run.')
+        data['images'] = [dict(row, core_calls=k, source_core_calls=row['core_calls']) for row in original['images']]
+        (view/'run.json').write_text(json.dumps(data, indent=2)+'\n')
+PY
+
+for mode in none reset-state; do
+    for k in 1 2 4 8; do
+        python "$EC523_STARTER_DIR/evaluate.py" --manifest "$CHECK_RUN_ROOT/manifest.json" \
+          --predictions "$CHECK_RUN_ROOT/views/${mode}_k${k}" \
+          --output "$CHECK_RUN_ROOT/reports/${mode}_k${k}.json"
+    done
+    python "$EC523_STARTER_DIR/evaluate.py" --manifest "$CHECK_RUN_ROOT/manifest.json" \
+      --predictions "$CHECK_RUN_ROOT/$mode" --output "$CHECK_RUN_ROOT/reports/${mode}_final8.json"
+done
+
+python - <<'PY'
+import json, os
+from pathlib import Path
+root = Path(os.environ['CHECK_RUN_ROOT'])
+for mode in ('none', 'reset-state'):
+    a = json.loads((root/'reports'/f'{mode}_k8.json').read_text())
+    b = json.loads((root/'reports'/f'{mode}_final8.json').read_text())
+    assert a['overall'] == b['overall'] and a['by_domain'] == b['by_domain']
+    run = json.loads((root/mode/'run.json').read_text())
+    print('CHECK', mode, 'images', len(run['images']), 'K8 trace/final exact match',
+          'inference_seconds', sum(row['seconds_with_trace_transfer'] for row in run['images']),
+          'peak_cuda_bytes', run['peak_cuda_allocated_bytes'], flush=True)
+PY
