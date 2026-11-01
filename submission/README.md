@@ -20,18 +20,23 @@ python -m pip install -r requirements.txt
 
 Acquire the encoder using **one** option (replace the placeholders):
 
+**(1) On BU SCC:** copy from the supplied local directory. The directory and
+encoder files must be readable by the `ec523kbta` group; parent directories
+must be searchable by that group.
+
 ```bash
-# Option A: copy dereferenced files from a local/SCC encoder directory.
 python submission/fetch_encoder.py --from-dir "<SCC_ENCODER_DIR>" --dest submission/encoder
 ```
 
+**(2) On other machines:** download the separate encoder ZIP.
+
 ```bash
-# Option B: download the separate encoder ZIP from a direct download URL.
 python submission/fetch_encoder.py --from-url "<ENCODER_ZIP_URL>" --dest submission/encoder
 ```
 
+**(3) Fallback:** use an approved Hugging Face account with access to the model.
+
 ```bash
-# Option C: use approved access to the gated Hugging Face model.
 # Authenticate in this HF_HOME first if not already logged in.
 hf auth login
 HF_HUB_OFFLINE=0 python submission/fetch_encoder.py --from-hf --dest submission/encoder
@@ -39,7 +44,7 @@ HF_HUB_OFFLINE=0 python submission/fetch_encoder.py --from-hf --dest submission/
 
 The Hugging Face option requires your own approved account and login. It uses
 model facebook/dinov3-vitl16-pretrain-lvd1689m at revision
-`ea8dc2863c51be0a264bab82070e3e8836b02d51`. Options A and local `file://` ZIP
+`ea8dc2863c51be0a264bab82070e3e8836b02d51`. Option (1) and local `file://` ZIP
 URLs work offline. A remote URL must return ZIP bytes, not a sharing/HTML page.
 Every source is checked against the three SHA-256 hashes embedded in the
 script and listed in submission/encoder_sha256.json. Already verified files
@@ -356,10 +361,17 @@ but omits all three encoder files. Without either flag, the packager retains
 the original complete-package behavior for local/manual GPU checks.
 
 Each command creates a copied directory and a sibling .zip file.
+To fill the distributed README, optionally pass --scc-encoder-dir and
+--encoder-url with the real deployment values at packaging time. Only the
+copied/archived README is substituted; the repository README keeps its
+placeholders, so personal paths and links do not enter git. Omitting either
+argument preserves its placeholder and prints a warning when packaging a
+README. Encoder-only ZIPs have no README and need no substitutions.
 All symlinks are dereferenced. The allowlist includes only inference Python
 sources, documentation, requirements, tensor weights, encoder configs and any
 local LICENSE files. It excludes env.sh, datasets, runtime runs, course code,
-bytecode and personal paths. Source modules named data contain only Python
+bytecode and unintended personal paths. Explicit deployment values may appear
+only in the packaged README. Source modules named data contain only Python
 code, not dataset files. Each payload file's size/SHA-256 and the ZIP's size
 and SHA-256 are printed. `--out` must be outside the repository or under ignored
 runs/. Include only the small generated ZIP in the hand-in, not a git archive

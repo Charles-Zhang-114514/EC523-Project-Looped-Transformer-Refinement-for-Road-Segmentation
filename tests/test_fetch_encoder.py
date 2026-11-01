@@ -1,5 +1,6 @@
 """Offline encoder acquisition, immutable identity and small-package checks."""
 import hashlib
+import io
 import json
 import os
 from pathlib import Path
@@ -7,6 +8,7 @@ import tempfile
 import unittest
 from unittest.mock import patch
 import zipfile
+from contextlib import redirect_stdout
 
 from submission import fetch_encoder as fetch
 from scripts import package_submission as pack
@@ -139,6 +141,23 @@ class FetchEncoderTests(unittest.TestCase):
         with zipfile.ZipFile(encoder) as zipped:
             self.assertEqual(set(zipped.namelist()), set(fetch.FILES))
         self.assertLess(small.stat().st_size, 95*1024**2)
+
+    def test_readme_replacement_is_literal_optional_and_source_unchanged(self):
+        source = self.root/'README.md'
+        original = '<SCC_ENCODER_DIR>\n<ENCODER_ZIP_URL>\n<SCC_ENCODER_DIR>\n'
+        source.write_text(original)
+        for directory, url in ((None, None), ('/tmp/example', None),
+                               (None, 'file:///tmp/example.zip'), ('/tmp/example', 'file:///tmp/example.zip')):
+            with self.subTest(directory=directory, url=url):
+                output = io.StringIO()
+                with redirect_stdout(output):
+                    rendered = pack.render_readme(source, scc_encoder_dir=directory, encoder_url=url).decode()
+                self.assertEqual(rendered, '\n'.join((directory or '<SCC_ENCODER_DIR>',
+                                                     url or '<ENCODER_ZIP_URL>',
+                                                     directory or '<SCC_ENCODER_DIR>', '')))
+                self.assertEqual('--scc-encoder-dir not provided' in output.getvalue(), directory is None)
+                self.assertEqual('--encoder-url not provided' in output.getvalue(), url is None)
+                self.assertEqual(source.read_text(), original)
 
 
 if __name__ == '__main__':

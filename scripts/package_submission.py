@@ -72,7 +72,22 @@ def payload_files(encoder_dir, *, no_encoder=False, encoder_only=False):
     return dict(sorted(selected.items())), licenses
 
 
-def package(out, encoder_dir, *, no_encoder=False, encoder_only=False):
+def render_readme(source, *, scc_encoder_dir=None, encoder_url=None):
+    """Fill only the distributed README; never modify its repository template."""
+    replacements = {'<SCC_ENCODER_DIR>': scc_encoder_dir,
+                    '<ENCODER_ZIP_URL>': encoder_url}
+    for placeholder, flag in (('<SCC_ENCODER_DIR>', '--scc-encoder-dir'),
+                              ('<ENCODER_ZIP_URL>', '--encoder-url')):
+        if replacements[placeholder] is None:
+            print(f'WARNING: {flag} not provided; keeping {placeholder} in packaged README.', flush=True)
+    text = source.read_bytes().decode('utf-8')
+    text = re.sub(r'<SCC_ENCODER_DIR>|<ENCODER_ZIP_URL>',
+                  lambda match: replacements[match[0]] if replacements[match[0]] is not None else match[0], text)
+    return text.encode('utf-8')
+
+
+def package(out, encoder_dir, *, no_encoder=False, encoder_only=False,
+            scc_encoder_dir=None, encoder_url=None):
     out = Path(out).resolve()
     if out.is_relative_to(ROOT):
         if not out.is_relative_to(ROOT/'runs'):
@@ -84,8 +99,13 @@ def package(out, encoder_dir, *, no_encoder=False, encoder_only=False):
     if out.exists() or archive.exists():
         raise FileExistsError('Choose a new package output directory and ZIP filename')
     files, licenses = payload_files(encoder_dir, no_encoder=no_encoder, encoder_only=encoder_only)
+    readme_path = Path('submission/README.md')
+    readme = (render_readme(files[readme_path], scc_encoder_dir=scc_encoder_dir, encoder_url=encoder_url)
+              if readme_path in files else None)
     out.parent.mkdir(parents=True, exist_ok=True)
     size = sum(source.stat().st_size for source in files.values())
+    if readme is not None:
+        size += len(readme) - files[readme_path].stat().st_size
     if shutil.disk_usage(out.parent).free < 2*size + 100*1024**2:
         raise OSError('Insufficient disk space for the copied payload and ZIP')
     out.mkdir()
@@ -93,10 +113,15 @@ def package(out, encoder_dir, *, no_encoder=False, encoder_only=False):
         destination = out/relative
         destination.parent.mkdir(parents=True, exist_ok=True)
         shutil.copyfile(source.resolve(strict=True), destination)
+        if relative == readme_path:
+            destination.write_bytes(readme)
+            expected = hashlib.sha256(readme).hexdigest()
+        else:
+            expected = digest(source)
         destination.chmod(0o644)
         # Stable ZIP metadata: no developer paths, permissions or timestamps.
         os.utime(destination, (1577836800, 1577836800))
-        if destination.is_symlink() or digest(destination) != digest(source):
+        if destination.is_symlink() or digest(destination) != expected:
             raise ValueError(f'Copy verification failed: {relative}')
         print(f'FILE {relative.as_posix()} bytes={destination.stat().st_size} sha256={digest(destination)}', flush=True)
     with zipfile.ZipFile(archive, 'w', compression=zipfile.ZIP_DEFLATED, compresslevel=1) as zipped:
@@ -121,11 +146,14 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--out', type=Path, required=True)
     parser.add_argument('--encoder-dir', type=Path, default=ROOT/'submission/encoder')
+    parser.add_argument('--scc-encoder-dir', help='Replace the SCC directory placeholder only in the packaged README')
+    parser.add_argument('--encoder-url', help='Replace the encoder ZIP URL placeholder only in the packaged README')
     mode = parser.add_mutually_exclusive_group()
     mode.add_argument('--no-encoder', action='store_true', help='Small Gradescope ZIP, excluding all three encoder files')
     mode.add_argument('--encoder-only', action='store_true', help='Separate ZIP of three encoder files and LICENSE.md')
     args = parser.parse_args()
-    package(args.out, args.encoder_dir, no_encoder=args.no_encoder, encoder_only=args.encoder_only)
+    package(args.out, args.encoder_dir, no_encoder=args.no_encoder, encoder_only=args.encoder_only,
+            scc_encoder_dir=args.scc_encoder_dir, encoder_url=args.encoder_url)
 
 
 if __name__ == '__main__':
