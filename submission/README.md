@@ -26,6 +26,27 @@ For CPU, prepare CPU wheels and use `--device cpu`. The default two-phase path
 needs about 16 MiB of temporary disk per image, outside the package/output.
 No labels are needed. No resizing is performed; non-1024 x 1024 inputs fail.
 
+## Measured resources
+
+Measured on an NVIDIA A40 with 835 images of 1024 x 1024 pixels in default
+two-phase mode, without traces (GPU check job 8386872). Times include phase
+model loading and file I/O; memory is peak PyTorch-allocated CUDA memory.
+GB and MB below are decimal (10^9 and 10^6 bytes); MiB and GiB are binary
+(2^20 and 2^30 bytes).
+
+| Steps K (ablation none) | Encoding (s) | Refinement (s) | Refinement peak (GB) |
+|---|---:|---:|---:|
+| 1 | 124.190 | 37.333 | 0.579 |
+| 2 | 119.877 | 45.188 | 0.584 |
+| 4 | 123.484 | 66.070 | 0.584 |
+| 8 | 120.692 | 106.333 | 0.584 |
+
+Encoding peak memory was 1.400 GB (1,400,381,952 bytes) in all four runs.
+Releasing the encoder reduced allocated memory from 1.247 GB
+(1,247,177,216 bytes) to 33.609 MB (33,608,704 bytes). Cached float32 features
+occupy 16 MiB per image plus a 128-byte NPY header: 14,009,082,240 bytes
+(13.047 GiB) for 835 images, verified in the job's retained run.json files.
+
 ## EC523 midway submission: frozen DINOv3 and looped road refiner
 
 This package performs image-only, offline inference. It never opens annotation
