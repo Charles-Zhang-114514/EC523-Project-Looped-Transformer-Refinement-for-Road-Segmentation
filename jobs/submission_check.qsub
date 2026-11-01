@@ -1,0 +1,155 @@
+#!/bin/bash -l
+#$ -N ec523-submission-check
+#$ -P ec523kb
+#$ -cwd
+#$ -pe omp 8
+#$ -l gpus=1
+#$ -l gpu_c=8.0
+#$ -l mem_per_core=8G
+#$ -l h_rt=01:30:00
+#$ -m ea
+#$ -j y
+#$ -o /dev/null
+
+# Six encoder passes (five repository runs + unpacked K4):
+# 6*835*0.076 = 381 s. Refiner steps sum to 1+2+4+8+8+4=27:
+# 835*27*(0.035/8) = 99 s. Five official evaluations: 5*835*0.125=522 s.
+# Allow 25 min for ~157 GiB feature-cache write/read traffic, output, ZIP and
+# extraction, plus 10 min startup/variance: ~52 min; request 90 min.
+# Live scratch: ~13.1 GiB features + 3.3 GiB probabilities + masks/reference
+# + ~3.5 GiB package/ZIP/extraction + margin. Require 32 GiB, no full traces.
+set -euo pipefail
+REPO="${SGE_O_WORKDIR:?Submit from repository root}"
+NODE_TMP="${TMPDIR:?SGE node-local TMPDIR is required}"
+export CHECK_REPORT_ROOT="$REPO/runs/submission_check/${JOB_ID:?}"
+mkdir -p "$CHECK_REPORT_ROOT"
+exec > "$CHECK_REPORT_ROOT/job.log" 2>&1
+source "$REPO/env.sh"
+cd "$REPO"
+# env.sh sets a development TMPDIR; restore SGE's captured local scratch.
+export TMPDIR="$NODE_TMP" TMP="$NODE_TMP" TEMP="$NODE_TMP"
+export CHECK_TMP_ROOT
+CHECK_TMP_ROOT="$(mktemp -d "$TMPDIR/ec523-submission-${JOB_ID}-XXXXXX")"
+trap 'rm -rf -- "$CHECK_TMP_ROOT"' EXIT
+export PYTHONPATH="$REPO/src:$REPO${PYTHONPATH:+:$PYTHONPATH}"
+export OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1
+: "${EC523_DATA_DIR:?Set the read-only dataset directory}"
+: "${EC523_STARTER_DIR:?Set the official cli directory}"
+: "${EC523_ENCODER_DIR:?Pass an explicit local encoder directory through qsub -v}"
+export HF_HOME="$CHECK_TMP_ROOT/empty_hf"
+export HF_HUB_CACHE="$HF_HOME/hub" HUGGINGFACE_HUB_CACHE="$HF_HOME/hub"
+export HF_HUB_OFFLINE=1 TRANSFORMERS_OFFLINE=1 HF_HUB_DISABLE_TELEMETRY=1
+unset TRANSFORMERS_CACHE
+mkdir "$HF_HOME"
+python -c 'import torch; print("GPU:", torch.cuda.get_device_name(), flush=True)'
+git rev-parse HEAD
+
+# This is check preparation, not image-only inference. Labels are used only
+# by the unchanged evaluator after inference has finished.
+python - <<'PREP'
+import json, os, shutil
+from pathlib import Path
+root = Path(os.environ['CHECK_TMP_ROOT'])
+if shutil.disk_usage(root).free < 32*1024**3:
+    raise RuntimeError('Need at least 32 GiB free on node-local TMPDIR')
+rows = []
+for domain, names in json.loads(Path('configs/val_split_seed0.json').read_text())['Val-rep'].items():
+    for name in names:
+        image = Path(os.environ['EC523_DATA_DIR'])/'Val'/domain/'images_png'/name
+        link = root/'images'/domain.lower()/name
+        link.parent.mkdir(parents=True, exist_ok=True)
+        link.symlink_to(image.resolve(strict=True))
+        rows.append(dict(id=f'{domain.lower()}/{Path(name).stem}', image=str(link),
+                         label=str((image.parent.parent/'masks_png'/name).resolve(strict=True)),
+                         domain=domain.lower(), condition='ordinary'))
+assert len(rows) == 835
+(root/'manifest.json').write_text(json.dumps(rows)+'\n')
+(root/'cache').mkdir()
+PREP
+
+for setting in none:1 none:2 none:4 none:8 reset-state:8; do
+    mode="${setting%:*}"
+    k="${setting#*:}"
+    name="${mode}_k${k}"
+    prediction="$CHECK_TMP_ROOT/$name"
+    test -z "$(find "$HF_HOME" -type f -print -quit)"
+    python -u submission/predict.py --checkpoint submission/model.safetensors \
+      --baseline submission/baseline.safetensors --encoder-dir "$EC523_ENCODER_DIR" \
+      --input "$CHECK_TMP_ROOT/images" --output "$prediction" --cache-dir "$CHECK_TMP_ROOT/cache" \
+      --steps "$k" --device cuda --seed 0 --ablation "$mode"
+    python "$EC523_STARTER_DIR/evaluate.py" --manifest "$CHECK_TMP_ROOT/manifest.json" \
+      --predictions "$prediction" --output "$CHECK_REPORT_ROOT/${name}_scores.json"
+    rm -rf -- "$prediction/probabilities"
+    cp "$prediction/run.json" "$CHECK_REPORT_ROOT/${name}_run.json"
+    if [[ "$name" == none_k4 ]]; then
+        mv "$prediction/road_masks" "$CHECK_TMP_ROOT/reference_masks"
+    fi
+    rm -rf -- "$prediction"
+    test -z "$(find "$HF_HOME" -type f -print -quit)"
+done
+
+python scripts/package_submission.py --encoder-dir "$EC523_ENCODER_DIR" --out "$CHECK_TMP_ROOT/bundle"
+rm -rf -- "$CHECK_TMP_ROOT/bundle"
+python - <<'UNPACK'
+import os, zipfile
+from pathlib import Path
+root = Path(os.environ['CHECK_TMP_ROOT'])
+with zipfile.ZipFile(root/'bundle.zip') as zipped:
+    zipped.extractall(root/'unpacked')
+UNPACK
+(
+    cd "$CHECK_TMP_ROOT/unpacked"
+    unset PYTHONPATH
+    export PYTHONNOUSERSITE=1
+    python -u submission/predict.py --checkpoint submission/model.safetensors \
+      --baseline submission/baseline.safetensors --encoder-dir submission/encoder \
+      --input "$CHECK_TMP_ROOT/images" --output "$CHECK_TMP_ROOT/unpacked_prediction" \
+      --cache-dir "$CHECK_TMP_ROOT/cache" --steps 4 --device cuda --seed 0
+)
+cp "$CHECK_TMP_ROOT/unpacked_prediction/run.json" "$CHECK_REPORT_ROOT/unpacked_k4_run.json"
+python - <<'COMPARE'
+import json, os
+from pathlib import Path
+import numpy as np
+from PIL import Image
+scratch, reports = Path(os.environ['CHECK_TMP_ROOT']), Path(os.environ['CHECK_REPORT_ROOT'])
+reference = scratch/'reference_masks'
+other = scratch/'unpacked_prediction/road_masks'
+a = sorted(p.relative_to(reference) for p in reference.rglob('*.png'))
+b = sorted(p.relative_to(other) for p in other.rglob('*.png'))
+assert a == b and len(a) == 835
+for relative in a:
+    with Image.open(reference/relative) as image: first = np.asarray(image)
+    with Image.open(other/relative) as image: second = np.asarray(image)
+    assert first.dtype == second.dtype == np.uint8 and np.array_equal(first, second), relative
+print('PASS independent ZIP: all 835 road_masks match pixel-for-pixel', flush=True)
+packed_run = json.loads((reports/'unpacked_k4_run.json').read_text())
+repo_run = json.loads((reports/'none_k4_run.json').read_text())
+assert packed_run['submission_source_sha256'] == repo_run['submission_source_sha256']
+assert packed_run['cache_removed'] and packed_run['mode'] == 'two-phase'
+assert all(phase['peak_cuda_allocated_bytes'] <= 48*1024**3 for phase in packed_run['phases'].values())
+print('PHASES unpacked K4', json.dumps(packed_run['phases']), flush=True)
+old = json.loads(Path('results/exp/e0_v2_s0/metrics.json').read_text())['evaluation']['groups']
+reset = json.loads(Path('results/exp_infer/e0_v2_s0/metrics.json').read_text())['evaluation']['ablations']['reset-state']['groups']
+passed = True
+print('| mode | K | domain | metric | actual | reference | abs delta | status |', flush=True)
+for mode, ks, baseline in [('none', (1,2,4,8), old), ('reset-state', (8,), reset)]:
+    for k in ks:
+        report = json.loads((reports/f'{mode}_k{k}_scores.json').read_text())
+        run = json.loads((reports/f'{mode}_k{k}_run.json').read_text())
+        print('PHASES', mode, k, json.dumps(run['phases']), 'RELEASE', json.dumps(run['encoder_release']), flush=True)
+        assert run['mode'] == 'two-phase' and run['cache_removed']
+        for phase in run['phases'].values():
+            assert phase['peak_cuda_allocated_bytes'] <= 48*1024**3
+        for group, key in [('Urban','urban'), ('Rural','rural'), ('Overall','overall')]:
+            actual = report['overall'] if key == 'overall' else report['by_domain'][key]
+            for metric in ('road_iou','cldice','boundary_iou','quality'):
+                expected = baseline[group][str(k)]['scores'][metric]
+                delta = abs(actual[metric]-expected)
+                ok = delta <= 1e-5
+                passed = passed and ok
+                print(f'| {mode} | {k} | {group} | {metric} | {actual[metric]:.12f} | {expected:.12f} | {delta:.3g} | {"PASS" if ok else "FAIL"} |', flush=True)
+print('PASS' if passed else 'FAIL', 'full submission regression', flush=True)
+if not passed:
+    raise SystemExit(1)
+COMPARE
