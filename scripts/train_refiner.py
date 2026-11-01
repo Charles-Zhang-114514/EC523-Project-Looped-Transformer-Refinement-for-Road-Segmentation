@@ -23,6 +23,7 @@ from scripts import train_linear_probe as probe
 from looproad.models.refiner import LoopRefiner
 
 DOMAINS = ("Urban", "Rural")
+INFER_ABLATIONS = ("none", "reset-state", "no-mask-feedback")
 STRUCTURE_KEYS = ("gap_skeleton_pixels", "terminal_missing_skeleton_pixels",
                   "whole_missed_skeleton_pixels", "fp_fragments", "predicted_components")
 
@@ -55,6 +56,36 @@ def refine_steps(model, features, draft, steps):
         state, answer = model.step(state, answer, feature_tokens)
         outputs.append(answer)
     return outputs
+
+
+def inference_steps(model, features, draft, ks, device, ablation="none"):
+    """Adapt predict.py:61-68 without changing LoopRefiner's init/step API.
+
+    Reset means rerunning init(features, draft) before EVERY step, not zeroing
+    state. Replacing the step answer also replaces its residual base with y0.
+    Yield requested logits only; the caller owns K and converts masks promptly.
+    """
+    if ablation not in INFER_ABLATIONS:
+        raise ValueError(f"Unknown inference ablation: {ablation}")
+    if model.reset_state or model.no_mask_feedback:
+        raise ValueError("Inference interventions require an unmodified checkpoint/model")
+    with torch.no_grad(), torch.autocast(device_type=device.type, enabled=False):
+        if device.type == "cuda":
+            torch.cuda.reset_peak_memory_stats(device)
+        phase = stamp(device)
+        state, feature_tokens = model.init(features.float().clone(), draft.float().clone())
+        elapsed = stamp(device) - phase
+        current = draft.clone()
+        for step in range(1, max(ks) + 1):
+            phase = stamp(device)
+            if ablation == "reset-state":
+                state, feature_tokens = model.init(features.float().clone(), draft.float().clone())
+            feedback = draft.clone() if ablation == "no-mask-feedback" else current.clone()
+            state, current = model.step(state, feedback, feature_tokens)
+            elapsed += stamp(device) - phase
+            if step in ks:
+                peak = torch.cuda.max_memory_allocated(device) if device.type == "cuda" else None
+                yield str(step), current, elapsed, peak
 
 
 def deep_supervision(outputs, targets, valid):
@@ -110,12 +141,19 @@ def make_loader(dataset, batch_size, workers, shuffle=False, seed=0):
                       worker_init_fn=probe.initialize_data_worker if workers else None)
 
 
-def evaluate(encoder, head, model, datasets, ks, device, loader_workers=1, metric_workers=6, geometry=True, eval_extra=False):
+def evaluate(encoder, head, model, datasets, ks, device, loader_workers=1, metric_workers=6, geometry=True, eval_extra=False,
+             infer_ablations=None):
     """One streamed trajectory to max(ks); workers receive only uint8 masks."""
     started = time.perf_counter()
     model.eval()
     metrics = probe.official_metrics()
-    keys = ["y0_draft"] + [str(k) for k in ks]
+    if infer_ablations is not None:
+        if not infer_ablations or any(mode not in INFER_ABLATIONS for mode in infer_ablations):
+            raise ValueError("Expected at least one valid inference ablation")
+        if len(set(infer_ablations)) != len(infer_ablations):
+            raise ValueError("Inference modes must be unique")
+    keys = ["y0_draft"] + ([f"{mode}:{k}" for mode in infer_ablations for k in ks]
+                           if infer_ablations is not None else [str(k) for k in ks])
     counts = {domain: {key: metrics.Counts() for key in keys} for domain in DOMAINS}
     sums = {domain: {key: {name: 0 for name in (*STRUCTURE_KEYS, "added", "deleted")} for key in keys}
             for domain in DOMAINS}
@@ -161,22 +199,31 @@ def evaluate(encoder, head, model, datasets, ks, device, loader_workers=1, metri
                     value = torch.cuda.max_memory_allocated(device)
                     peaks[domain]["y0_draft"] = max(peaks[domain]["y0_draft"] or 0, value)
                     torch.cuda.reset_peak_memory_stats(device)
-                with torch.no_grad(), torch.autocast(device_type=device.type, enabled=False):
-                    phase = stamp(device)
-                    state, feature_tokens = model.init(features.float(), draft.float())
-                    elapsed = stamp(device) - phase
-                    answer = draft
-                    for step in range(1, max(ks) + 1):
+                if infer_ablations is not None:
+                    for mode in infer_ablations:
+                        for key, answer, elapsed, peak in inference_steps(model, features, draft, ks, device, mode):
+                            name = f"{mode}:{key}"
+                            times[domain][name].append(elapsed)
+                            if peak is not None:
+                                peaks[domain][name] = max(peaks[domain][name] or 0, peak)
+                            predictions[name] = (answer.sigmoid().squeeze() >= .5).cpu().numpy().astype(np.uint8)
+                else:
+                    with torch.no_grad(), torch.autocast(device_type=device.type, enabled=False):
                         phase = stamp(device)
-                        state, answer = model.step(state, answer, feature_tokens)
-                        elapsed += stamp(device) - phase
-                        if step in ks:
-                            key = str(step)
-                            times[domain][key].append(elapsed)
-                            if device.type == "cuda":
-                                peaks[domain][key] = max(peaks[domain][key] or 0,
-                                                         torch.cuda.max_memory_allocated(device))
-                            predictions[key] = (answer.sigmoid().squeeze() >= .5).cpu().numpy().astype(np.uint8)
+                        state, feature_tokens = model.init(features.float(), draft.float())
+                        elapsed = stamp(device) - phase
+                        answer = draft
+                        for step in range(1, max(ks) + 1):
+                            phase = stamp(device)
+                            state, answer = model.step(state, answer, feature_tokens)
+                            elapsed += stamp(device) - phase
+                            if step in ks:
+                                key = str(step)
+                                times[domain][key].append(elapsed)
+                                if device.type == "cuda":
+                                    peaks[domain][key] = max(peaks[domain][key] or 0,
+                                                             torch.cuda.max_memory_allocated(device))
+                                predictions[key] = (answer.sigmoid().squeeze() >= .5).cpu().numpy().astype(np.uint8)
                 labels = np.asarray(raw).squeeze().astype(np.uint8, copy=False)
                 pending.append(pool.apply_async(score_image, (domain, image_id[0], predictions, labels, geometry, eval_extra)))
                 if eval_extra:
@@ -227,8 +274,24 @@ def evaluate(encoder, head, model, datasets, ks, device, loader_workers=1, metri
                                 new_break_fraction=fraction(tracking['covered_lost'], tracking['covered_total']))
                 fragments['aligned_edge_fraction'] = fraction(fragments['aligned_edges'], 4*fragments['count'])
                 report[domain][key]['extra'] = sections
-    return {"groups": report, "images": images, "encoder_seconds": encoder_seconds,
-            "metric_geometry_worker_seconds": worker_seconds, "wall_seconds": time.perf_counter() - started}
+    result = {"groups": report, "images": images, "encoder_seconds": encoder_seconds,
+              "metric_geometry_worker_seconds": worker_seconds, "wall_seconds": time.perf_counter() - started}
+    if infer_ablations is not None:
+        result['ablations'] = {mode: {'groups': {domain: {
+            'y0_draft': variants['y0_draft'], **{str(k): variants[f'{mode}:{k}'] for k in ks}}
+            for domain, variants in report.items()}} for mode in infer_ablations}
+        reference = 'none' if 'none' in infer_ablations else infer_ablations[0]
+        result['groups'] = result['ablations'][reference]['groups']
+        result['groups_reference_mode'] = reference
+        result['timing_note'] = 'One shared encoder/draft pass. Wall/worker times cover all modes; per-K refiner times are cumulative within each mode.'
+    return result
+
+
+def parse_infer_ablations(text):
+    modes = [value.strip() for value in text.split(',')]
+    if not modes or any(mode not in INFER_ABLATIONS for mode in modes) or len(set(modes)) != len(modes):
+        raise argparse.ArgumentTypeError('Expected unique comma-separated modes: none,reset-state,no-mask-feedback')
+    return modes
 
 
 def parse_ks(text):
@@ -312,6 +375,19 @@ def is_new_best(score, best):
 
 
 def summary_markdown(report):
+    if report.get('infer_ablations'):
+        observed = report['evaluation']
+        lines = ['# Inference interventions', '',
+                 'Observed the same frozen checkpoint under inference interventions; no retraining.',
+                 'reset-state reruns init(features, y0) before every update.',
+                 'no-mask-feedback passes y0 as the step answer/residual base; each output is y0 + delta_t.',
+                 f"Shared encoder+probe seconds: {observed['encoder_seconds']:.6f}; all-mode wall seconds: {observed['wall_seconds']:.6f}.",
+                 observed['timing_note'], '']
+        for mode, evaluation in observed['ablations'].items():
+            local = dict(report, evaluation=evaluation)
+            local.pop('infer_ablations')
+            lines += [f'## Mode: {mode}', '', summary_markdown(local)]
+        return '\n'.join(lines)
     if report.get('protocol') == 'val_sel_rep':
         primary = dict(report)
         primary.pop('protocol')
@@ -422,12 +498,16 @@ def build_parser():
     parser.add_argument('--val-split', type=Path)
     parser.add_argument('--selection-ks', type=parse_selection_ks, default='1:0.25,2:0.25,4:0.5')
     parser.add_argument('--eval-extra', action='store_true')
+    parser.add_argument('--infer-ablations', type=parse_infer_ablations,
+                        help='Eval-only interventions matching the staff predict.py loop')
     return parser
 
 
 def main():
     parser = build_parser()
     args = parser.parse_args()
+    if args.infer_ablations is not None and not args.eval_only:
+        parser.error('--infer-ablations requires --eval-only')
     if args.eval_only and args.ckpt is None:
         parser.error("--eval-only requires --ckpt")
     if args.ckpt is not None and not args.eval_only:
@@ -479,6 +559,8 @@ def main():
             parser.error('Controlled training requires positive epochs and selection every epoch')
     if args.epochs < 0 or min(args.batch_size, args.k_train, args.monitor_every, args.monitor_per_domain, args.metric_workers) < 1:
         parser.error("Epochs must be nonnegative; batch/loop/monitor/metric settings must be positive")
+    if args.infer_ablations is not None and (args.reset_state or args.no_mask_feedback):
+        parser.error('Inference interventions require a checkpoint with both trained ablation flags disabled')
     if args.resume and args.epochs < int(restored["epoch"]):
         parser.error("--epochs is the total target and cannot precede the saved epoch")
     if args.lr <= 0 or min(args.loader_workers, args.eval_loader_workers) < 0:
@@ -524,6 +606,8 @@ def main():
               if isinstance(value, Path) else value for key, value in vars(args).items()}
     config.update(weight_decay=.01, warmup_steps=500, clip_grad_norm=1., pos_weight=4.,
                   refiner_dtype="float32", encoder=y0.ENCODER, probe_head=checkpoint["head"])
+    if args.infer_ablations is None:
+        config.pop('infer_ablations')
     if split is not None:
         config['val_split_sha256'] = split_hash
     train_sets = ([probe.RoadDataset("Train", domain, limit=args.limit_per_domain, seed=args.seed + i)
@@ -650,8 +734,9 @@ def main():
     if split is not None and not args.eval_only:
         best = torch.load(args.ckpt_dir/'best.pt', map_location='cpu', weights_only=True)
         model.load_state_dict(best['state_dict'])
+    evaluation_options = {} if args.infer_ablations is None else {'infer_ablations': args.infer_ablations}
     observed = evaluate(encoder, head, model, datasets, args.eval_k, device,
-                        args.eval_loader_workers, args.metric_workers, eval_extra=args.eval_extra)
+                        args.eval_loader_workers, args.metric_workers, eval_extra=args.eval_extra, **evaluation_options)
     last_observed = None
     if split is None and args.select_every and not args.eval_only:
         last_observed = observed
@@ -687,10 +772,15 @@ def main():
                       evaluated_epoch=start_epoch if args.eval_only else best_epoch,
                       evaluation_files={d: [a.name for a, _ in dataset.pairs] for d, dataset in datasets.items()},
                       model_selection='loaded checkpoint on Val-rep' if args.eval_only else 'best weighted score on Val-sel; report only on Val-rep')
+    if args.infer_ablations is not None:
+        report['infer_ablations'] = args.infer_ablations
     args.out_dir.mkdir(parents=True, exist_ok=True)
     (args.out_dir / "metrics.json").write_text(json.dumps(report, indent=2, allow_nan=False) + "\n", encoding="utf-8")
     (args.out_dir / "summary.md").write_text(summary_markdown(report), encoding="utf-8")
     print("FINAL_OVERALL_A " + json.dumps({key: row["scores"]["A"] for key, row in observed["groups"]["Overall"].items()}), flush=True)
+    if args.infer_ablations is not None:
+        for mode, evaluation in observed['ablations'].items():
+            print('INFER_OVERALL_A ' + mode + ' ' + json.dumps({key: row['scores']['A'] for key, row in evaluation['groups']['Overall'].items()}), flush=True)
     print(f"Wrote {args.out_dir / 'metrics.json'} and summary.md", flush=True)
 
 
