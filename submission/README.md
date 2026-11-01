@@ -1,10 +1,12 @@
 # Quick start
 
-Unzip into an empty folder and run from that folder. Prepare dependencies on
-a network-enabled machine first; inference itself is completely offline.
+Unzip the small Gradescope package into an empty folder, prepare Python 3.12,
+acquire the encoder using exactly one of the three options below, then run
+inference. Dependencies and remote encoder sources need network access during
+preparation; inference itself is completely offline.
 
 ```bash
-unzip midway.zip -d midway
+unzip gradescope.zip -d midway
 cd midway
 mkdir -p .cache/pip .cache/hf .cache/torch .cache/xdg
 export PIP_CACHE_DIR="$PWD/.cache/pip" HF_HOME="$PWD/.cache/hf"
@@ -14,6 +16,41 @@ python -m venv .venv
 source .venv/bin/activate
 python -m pip install torch==2.6.0 torchvision==0.21.0 --index-url https://download.pytorch.org/whl/cu124
 python -m pip install -r requirements.txt
+```
+
+Acquire the encoder using **one** option (replace the placeholders):
+
+**(1) On BU SCC:** copy from the supplied local directory. The directory and
+encoder files must be readable by the `ec523kbta` group; parent directories
+must be searchable by that group.
+
+```bash
+python submission/fetch_encoder.py --from-dir "<SCC_ENCODER_DIR>" --dest submission/encoder
+```
+
+**(2) On other machines:** download the separate encoder ZIP.
+
+```bash
+python submission/fetch_encoder.py --from-url "<ENCODER_ZIP_URL>" --dest submission/encoder
+```
+
+**(3) Fallback:** use an approved Hugging Face account with access to the model.
+
+```bash
+# Authenticate in this HF_HOME first if not already logged in.
+hf auth login
+HF_HUB_OFFLINE=0 python submission/fetch_encoder.py --from-hf --dest submission/encoder
+```
+
+The Hugging Face option requires your own approved account and login. It uses
+model facebook/dinov3-vitl16-pretrain-lvd1689m at revision
+`ea8dc2863c51be0a264bab82070e3e8836b02d51`. Option (1) and local `file://` ZIP
+URLs work offline. A remote URL must return ZIP bytes, not a sharing/HTML page.
+Every source is checked against the three SHA-256 hashes embedded in the
+script and listed in submission/encoder_sha256.json. Already verified files
+are reused; failed preparation removes staged downloads/copies.
+
+```bash
 export HF_HUB_OFFLINE=1 TRANSFORMERS_OFFLINE=1
 python submission/predict.py --checkpoint submission/model.safetensors \
   --baseline submission/baseline.safetensors --encoder-dir submission/encoder \
@@ -91,14 +128,16 @@ submission/
   model.py
   baseline.py
   predict.py
+  fetch_encoder.py
+  encoder_sha256.json         # pinned model identity, revision and three hashes
   README.md
   model.safetensors          # exported refiner parameters and model buffers
   baseline.safetensors       # exported BN probe parameters and running stats
   encoder/
-    config.json
-    preprocessor_config.json
-    model.safetensors        # frozen facebook/dinov3-vitl16-pretrain-lvd1689m
-    LICENSE.md               # upstream license, when present locally
+    LICENSE.md               # included in the small package
+    config.json              # acquired by fetch_encoder.py
+    preprocessor_config.json # acquired by fetch_encoder.py
+    model.safetensors        # acquired frozen DINOv3 web encoder
 ```
 
 The encoder files must be actual readable files, not dangling symlinks into a
@@ -108,9 +147,17 @@ uses `local_files_only=True`. Normalization mean/std are read from the supplied
 preprocessor configuration; the image processor is never applied to images.
 The encoder is DINOv3 ViT-L/16, model ID
 `facebook/dinov3-vitl16-pretrain-lvd1689m`, subject to the DINOv3 License.
-This author's local snapshot includes LICENSE.md, which is included in the
-package. If another local snapshot lacks a LICENSE file, the model remains
-subject to the DINOv3 License; the model ID identifies the upstream release.
+The upstream LICENSE.md is included in both the small package and separate
+encoder ZIP. The three encoder files are obtained in a preparation step,
+not during inference. The small package omits all three encoder files.
+
+Before loading any encoder, predict.py verifies the pinned SHA-256 hashes.
+It caches successful verification in encoder/.encoder_verified.json using
+file size, nanosecond mtime and ctime. Unchanged files avoid repeated hashing
+of the 1.2 GB weights. Modified files are rehashed; missing or mismatched files
+produce an error directing the user to fetch_encoder.py. A read-only encoder
+directory works without the cache, with a full rehash on each run. The cache
+is only a local speed optimization and is not included in either ZIP.
 
 The author prepares the two small files using trusted local training artifacts:
 
@@ -297,18 +344,36 @@ Only report JSONs, run.json files and job.log persist under
 `runs/submission_check/<JOB_ID>/`. Reserve 32 GiB of node-local free space.
 All scratch work is removed even if the job fails.
 
-## Build a standalone ZIP
+## Build the small submission and separate encoder ZIP
 
 ```bash
-python scripts/package_submission.py --out runs/submission_packages/midway
+python scripts/package_submission.py --no-encoder --out runs/submission_packages/gradescope
+python scripts/package_submission.py --encoder-only --out runs/submission_packages/encoder
 ```
 
-This creates the copied directory and `runs/submission_packages/midway.zip`.
+Submit gradescope.zip to Gradescope; it is checked to be strictly below
+95 MiB (95 * 2^20 bytes). Upload encoder.zip separately, then replace
+<ENCODER_ZIP_URL> in the Quick start with a direct download URL. Do not upload
+the encoder ZIP to Gradescope. The encoder ZIP contains exactly config.json,
+preprocessor_config.json, model.safetensors and LICENSE.md at its root.
+The small ZIP includes fetch_encoder.py, the SHA-256 manifest and LICENSE.md,
+but omits all three encoder files. Without either flag, the packager retains
+the original complete-package behavior for local/manual GPU checks.
+
+Each command creates a copied directory and a sibling .zip file.
+To fill the distributed README, optionally pass --scc-encoder-dir and
+--encoder-url with the real deployment values at packaging time. Only the
+copied/archived README is substituted; the repository README keeps its
+placeholders, so personal paths and links do not enter git. Omitting either
+argument preserves its placeholder and prints a warning when packaging a
+README. Encoder-only ZIPs have no README and need no substitutions.
 All symlinks are dereferenced. The allowlist includes only inference Python
 sources, documentation, requirements, tensor weights, encoder configs and any
 local LICENSE files. It excludes env.sh, datasets, runtime runs, course code,
-bytecode and personal paths. Source modules named data contain only Python
+bytecode and unintended personal paths. Explicit deployment values may appear
+only in the packaged README. Source modules named data contain only Python
 code, not dataset files. Each payload file's size/SHA-256 and the ZIP's size
 and SHA-256 are printed. `--out` must be outside the repository or under ignored
-runs/. Include the generated ZIP in the hand-in, not a git archive that omits
-the ignored weights. Do not place feature caches inside the copied package.
+runs/. Include only the small generated ZIP in the hand-in, not a git archive
+that omits the ignored refiner/probe weights. Do not place feature caches
+inside the copied package.

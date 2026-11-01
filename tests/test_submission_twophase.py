@@ -56,6 +56,10 @@ class TwoPhaseTests(unittest.TestCase):
         (self.root/'encoder').mkdir()
         for name in ('config.json', 'preprocessor_config.json', 'model.safetensors'):
             (self.root/'encoder'/name).write_bytes(b'test fixture')
+        fixture_hashes = {name: predict.sha256(self.root/'encoder'/name) for name in ('config.json', 'preprocessor_config.json', 'model.safetensors')}
+        pinned = patch.dict('submission.fetch_encoder.EXPECTED_SHA256', fixture_hashes, clear=True)
+        pinned.start()
+        self.addCleanup(pinned.stop)
         (self.root/'baseline.safetensors').write_bytes(b'test fixture')
         config = dict(dimension=16, heads=4, image_size=1024, patch=16, head_type='conv_upsample')
         torch.manual_seed(19)
