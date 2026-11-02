@@ -12,6 +12,22 @@ mkdir -p .cache/pip .cache/hf .cache/torch .cache/xdg
 export PIP_CACHE_DIR="$PWD/.cache/pip" HF_HOME="$PWD/.cache/hf"
 export TORCH_HOME="$PWD/.cache/torch" XDG_CACHE_HOME="$PWD/.cache/xdg"
 export TMPDIR="${TMPDIR:-/tmp}"  # must be outside this extracted folder
+```
+
+Choose one environment option:
+
+**On BU SCC (simplest):** a teammate tested the following course environment
+successfully. No venv or package installation is needed for this option.
+
+```bash
+module load miniconda/25.3.1
+module load academic-ml/fall-2026
+conda activate fall-2026-pyt
+```
+
+**Other machines:** create a Python 3.12 virtual environment:
+
+```bash
 python -m venv .venv
 source .venv/bin/activate
 python -m pip install torch==2.6.0 torchvision==0.21.0 --index-url https://download.pytorch.org/whl/cu124
@@ -52,10 +68,18 @@ are reused; failed preparation removes staged downloads/copies.
 
 ```bash
 export HF_HUB_OFFLINE=1 TRANSFORMERS_OFFLINE=1
-python submission/predict.py --checkpoint submission/model.safetensors \
-  --baseline submission/baseline.safetensors --encoder-dir submission/encoder \
-  --input /path/to/images --output /path/to/new-output --steps 4 --device cuda
+for k in 1 2 4; do
+  python submission/predict.py --checkpoint submission/model.safetensors \
+    --baseline submission/baseline.safetensors --encoder-dir submission/encoder \
+    --input /path/to/images --output "out_k${k}" --steps "$k" --device cuda
+done
 ```
+
+**out_kK/road_masks/ contains the final masks after exactly K refinement rounds (K = 1, 2, 4). Each folder's run.json also records "steps": K.**
+
+Replace /path/to/images with your own input folder. For a single run, use the
+command inside the loop with --steps 4 --output out_k4 (or another desired K).
+Each output directory must be new or empty.
 
 **The TA-required result folder is `<output>/road_masks/`: one PNG per image,
 uint8, 1 = road and 0 = non-road, with exactly the input H x W dimensions.**
