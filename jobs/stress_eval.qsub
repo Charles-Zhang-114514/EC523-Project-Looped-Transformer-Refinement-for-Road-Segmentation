@@ -1,0 +1,56 @@
+#!/bin/bash -l
+#$ -N ec523-stress-eval
+#$ -P ec523kb
+#$ -cwd
+#$ -pe omp 8
+#$ -l gpus=1
+#$ -l gpu_c=8.0
+#$ -l mem_per_core=8G
+#$ -l h_rt=03:00:00
+#$ -m ea
+#$ -j y
+#$ -o runs/logs/
+
+# Submit from the repository root after mkdir -p runs/logs.
+# Four sets of 835 images: encoding 4*120=480 s; refinement 4*3*106=1272 s.
+# Five scored outputs (y0,K1,K2,K4,K8) per model:
+# official metrics 4*3*835*5*0.125/6=1044 s (~17.4 min).
+# Conservative geometry budget: 4*3*835*4*0.22/6=1470 s (~24.5 min),
+# with fixed-y0 skeletons shared within each image/model's worker task.
+# Official make_stress CPU pilots: 0.595 and 0.747 s/image (4 images each).
+# Allow 2505*0.747=1871 s (~31.2 min) for fresh single-process generation;
+# verified existing stress sets are reused. Only generation uses pilot CPU
+# wall times; GPU encoding/refinement use the supplied GPU measurements.
+# One evaluator cross-check adds 835*0.125=104 s. Total ~104 min.
+# Allow 30 min for cache/image I/O, spawn/startup and variance: ~134 min;
+# request 180 min. Do not scale GPU encoding/refinement using CPU timings.
+# One live float32 cache: ~13.1 GiB, deleted after each of the four sets.
+# Require 32 GiB free node scratch. PNGs/manifests remain under ignored runs/.
+# Encoding: main + 1 loader. Scoring: main + 6 spawn workers; no overlap.
+NODE_TMP="${TMPDIR:?SGE node-local TMPDIR is required}"
+source "${SGE_O_WORKDIR:?Submit from repository root}/env.sh" || exit 1
+set -euo pipefail
+cd "$SGE_O_WORKDIR"
+export TMPDIR="$NODE_TMP" TMP="$NODE_TMP" TEMP="$NODE_TMP"
+export PYTHONPATH="$PWD/src:$PWD"
+export OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1
+export HF_HUB_OFFLINE=1 TRANSFORMERS_OFFLINE=1 HF_HUB_DISABLE_TELEMETRY=1
+: "${EC523_DATA_DIR:?Set the read-only dataset directory}"
+: "${EC523_STARTER_DIR:?Set the original starter cli directory}"
+STRESS_CACHE_ROOT="$(mktemp -d "$TMPDIR/ec523-stress-${JOB_ID:-manual}-XXXXXX")"
+trap 'rm -rf -- "$STRESS_CACHE_ROOT"' EXIT
+python - <<'PY'
+import os, shutil
+import torch, numpy, transformers, PIL, scipy, skimage, safetensors
+print('GPU:',torch.cuda.get_device_name(),flush=True)
+print('Versions:',dict(torch=torch.__version__,numpy=numpy.__version__,transformers=transformers.__version__,
+                      Pillow=PIL.__version__,scipy=scipy.__version__,skimage=skimage.__version__,safetensors=safetensors.__version__),flush=True)
+free=shutil.disk_usage(os.environ['TMPDIR']).free
+print('TMPDIR free bytes:',free,flush=True)
+if free < 32*1024**3:
+    raise RuntimeError('Need at least 32 GiB free node-local scratch')
+PY
+git rev-parse HEAD
+python -u scripts/eval_stress.py --device cuda --loader-workers 1 --metric-workers 6 \
+    --stress-seeds 523,524,525 --model-seeds 0,1,2 --ks 1,2,4,8 \
+    --cache-dir "$STRESS_CACHE_ROOT" --work-dir runs/stress --out-dir results/stress/v2
