@@ -6,7 +6,7 @@ from pathlib import Path
 import statistics
 
 ROOT = Path(__file__).resolve().parents[1]
-EXPERIMENTS = ('e0_v2', 'e1_reset', 'e2_nofb', 'e3_single')
+EXPERIMENTS = ('e0_v2', 'e1_reset', 'e2_nofb', 'e3_single', 'e4_untied')
 EXPECTED = tuple(f'{experiment}_s{seed}' for experiment in EXPERIMENTS for seed in (0, 1, 2))
 COLUMNS = ('experiment', 'seed', 'status', 'best_epoch', 'y0_A', 'A_K1', 'A_K2', 'A_K4', 'A_K6', 'A_K8', 'proxy',
            'Urban_A_K1', 'Rural_A_K1', 'Urban_A_K4', 'Rural_A_K4', 'gap_repair_K1', 'new_break_K1',
@@ -43,7 +43,9 @@ def read_run(name, path):
         for domain in ('Urban', 'Rural'):
             row[f'{domain}_y0_A'] = groups[domain]['y0_draft']['scores']['A']
         for k in (1, 2, 4, 6, 8):
-            row['A_K'+str(k)] = overall[str(k)]['scores']['A']
+            # The finite untied control has no K6/K8 trajectory, not a missing run.
+            row['A_K'+str(k)] = (None if experiment == 'e4_untied' and k in (6, 8)
+                                else overall[str(k)]['scores']['A'])
         row['proxy'] = .25*row['A_K1'] + .25*row['A_K2'] + .5*row['A_K4']
         for k in (1, 4):
             for domain in ('Urban', 'Rural'):

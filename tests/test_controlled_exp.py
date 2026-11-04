@@ -118,9 +118,10 @@ class ControlledExperimentTests(unittest.TestCase):
         self.assertEqual(read_run('incomplete_smoke', Path('absent'))['status'], 'missing')
         with patch.object(Path,'glob',return_value=[]), patch.object(Path,'read_text',side_effect=FileNotFoundError):
             result=aggregate_directory(Path('absent'))
-        self.assertEqual(len(result['rows']),16)
-        self.assertTrue(all(r['status']=='missing' for r in result['rows'][:12]))
-        self.assertTrue(all(r['status']=='incomplete' for r in result['rows'][12:]))
+        expected_runs = 3 * len(EXPERIMENTS)
+        self.assertEqual(len(result['rows']), expected_runs + len(EXPERIMENTS))
+        self.assertTrue(all(r['status']=='missing' for r in result['rows'][:expected_runs]))
+        self.assertTrue(all(r['status']=='incomplete' for r in result['rows'][expected_runs:]))
         self.assertTrue(all(r['status']=='incomplete' for r in result['table1']))
         rows=[dict(experiment='e0_v2',seed=i,status='complete',**{name:float(i) for name in COLUMNS[3:]}) for i in (0,1,2)]
         mean=mean_row(rows)
@@ -155,7 +156,7 @@ class ControlledExperimentTests(unittest.TestCase):
                 for experiment in EXPERIMENTS for seed in (2, 0, 1)]
         aggregates = [mean_row(rows, experiment) for experiment in EXPERIMENTS]
         table = table1_rows(rows, aggregates)
-        self.assertEqual(len(table), 5)
+        self.assertEqual(len(table), 1 + len(EXPERIMENTS))
         baseline = table[0]
         for key in ('A_K1', 'A_K2', 'A_K4', 'A_K6', 'A_K8', 'proxy'):
             self.assertEqual(baseline[key], {'mean': 2.0, 'std': 1.0})
