@@ -1,4 +1,4 @@
-"""A shared global-attention correction core with externally controlled looping."""
+"""Shared recurrence, with an optional finite untied stack for comparison."""
 import math
 
 import torch
@@ -80,12 +80,17 @@ class ConvUpsampleHead(nn.Module):
 class LoopRefiner(nn.Module):
     def __init__(self, in_channels=1024, dimension=256, layers=1, heads=8,
                  mlp_ratio=4., patch=16, image_size=1024,
-                 no_mask_feedback=False, reset_state=False, head_type="patch_linear"):
+                 no_mask_feedback=False, reset_state=False, head_type="patch_linear",
+                 untied_steps=0):
         super().__init__()
         if min(in_channels, dimension, layers, heads, patch, image_size) < 1 or mlp_ratio <= 0:
             raise ValueError("Model dimensions must be positive")
         if dimension % heads or dimension % 4 or image_size % patch:
             raise ValueError("Incompatible attention dimension or patch grid")
+        if not isinstance(untied_steps, int) or untied_steps < 0:
+            raise ValueError("untied_steps must be a nonnegative integer")
+        self.untied_steps = untied_steps
+        self._step_index = 0
         self.image_size, self.patch = image_size, patch
         self.grid = image_size // patch
         if head_type not in ("patch_linear", "conv_upsample") or (head_type == "conv_upsample" and patch != 16):
@@ -96,7 +101,14 @@ class LoopRefiner(nn.Module):
         self.answer_projection = nn.Linear(patch * patch, dimension)
         self.initializer = nn.Linear(dimension, dimension)
         self.register_buffer("position_encoding", sine_position_encoding(self.grid, dimension))
-        self.core = nn.Sequential(*(TransformerBlock(dimension, heads, mlp_ratio) for _ in range(layers)))
+        if untied_steps:
+            self.core = nn.ModuleList([
+                nn.Sequential(*(TransformerBlock(dimension, heads, mlp_ratio) for _ in range(layers)))
+                for _ in range(untied_steps)
+            ])
+        else:
+            # Preserve legacy registration keys, initialization order and RNG use.
+            self.core = nn.Sequential(*(TransformerBlock(dimension, heads, mlp_ratio) for _ in range(layers)))
         if head_type == "patch_linear":
             self.output_head = nn.Sequential(nn.LayerNorm(dimension), nn.Linear(dimension, patch * patch))
             nn.init.zeros_(self.output_head[-1].weight)
@@ -118,21 +130,32 @@ class LoopRefiner(nn.Module):
         initial_state = self.initializer(feature_tokens + self.answer_tokens(draft))
         # Retain the graph for the reset-state ablation; never detach across steps.
         self._initial_state = initial_state
+        self._step_index = 0
         return initial_state, feature_tokens
 
     def step(self, state, answer, feature_tokens):
+        if self.untied_steps:
+            if self._initial_state is None:
+                raise RuntimeError("Call init before using the untied stack")
+            if self._step_index >= self.untied_steps:
+                raise RuntimeError(f"Untied stack exhausted: step {self._step_index + 1} "
+                                   f"exceeds untied_steps={self.untied_steps}; call init for a new trajectory")
         if self.reset_state:
             if self._initial_state is None:
                 raise RuntimeError("Call init before using reset_state")
             state = self._initial_state
         feedback = (torch.zeros_like(feature_tokens) if self.no_mask_feedback
                     else self.answer_tokens(answer))
-        next_state = self.core(state + feature_tokens + feedback + self.position_encoding)
+        core = self.core[self._step_index] if self.untied_steps else self.core
+        next_state = core(state + feature_tokens + feedback + self.position_encoding)
         correction = (unpatchify(self.output_head(next_state), self.image_size, self.image_size, self.patch)
                       if self.head_type == "patch_linear" else self.output_head(next_state, self.grid))
+        if self.untied_steps:
+            self._step_index += 1
         return next_state, answer + correction
 
     def parameter_counts(self):
+        # ModuleList.parameters() includes every independent core exactly once.
         names = ("core", "feature_projection", "answer_projection", "initializer", "output_head")
         counts = {name: sum(p.numel() for p in getattr(self, name).parameters()) for name in names}
         counts["trainable_total"] = sum(p.numel() for p in self.parameters() if p.requires_grad)

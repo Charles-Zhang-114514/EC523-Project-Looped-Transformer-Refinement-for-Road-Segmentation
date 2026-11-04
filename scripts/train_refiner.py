@@ -67,6 +67,7 @@ def inference_steps(model, features, draft, ks, device, ablation="none"):
     """
     if ablation not in INFER_ABLATIONS:
         raise ValueError(f"Unknown inference ablation: {ablation}")
+    check_untied_limit(model.untied_steps, ks, "inference K")
     if model.reset_state or model.no_mask_feedback:
         raise ValueError("Inference interventions require an unmodified checkpoint/model")
     with torch.no_grad(), torch.autocast(device_type=device.type, enabled=False):
@@ -144,6 +145,7 @@ def make_loader(dataset, batch_size, workers, shuffle=False, seed=0):
 def evaluate(encoder, head, model, datasets, ks, device, loader_workers=1, metric_workers=6, geometry=True, eval_extra=False,
              infer_ablations=None):
     """One streamed trajectory to max(ks); workers receive only uint8 masks."""
+    check_untied_limit(model.untied_steps, ks, "evaluation K")
     started = time.perf_counter()
     model.eval()
     metrics = probe.official_metrics()
@@ -463,6 +465,22 @@ def summary_markdown(report):
     return "\n".join(lines)
 
 
+def check_untied_limit(untied_steps, requested, context):
+    """Reject unsupported depths explicitly; never silently shorten a loop."""
+    if untied_steps < 0:
+        raise ValueError("--untied-steps must be nonnegative")
+    if untied_steps and max(requested) > untied_steps:
+        raise ValueError(f"{context}={max(requested)} exceeds --untied-steps={untied_steps}")
+
+
+def validate_untied_settings(args):
+    check_untied_limit(args.untied_steps, [args.k_train], "--k-train")
+    check_untied_limit(args.untied_steps, args.eval_k, "--eval-k")
+    check_untied_limit(args.untied_steps, [int(k) for k in args.selection_ks], "--selection-ks K")
+    if not args.eval_only and args.epochs and args.val_split is None:
+        check_untied_limit(args.untied_steps, [1, 4], "legacy monitoring K (use --val-split for another selection grid)")
+
+
 def build_parser():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--epochs", type=int, default=20, help="Zero evaluates an untrained zero-output refiner")
@@ -492,6 +510,8 @@ def build_parser():
     parser.add_argument("--patch", type=int, default=16)
     parser.add_argument("--no-mask-feedback", action="store_true")
     parser.add_argument("--reset-state", action="store_true")
+    parser.add_argument("--untied-steps", type=int, default=0,
+                        help="Independent cores for a finite stack; zero preserves shared recurrence")
     parser.add_argument("--head-type", choices=("patch_linear", "conv_upsample"), default="patch_linear")
     parser.add_argument("--select-every", type=int, default=0, help="Zero preserves final-epoch-only v1 behavior")
     parser.add_argument("--select-per-domain", type=int, default=100)
@@ -523,11 +543,11 @@ def main():
         explicit = {value.split("=", 1)[0] for value in sys.argv[1:] if value.startswith("--")}
         if '--eval-extra' not in explicit:
             args.eval_extra = restored['config'].get('eval_extra', False)
-        settings = ["dimension", "layers", "heads", "mlp_ratio", "patch", "no_mask_feedback", "reset_state", "k_train", "head_type", "selection_ks"]
+        settings = ["dimension", "layers", "heads", "mlp_ratio", "patch", "no_mask_feedback", "reset_state", "k_train", "head_type", "selection_ks", "untied_steps"]
         if args.resume:
             settings += ["batch_size", "lr", "seed", "limit_per_domain", "monitor_every", "monitor_per_domain", "select_every", "select_per_domain"]
         for name in settings:
-            saved = restored["config"].get(name, {"head_type": "patch_linear", "select_every": 0, "select_per_domain": 100, 'selection_ks': parse_selection_ks('1:0.25,2:0.25,4:0.5')}.get(name))
+            saved = restored["config"].get(name, {"head_type": "patch_linear", "select_every": 0, "select_per_domain": 100, 'selection_ks': parse_selection_ks('1:0.25,2:0.25,4:0.5'), 'untied_steps': 0}.get(name))
             if "--" + name.replace("_", "-") in explicit and getattr(args, name) != saved:
                 parser.error(f"Checkpoint setting {name}={saved!r} conflicts with the requested value")
             setattr(args, name, saved)
@@ -544,6 +564,10 @@ def main():
             args.val_split = ROOT/saved_split
         elif args.resume and args.val_split is not None:
             parser.error('Cannot change a legacy training run to the controlled protocol on resume')
+    try:
+        validate_untied_settings(args)
+    except ValueError as error:
+        parser.error(str(error))
     split = None
     split_hash = None
     if args.val_split is not None:
@@ -593,7 +617,8 @@ def main():
     encoder.requires_grad_(False).eval()
     model = LoopRefiner(encoder.out_channels, args.dimension, args.layers, args.heads,
                         args.mlp_ratio, args.patch, no_mask_feedback=args.no_mask_feedback,
-                        reset_state=args.reset_state, head_type=args.head_type).to(device=device, dtype=torch.float32)
+                        reset_state=args.reset_state, head_type=args.head_type,
+                        untied_steps=args.untied_steps).to(device=device, dtype=torch.float32)
     if restored is not None:
         model.load_state_dict(restored["state_dict"])
     parameters = model.parameter_counts()
