@@ -94,6 +94,27 @@ def deep_supervision(outputs, targets, valid):
     return torch.stack(losses).mean(), losses
 
 
+def noadd_penalties(outputs, draft, targets, valid):
+    """Penalize probability increases on valid GT background with y0 < 0.5."""
+    initial_probability = draft.detach().sigmoid().squeeze(1)
+    mask = valid.bool() & (targets == 0) & (initial_probability < .5)
+    # Match masked_bce_with_logits: sum over the full batch's valid pixels.
+    denominator = valid.to(dtype=outputs[0].dtype).sum().clamp_min(1)
+    penalties = [((answer.sigmoid().squeeze(1) - initial_probability).relu().square()
+                  * mask).sum() / denominator for answer in outputs]
+    return torch.stack(penalties).mean(), penalties
+
+
+def refiner_objective(outputs, targets, valid, draft, noadd_lambda=0.):
+    """Return total, per-step BCE, mean BCE, mean penalty and per-step penalty."""
+    bce, losses = deep_supervision(outputs, targets, valid)
+    if noadd_lambda == 0:
+        # No new tensor operation, sigmoid, graph branch or RNG use at lambda=0.
+        return bce, losses, bce, 0., [0.] * len(outputs)
+    penalty, penalties = noadd_penalties(outputs, draft, targets, valid)
+    return bce + noadd_lambda * penalty, losses, bce, penalty, penalties
+
+
 def initialize_eval_worker(starter):
     probe.initialize_metric_worker(starter, (.5,))
 
@@ -458,6 +479,15 @@ def summary_markdown(report):
               "| Epoch | y0_draft A | K=1 A | K=4 A | Seconds |", "|---|---:|---:|---:|---:|"]
     for row in report["train_curve"]:
         lines.append(f"| {row['epoch']} | {row['y0_draft']:.6f} | {row['1']:.6f} | {row['4']:.6f} | {row['seconds']:.3f} |")
+    if report['config'].get('noadd_lambda', 0):
+        lines += ['', '## No-add training objective', '',
+                  f"Observed noadd_lambda={report['config']['noadd_lambda']}. Total loss = mean BCE + lambda * mean penalty.",
+                  'Legacy step_losses and explicit step_bce record BCE; step_penalties record the unweighted penalty.', '',
+                  '| Epoch | Mean BCE | Step BCE | Mean penalty | Step penalties | Total loss |',
+                  '|---|---:|---|---:|---|---:|']
+        for row in report['epochs']:
+            lines.append(f"| {row['epoch']} | {row['bce']:.9f} | {row['step_bce']} | "
+                         f"{row['penalty']:.9f} | {row['step_penalties']} | {row['loss']:.9f} |")
     lines += ["", "Observed timings synchronize CUDA at both boundaries. Refiner timings include initialization but exclude encoder/probe, snapshot copies and metric workers.",
               "Epoch losses are weighted by batch sample count; every batch loss averages valid pixels and supervised steps.",
               "Geometry uses the existing y0 analysis definitions. Counts are summed before official summarize; Overall = Urban + Rural.",
@@ -479,6 +509,11 @@ def validate_untied_settings(args):
     check_untied_limit(args.untied_steps, [int(k) for k in args.selection_ks], "--selection-ks K")
     if not args.eval_only and args.epochs and args.val_split is None:
         check_untied_limit(args.untied_steps, [1, 4], "legacy monitoring K (use --val-split for another selection grid)")
+
+
+def validate_noadd_lambda(value):
+    if not math.isfinite(value) or value < 0:
+        raise ValueError('--noadd-lambda must be finite and nonnegative')
 
 
 def build_parser():
@@ -512,6 +547,8 @@ def build_parser():
     parser.add_argument("--reset-state", action="store_true")
     parser.add_argument("--untied-steps", type=int, default=0,
                         help="Independent cores for a finite stack; zero preserves shared recurrence")
+    parser.add_argument('--noadd-lambda', type=float, default=0.,
+                        help='Weight of the valid-background probability-increase penalty')
     parser.add_argument("--head-type", choices=("patch_linear", "conv_upsample"), default="patch_linear")
     parser.add_argument("--select-every", type=int, default=0, help="Zero preserves final-epoch-only v1 behavior")
     parser.add_argument("--select-per-domain", type=int, default=100)
@@ -543,11 +580,11 @@ def main():
         explicit = {value.split("=", 1)[0] for value in sys.argv[1:] if value.startswith("--")}
         if '--eval-extra' not in explicit:
             args.eval_extra = restored['config'].get('eval_extra', False)
-        settings = ["dimension", "layers", "heads", "mlp_ratio", "patch", "no_mask_feedback", "reset_state", "k_train", "head_type", "selection_ks", "untied_steps"]
+        settings = ["dimension", "layers", "heads", "mlp_ratio", "patch", "no_mask_feedback", "reset_state", "k_train", "head_type", "selection_ks", "untied_steps", "noadd_lambda"]
         if args.resume:
             settings += ["batch_size", "lr", "seed", "limit_per_domain", "monitor_every", "monitor_per_domain", "select_every", "select_per_domain"]
         for name in settings:
-            saved = restored["config"].get(name, {"head_type": "patch_linear", "select_every": 0, "select_per_domain": 100, 'selection_ks': parse_selection_ks('1:0.25,2:0.25,4:0.5'), 'untied_steps': 0}.get(name))
+            saved = restored["config"].get(name, {"head_type": "patch_linear", "select_every": 0, "select_per_domain": 100, 'selection_ks': parse_selection_ks('1:0.25,2:0.25,4:0.5'), 'untied_steps': 0, 'noadd_lambda': 0.}.get(name))
             if "--" + name.replace("_", "-") in explicit and getattr(args, name) != saved:
                 parser.error(f"Checkpoint setting {name}={saved!r} conflicts with the requested value")
             setattr(args, name, saved)
@@ -566,6 +603,7 @@ def main():
             parser.error('Cannot change a legacy training run to the controlled protocol on resume')
     try:
         validate_untied_settings(args)
+        validate_noadd_lambda(args.noadd_lambda)
     except ValueError as error:
         parser.error(str(error))
     split = None
@@ -689,7 +727,8 @@ def main():
             phase = stamp(device)
             with torch.autocast(device_type=device.type, enabled=False):
                 logits = refine_steps(model, features.float(), draft.float(), args.k_train)
-                loss, losses = deep_supervision(logits, targets, valid)
+                loss, losses, bce, penalty, penalties = refiner_objective(
+                    logits, targets, valid, draft, args.noadd_lambda)
                 if not torch.isfinite(loss):
                     raise FloatingPointError("Nonfinite training loss")
                 loss.backward()
@@ -702,10 +741,14 @@ def main():
                      "step_losses": [float(value.detach()) for value in losses],
                      "encoder_seconds": encoder_time, "refiner_forward_backward_seconds": refiner_time,
                      "lr": learning_rate, "gradient_norm_before_clip": float(gradient_norm)}
+            batch.update(bce=float(bce.detach()), step_bce=batch['step_losses'],
+                         penalty=float(penalty.detach()) if isinstance(penalty, torch.Tensor) else penalty,
+                         step_penalties=[float(value.detach()) if isinstance(value, torch.Tensor) else value
+                                         for value in penalties])
             batches.append(batch)
             seen += images.shape[0]
             print(f"BATCH epoch={epoch + 1} " + json.dumps(batch), flush=True)
-            del logits, loss, losses, features, draft
+            del logits, loss, losses, features, draft, bce, penalty, penalties
         record = {"epoch": epoch + 1, "loss": sum(row["loss"] * row["samples"] for row in batches) / seen,
                   "step_losses": [sum(row["step_losses"][step] * row["samples"] for row in batches) / seen
                                   for step in range(args.k_train)],
@@ -714,6 +757,11 @@ def main():
                   "refiner_forward_backward_seconds": sum(row["refiner_forward_backward_seconds"] for row in batches),
                   "peak_cuda_bytes": torch.cuda.max_memory_allocated(device) if device.type == "cuda" else None,
                   "batches": batches}
+        record.update(bce=sum(row['bce'] * row['samples'] for row in batches) / seen,
+                      step_bce=record['step_losses'],
+                      penalty=sum(row['penalty'] * row['samples'] for row in batches) / seen,
+                      step_penalties=[sum(row['step_penalties'][step] * row['samples'] for row in batches) / seen
+                                      for step in range(args.k_train)])
         epochs.append(record)
         print("EPOCH " + json.dumps({key: value for key, value in record.items() if key != "batches"}), flush=True)
         if split is None and (epoch == 0 or (epoch + 1) % args.monitor_every == 0):

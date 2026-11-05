@@ -197,13 +197,15 @@ class UntiedAggregateTests(unittest.TestCase):
             aggregate.main()
         # The candidate is rendered only in memory; existing result files stay untouched.
         old_md = (aggregate.ROOT/'results/exp/summary.md').read_text()
-        strip_e4 = lambda text: '\n'.join(line for line in text.splitlines() if not line.startswith('| e4_untied'))
+        strip_e4 = lambda text: '\n'.join(line for line in text.splitlines()
+                                        if not line.startswith(('| e4_untied', '| e5_noadd')))
         self.assertEqual(strip_e4(captured['summary.md']), strip_e4(old_md))
         old = json.loads((aggregate.ROOT/'results/exp/summary.json').read_text())
         new = json.loads(captured['summary.json'])
         for report in (old, new):
             for key in ('rows', 'table1'):
-                report[key] = [row for row in report[key] if not row['experiment'].startswith('e4_untied')]
+                report[key] = [row for row in report[key]
+                               if not row['experiment'].startswith(('e4_untied', 'e5_noadd'))]
         self.assertEqual(json.dumps(old, indent=2), json.dumps(new, indent=2))
 
 
