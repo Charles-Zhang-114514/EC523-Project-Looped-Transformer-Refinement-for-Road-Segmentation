@@ -6,7 +6,7 @@ from pathlib import Path
 import statistics
 
 ROOT = Path(__file__).resolve().parents[1]
-EXPERIMENTS = ('e0_v2', 'e1_reset', 'e2_nofb', 'e3_single', 'e4_untied')
+EXPERIMENTS = ('e0_v2', 'e1_reset', 'e2_nofb', 'e3_single', 'e4_untied', 'e5_noadd')
 EXPECTED = tuple(f'{experiment}_s{seed}' for experiment in EXPERIMENTS for seed in (0, 1, 2))
 COLUMNS = ('experiment', 'seed', 'status', 'best_epoch', 'y0_A', 'A_K1', 'A_K2', 'A_K4', 'A_K6', 'A_K8', 'proxy',
            'Urban_A_K1', 'Rural_A_K1', 'Urban_A_K4', 'Rural_A_K4', 'gap_repair_K1', 'new_break_K1',
@@ -121,7 +121,8 @@ def display(value):
 
 
 def aggregate_directory(directory):
-    discovered = {p.parent.name for p in directory.glob('*/metrics.json') if '_s' in p.parent.name}
+    discovered = {p.parent.name for p in directory.glob('*/metrics.json')
+                  if '_s' in p.parent.name and not p.parent.name.endswith('_rerun')}
     names = list(EXPECTED) + sorted(discovered - set(EXPECTED))
     rows = [read_run(name, directory/name/'metrics.json') for name in names]
     aggregates = [mean_row(rows, experiment) for experiment in EXPERIMENTS]
@@ -199,6 +200,17 @@ def write_inference_summary(directory, out_dir):
     print('Observed inference summary written to summary.md and summary.json', flush=True)
 
 
+def existing_comparison_appendix(directory):
+    """Keep manually appended comparisons verbatim when refreshing run tables."""
+    try:
+        text = (directory/'summary.md').read_text(encoding='utf-8')
+    except FileNotFoundError:
+        return ''
+    marker = '\n\n## Untied vs shared\n'
+    position = text.find(marker)
+    return text[position:] if position >= 0 else ''
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--results-dir', type=Path)
@@ -224,7 +236,7 @@ def main():
     lines += ['| ' + ' | '.join(display(row.get(key)) for key in TABLE1_COLUMNS) + ' |' for row in report['table1']]
     out_dir.mkdir(parents=True, exist_ok=True)
     (out_dir/'summary.json').write_text(json.dumps(report, indent=2, allow_nan=False)+'\n', encoding='utf-8')
-    (out_dir/'summary.md').write_text('\n'.join(lines)+'\n', encoding='utf-8')
+    (out_dir/'summary.md').write_text('\n'.join(lines)+'\n'+existing_comparison_appendix(args.results_dir), encoding='utf-8')
     print(f"Observed {report['completed_runs']} completed runs; wrote summary.md and summary.json", flush=True)
 
 
