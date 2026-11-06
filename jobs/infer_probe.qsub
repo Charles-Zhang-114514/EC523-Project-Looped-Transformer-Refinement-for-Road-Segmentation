@@ -1,0 +1,47 @@
+#!/bin/bash -l
+#$ -N ec523-infer-probe
+#$ -P ec523kb
+#$ -cwd
+#$ -pe omp 8
+#$ -l gpus=1
+#$ -l gpu_c=8.0
+#$ -l mem_per_core=8G
+#$ -l h_rt=03:00:00
+#$ -m ea
+#$ -j y
+#$ -o runs/logs/
+
+# Submit from the repository root after mkdir -p runs/logs.
+# Gating: 6 checkpoints * 2 sets * 2 K * 10 tau = 240 groups.
+# With average 834.5 images/set: 240*834.5*.125/6=4172.5 s (~69.5 min).
+# Direct y0/K1/K4 references: 6*1669*3*.125/6=625.9 s (~10.4 min).
+# Two encodings: ~240 s. Native refinement conservatively uses the K8
+# timing even though only K4 is needed: 12*106=1272 s (~21.2 min).
+# New intervention: 3*106=318 s; 3*835*5*.125/6=260.9 s metrics;
+# geometry allowance 3*835*4*.22/6=367.4 s. Total ~7257 s (~121 min).
+# Allow 30 min for feature I/O, model loading, IPC and spawn; request 180 min.
+# Full six-checkpoint/two-set scope is retained; no CPU/GPU speed scaling.
+# One float32 cache at a time: ~13.1 GiB; remove after each set and on errors.
+# Encoding uses main+1 loader; scoring uses main+6 single-thread spawn workers.
+NODE_TMP="${TMPDIR:?SGE node-local TMPDIR is required}"
+source "${SGE_O_WORKDIR:?Submit from repository root}/env.sh" || exit 1
+set -euo pipefail
+cd "$SGE_O_WORKDIR"
+export TMPDIR="$NODE_TMP" TMP="$NODE_TMP" TEMP="$NODE_TMP"
+export PYTHONPATH="$PWD/src:$PWD"
+export OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1
+export HF_HUB_OFFLINE=1 TRANSFORMERS_OFFLINE=1 HF_HUB_DISABLE_TELEMETRY=1
+PROBE_CACHE_ROOT="$(mktemp -d "$TMPDIR/ec523-infer-probe-${JOB_ID:-manual}-XXXXXX")"
+trap 'rm -rf -- "$PROBE_CACHE_ROOT"' EXIT
+python - <<'PY'
+import os, shutil, torch, numpy, transformers, PIL
+print('GPU:',torch.cuda.get_device_name(),flush=True)
+print('Versions:',torch.__version__,numpy.__version__,transformers.__version__,PIL.__version__,flush=True)
+free=shutil.disk_usage(os.environ['TMPDIR']).free
+print('TMPDIR free bytes:',free,flush=True)
+if free < 32*1024**3:
+    raise RuntimeError('Need at least 32 GiB free node scratch')
+PY
+git rev-parse HEAD
+python -u analysis/gating_sweep.py --device cuda --loader-workers 1 --metric-workers 6 \
+    --cache-dir "$PROBE_CACHE_ROOT" --out-dir results/infer_probe

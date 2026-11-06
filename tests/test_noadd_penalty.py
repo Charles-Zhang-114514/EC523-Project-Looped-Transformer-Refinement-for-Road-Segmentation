@@ -130,13 +130,17 @@ class NoAddAggregateTests(unittest.TestCase):
                 patch.object(Path, 'mkdir'), patch.object(Path, 'write_text', autospec=True, side_effect=capture):
             aggregate.main()
         old_md = (aggregate.ROOT/'results/exp/summary.md').read_text()
-        new_md = ''.join(line for line in captured['summary.md'].splitlines(keepends=True)
-                         if not line.startswith('| e5_noadd'))
+        # Once e5 is committed, compare the complete report, including e5 itself.
+        already_reported = '| e5_noadd |' in old_md
+        new_md = captured['summary.md'] if already_reported else ''.join(
+            line for line in captured['summary.md'].splitlines(keepends=True)
+            if not line.startswith('| e5_noadd'))
         self.assertEqual(new_md, old_md)
         self.assertIn('## Untied vs shared', new_md)
         new = json.loads(captured['summary.json'])
-        for key in ('rows', 'table1'):
-            new[key] = [row for row in new[key] if not row['experiment'].startswith('e5_noadd')]
+        if not already_reported:
+            for key in ('rows', 'table1'):
+                new[key] = [row for row in new[key] if not row['experiment'].startswith('e5_noadd')]
         self.assertEqual(json.dumps(new, indent=2, allow_nan=False)+'\n',
                          (aggregate.ROOT/'results/exp/summary.json').read_text())
 
