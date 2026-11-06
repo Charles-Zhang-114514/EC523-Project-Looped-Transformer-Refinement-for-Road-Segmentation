@@ -2,6 +2,7 @@
 """Train only a shared float32 refiner on frozen RoadSeg probe drafts."""
 import argparse
 from collections import deque
+from contextlib import contextmanager
 import json
 import hashlib
 import math
@@ -24,6 +25,7 @@ from looproad.models.refiner import LoopRefiner
 
 DOMAINS = ("Urban", "Rural")
 INFER_ABLATIONS = ("none", "reset-state", "no-mask-feedback")
+SUPPORTED_INFER_ABLATIONS = (*INFER_ABLATIONS, "y0_answer_keep_residual")
 STRUCTURE_KEYS = ("gap_skeleton_pixels", "terminal_missing_skeleton_pixels",
                   "whole_missed_skeleton_pixels", "fp_fragments", "predicted_components")
 
@@ -58,6 +60,20 @@ def refine_steps(model, features, draft, steps):
     return outputs
 
 
+@contextmanager
+def draft_answer_tokens(model, draft, enabled):
+    """Override only answer-token output; step still adds delta to its answer."""
+    if not enabled:
+        yield
+        return
+    tokens = model.answer_tokens(draft)
+    handle = model.answer_projection.register_forward_hook(lambda _module, _args, _output: tokens)
+    try:
+        yield
+    finally:
+        handle.remove()
+
+
 def inference_steps(model, features, draft, ks, device, ablation="none"):
     """Adapt predict.py:61-68 without changing LoopRefiner's init/step API.
 
@@ -65,7 +81,7 @@ def inference_steps(model, features, draft, ks, device, ablation="none"):
     state. Replacing the step answer also replaces its residual base with y0.
     Yield requested logits only; the caller owns K and converts masks promptly.
     """
-    if ablation not in INFER_ABLATIONS:
+    if ablation not in SUPPORTED_INFER_ABLATIONS:
         raise ValueError(f"Unknown inference ablation: {ablation}")
     check_untied_limit(model.untied_steps, ks, "inference K")
     if model.reset_state or model.no_mask_feedback:
@@ -77,16 +93,20 @@ def inference_steps(model, features, draft, ks, device, ablation="none"):
         state, feature_tokens = model.init(features.float().clone(), draft.float().clone())
         elapsed = stamp(device) - phase
         current = draft.clone()
-        for step in range(1, max(ks) + 1):
-            phase = stamp(device)
-            if ablation == "reset-state":
-                state, feature_tokens = model.init(features.float().clone(), draft.float().clone())
-            feedback = draft.clone() if ablation == "no-mask-feedback" else current.clone()
-            state, current = model.step(state, feedback, feature_tokens)
-            elapsed += stamp(device) - phase
-            if step in ks:
-                peak = torch.cuda.max_memory_allocated(device) if device.type == "cuda" else None
-                yield str(step), current, elapsed, peak
+        phase = stamp(device) if ablation == "y0_answer_keep_residual" else None
+        with draft_answer_tokens(model, draft, ablation == "y0_answer_keep_residual"):
+            if ablation == "y0_answer_keep_residual":
+                elapsed += stamp(device) - phase
+            for step in range(1, max(ks) + 1):
+                phase = stamp(device)
+                if ablation == "reset-state":
+                    state, feature_tokens = model.init(features.float().clone(), draft.float().clone())
+                feedback = draft.clone() if ablation == "no-mask-feedback" else current.clone()
+                state, current = model.step(state, feedback, feature_tokens)
+                elapsed += stamp(device) - phase
+                if step in ks:
+                    peak = torch.cuda.max_memory_allocated(device) if device.type == "cuda" else None
+                    yield str(step), current, elapsed, peak
 
 
 def deep_supervision(outputs, targets, valid):
@@ -171,7 +191,7 @@ def evaluate(encoder, head, model, datasets, ks, device, loader_workers=1, metri
     model.eval()
     metrics = probe.official_metrics()
     if infer_ablations is not None:
-        if not infer_ablations or any(mode not in INFER_ABLATIONS for mode in infer_ablations):
+        if not infer_ablations or any(mode not in SUPPORTED_INFER_ABLATIONS for mode in infer_ablations):
             raise ValueError("Expected at least one valid inference ablation")
         if len(set(infer_ablations)) != len(infer_ablations):
             raise ValueError("Inference modes must be unique")
@@ -312,8 +332,8 @@ def evaluate(encoder, head, model, datasets, ks, device, loader_workers=1, metri
 
 def parse_infer_ablations(text):
     modes = [value.strip() for value in text.split(',')]
-    if not modes or any(mode not in INFER_ABLATIONS for mode in modes) or len(set(modes)) != len(modes):
-        raise argparse.ArgumentTypeError('Expected unique comma-separated modes: none,reset-state,no-mask-feedback')
+    if not modes or any(mode not in SUPPORTED_INFER_ABLATIONS for mode in modes) or len(set(modes)) != len(modes):
+        raise argparse.ArgumentTypeError('Expected unique comma-separated modes: '+','.join(SUPPORTED_INFER_ABLATIONS))
     return modes
 
 
@@ -410,6 +430,8 @@ def summary_markdown(report):
             local = dict(report, evaluation=evaluation)
             local.pop('infer_ablations')
             lines += [f'## Mode: {mode}', '', summary_markdown(local)]
+        if 'y0_answer_keep_residual' in report['infer_ablations']:
+            lines += ['', 'Observed y0_answer_keep_residual uses fixed y0 answer tokens, recurrent memory and the current-logit residual base.']
         return '\n'.join(lines)
     if report.get('protocol') == 'val_sel_rep':
         primary = dict(report)

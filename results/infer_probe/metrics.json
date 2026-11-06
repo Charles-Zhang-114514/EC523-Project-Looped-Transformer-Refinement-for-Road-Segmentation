@@ -1,0 +1,362 @@
+{
+  "status": "stress_only",
+  "config": {
+    "checkpoints": [
+      "e0_v2_s0",
+      "e0_v2_s1",
+      "e0_v2_s2",
+      "e5_noadd_s0",
+      "e5_noadd_s1",
+      "e5_noadd_s2"
+    ],
+    "taus": [
+      0.5,
+      0.55,
+      0.6,
+      0.65,
+      0.7,
+      0.75,
+      0.8,
+      0.85,
+      0.9,
+      0.95
+    ],
+    "limit_per_domain": null,
+    "device": "cpu",
+    "val_split_sha256": "bdd7d7a89237c96305f0ad404a5c9ae1254ed8cbc0b6e0e4fcc7b514bd323c68",
+    "proxy_weights": {
+      "1": 0.33,
+      "4": 0.67
+    },
+    "intervention_ks": [
+      1,
+      2,
+      4,
+      8
+    ],
+    "loader_workers": 1,
+    "metric_workers": 6
+  },
+  "stress": {
+    "rows": [
+      {
+        "condition": "ordinary",
+        "domain": "Urban",
+        "scores": {
+          "road_iou": 0.6714175702693408,
+          "cldice": 0.714745204896131,
+          "boundary_iou": 0.0823753480259926,
+          "quality": 0.5666074162087082
+        },
+        "paired_clean": {
+          "road_iou": 0.6714175702693408,
+          "cldice": 0.714745204896131,
+          "boundary_iou": 0.0823753480259926,
+          "quality": 0.5666074162087082
+        },
+        "drop": {
+          "road_iou": 0.0,
+          "cldice": 0.0,
+          "boundary_iou": 0.0,
+          "quality": 0.0
+        },
+        "break_even": 0.40170546380049427,
+        "added_precision_mean": 0.3419020597588042,
+        "added_precision_std": 0.028724505453372698,
+        "above_seeds": 0
+      },
+      {
+        "condition": "ordinary",
+        "domain": "Rural",
+        "scores": {
+          "road_iou": 0.5060604286306124,
+          "cldice": 0.6106998998330398,
+          "boundary_iou": 0.09181465271446032,
+          "quality": 0.4546031148081102
+        },
+        "paired_clean": {
+          "road_iou": 0.5060604286306124,
+          "cldice": 0.6106998998330398,
+          "boundary_iou": 0.09181465271446032,
+          "quality": 0.4546031148081102
+        },
+        "drop": {
+          "road_iou": 0.0,
+          "cldice": 0.0,
+          "boundary_iou": 0.0,
+          "quality": 0.0
+        },
+        "break_even": 0.3360160183550859,
+        "added_precision_mean": 0.4790070790974773,
+        "added_precision_std": 0.0064800847727766965,
+        "above_seeds": 3
+      },
+      {
+        "condition": "ordinary",
+        "domain": "Overall",
+        "scores": {
+          "road_iou": 0.6170804094462194,
+          "cldice": 0.6672210402500885,
+          "boundary_iou": 0.08671763521913169,
+          "quality": 0.5260500438419626
+        },
+        "paired_clean": {
+          "road_iou": 0.6170804094462194,
+          "cldice": 0.6672210402500885,
+          "boundary_iou": 0.08671763521913169,
+          "quality": 0.5260500438419626
+        },
+        "drop": {
+          "road_iou": 0.0,
+          "cldice": 0.0,
+          "boundary_iou": 0.0,
+          "quality": 0.0
+        },
+        "break_even": 0.3816015615806903,
+        "added_precision_mean": 0.4023117505327762,
+        "added_precision_std": 0.023912821526536707,
+        "above_seeds": 2
+      },
+      {
+        "condition": "shadow",
+        "domain": "Urban",
+        "scores": {
+          "road_iou": 0.673793138413379,
+          "cldice": 0.7156946989851554,
+          "boundary_iou": 0.08132216362580867,
+          "quality": 0.5678694116273979
+        },
+        "paired_clean": {
+          "road_iou": 0.6759173489498933,
+          "cldice": 0.7191402262734531,
+          "boundary_iou": 0.08184440833513848,
+          "quality": 0.5700696240240103
+        },
+        "drop": {
+          "road_iou": 0.002124210536514348,
+          "cldice": 0.003445527288297723,
+          "boundary_iou": 0.0005222447093298083,
+          "quality": 0.0022002123966123888
+        },
+        "break_even": 0.40255460662963444,
+        "added_precision_mean": 0.3327635427591864,
+        "added_precision_std": 0.02588805197866733,
+        "above_seeds": 0
+      },
+      {
+        "condition": "shadow",
+        "domain": "Rural",
+        "scores": {
+          "road_iou": 0.5140185489907658,
+          "cldice": 0.6269732685572411,
+          "boundary_iou": 0.09157876314302021,
+          "quality": 0.4634170076911593
+        },
+        "paired_clean": {
+          "road_iou": 0.5109354185478489,
+          "cldice": 0.6261650983784508,
+          "boundary_iou": 0.09177689509648969,
+          "quality": 0.4616726178067576
+        },
+        "drop": {
+          "road_iou": -0.0030831304429169704,
+          "cldice": -0.0008081701787903128,
+          "boundary_iou": 0.0001981319534694742,
+          "quality": -0.0017443898844016759
+        },
+        "break_even": 0.3395061106308156,
+        "added_precision_mean": 0.4840649084898264,
+        "added_precision_std": 0.0076675915702732475,
+        "above_seeds": 3
+      },
+      {
+        "condition": "shadow",
+        "domain": "Overall",
+        "scores": {
+          "road_iou": 0.6226581389843704,
+          "cldice": 0.674501311072337,
+          "boundary_iou": 0.08603049771024338,
+          "quality": 0.530885562355935
+        },
+        "paired_clean": {
+          "road_iou": 0.6231747636531746,
+          "cldice": 0.6760587118385534,
+          "boundary_iou": 0.08639975155250054,
+          "quality": 0.5316849456886534
+        },
+        "drop": {
+          "road_iou": 0.0005166246688041998,
+          "cldice": 0.0015574007662163547,
+          "boundary_iou": 0.00036925384225716673,
+          "quality": 0.0007993833327184507
+        },
+        "break_even": 0.3837272460692769,
+        "added_precision_mean": 0.4000475410841773,
+        "added_precision_std": 0.025282537317064133,
+        "above_seeds": 2
+      },
+      {
+        "condition": "occlusion",
+        "domain": "Urban",
+        "scores": {
+          "road_iou": 0.6651870624361391,
+          "cldice": 0.7076452202976233,
+          "boundary_iou": 0.08239876073630337,
+          "quality": 0.5613668494546172
+        },
+        "paired_clean": {
+          "road_iou": 0.6717669700773119,
+          "cldice": 0.7140595653253556,
+          "boundary_iou": 0.08351343782984254,
+          "quality": 0.5668040422022311
+        },
+        "drop": {
+          "road_iou": 0.0065799076411727775,
+          "cldice": 0.006414345027732304,
+          "boundary_iou": 0.0011146770935391709,
+          "quality": 0.005437192747613895
+        },
+        "break_even": 0.3994668691834431,
+        "added_precision_mean": 0.3286550055462733,
+        "added_precision_std": 0.02948089307296375,
+        "above_seeds": 0
+      },
+      {
+        "condition": "occlusion",
+        "domain": "Rural",
+        "scores": {
+          "road_iou": 0.49676429147404827,
+          "cldice": 0.5849501337358539,
+          "boundary_iou": 0.09185413546922007,
+          "quality": 0.4422380129516243
+        },
+        "paired_clean": {
+          "road_iou": 0.5011883498447288,
+          "cldice": 0.5945044040043,
+          "boundary_iou": 0.09302469742119968,
+          "quality": 0.4475504356078943
+        },
+        "drop": {
+          "road_iou": 0.00442405837068055,
+          "cldice": 0.00955427026844613,
+          "boundary_iou": 0.0011705619519796068,
+          "quality": 0.005312422656270022
+        },
+        "break_even": 0.3318921317830366,
+        "added_precision_mean": 0.47577194164245606,
+        "added_precision_std": 0.0070479763286243145,
+        "above_seeds": 3
+      },
+      {
+        "condition": "occlusion",
+        "domain": "Overall",
+        "scores": {
+          "road_iou": 0.6087837118352585,
+          "cldice": 0.6519198576639383,
+          "boundary_iou": 0.08675122015366923,
+          "quality": 0.5173180572475445
+        },
+        "paired_clean": {
+          "road_iou": 0.6144642547384972,
+          "cldice": 0.6597045070858278,
+          "boundary_iou": 0.0879114055979102,
+          "quality": 0.522725760614579
+        },
+        "drop": {
+          "road_iou": 0.005680542903238717,
+          "cldice": 0.0077846494218895,
+          "boundary_iou": 0.0011601854442409715,
+          "quality": 0.005407703367034444
+        },
+        "break_even": 0.3784124039525325,
+        "added_precision_mean": 0.39115923408141073,
+        "added_precision_std": 0.025555601998421808,
+        "above_seeds": 2
+      },
+      {
+        "condition": "blur",
+        "domain": "Urban",
+        "scores": {
+          "road_iou": 0.6662762714510502,
+          "cldice": 0.7084488160079881,
+          "boundary_iou": 0.08006965052642215,
+          "quality": 0.561686710633206
+        },
+        "paired_clean": {
+          "road_iou": 0.6663959354404156,
+          "cldice": 0.7112780505057129,
+          "boundary_iou": 0.08183220876027218,
+          "quality": 0.5629478246239762
+        },
+        "drop": {
+          "road_iou": 0.00011966398936547051,
+          "cldice": 0.002829234497724764,
+          "boundary_iou": 0.001762558233850034,
+          "quality": 0.001261113990770224
+        },
+        "break_even": 0.3998594247944455,
+        "added_precision_mean": 0.3859761378481401,
+        "added_precision_std": 0.032510616646976465,
+        "above_seeds": 1
+      },
+      {
+        "condition": "blur",
+        "domain": "Rural",
+        "scores": {
+          "road_iou": 0.5120499434338603,
+          "cldice": 0.6132668757761494,
+          "boundary_iou": 0.09267538019982566,
+          "quality": 0.45854011048974014
+        },
+        "paired_clean": {
+          "road_iou": 0.5058715559253751,
+          "cldice": 0.6110382886870519,
+          "boundary_iou": 0.09070813242315962,
+          "quality": 0.45438889105343505
+        },
+        "drop": {
+          "road_iou": -0.006178387508485206,
+          "cldice": -0.0022285870890974557,
+          "boundary_iou": -0.0019672477766660423,
+          "quality": -0.004151219436305087
+        },
+        "break_even": 0.3386461840479929,
+        "added_precision_mean": 0.46938027116163805,
+        "added_precision_std": 0.004633757638348011,
+        "above_seeds": 3
+      },
+      {
+        "condition": "blur",
+        "domain": "Overall",
+        "scores": {
+          "road_iou": 0.6147836140477521,
+          "cldice": 0.6648455171683519,
+          "boundary_iou": 0.08591705753779753,
+          "quality": 0.5240288736819412
+        },
+        "paired_clean": {
+          "road_iou": 0.613282058222329,
+          "cldice": 0.6657405227359627,
+          "boundary_iou": 0.08590760009727473,
+          "quality": 0.5235447059514082
+        },
+        "drop": {
+          "road_iou": -0.0015015558254231065,
+          "cldice": 0.000895005567610796,
+          "boundary_iou": -9.457440522803173e-06,
+          "quality": -0.00048416773053294726
+        },
+        "break_even": 0.380721979526832,
+        "added_precision_mean": 0.4238441497084069,
+        "added_precision_std": 0.02168726627554032,
+        "above_seeds": 3
+      }
+    ],
+    "source": "results/stress/v2/metrics.json",
+    "sha256": "0490428976283851c71c144bfa36021d09f59eac4e73a2d24871c32405c67ff3",
+    "clean_reference": "Matched clean tile assignments for each category, Counts-pooled over stress seeds 523/524/525"
+  },
+  "gating": {},
+  "selections": {},
+  "encoding": {}
+}
