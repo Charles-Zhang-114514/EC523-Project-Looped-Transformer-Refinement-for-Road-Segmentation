@@ -1,0 +1,2746 @@
+{
+  "protocol": "Domain-label-aware bound; domain is not known by the inference model",
+  "proxy_weights": {
+    "1": 0.33,
+    "4": 0.67
+  },
+  "rows": [
+    {
+      "checkpoint": "e0_v2_s0",
+      "selected_on": "Val-sel",
+      "optimistic": false,
+      "thresholds": {
+        "Urban": 0.85,
+        "Rural": 0.5
+      },
+      "K": 1,
+      "groups": {
+        "Urban": {
+          "counts": {
+            "valid": 340787183,
+            "intersection": 22310040,
+            "union": 33209272,
+            "predicted_skeleton": 654905,
+            "true_skeleton": 536072,
+            "skeleton_precision_hits": 481032,
+            "skeleton_recall_hits": 373648,
+            "boundary_intersection": 562116,
+            "boundary_union": 6798015
+          },
+          "scores": {
+            "road_iou": 0.6718015378355779,
+            "cldice": 0.7152676288718199,
+            "boundary_iou": 0.0826882553215902,
+            "skeleton_precision": 0.7345065314816652,
+            "skeleton_recall": 0.6970108492889014,
+            "quality": 0.567018708643653,
+            "counts": {
+              "valid": 340787183,
+              "intersection": 22310040,
+              "union": 33209272,
+              "predicted_skeleton": 654905,
+              "true_skeleton": 536072,
+              "skeleton_precision_hits": 481032,
+              "skeleton_recall_hits": 373648,
+              "boundary_intersection": 562116,
+              "boundary_union": 6798015
+            }
+          },
+          "delta_native": 0.007178232759871839,
+          "delta_y0": 0.00041124558918070875
+        },
+        "Rural": {
+          "counts": {
+            "valid": 512411151,
+            "intersection": 9017579,
+            "union": 17140734,
+            "predicted_skeleton": 452319,
+            "true_skeleton": 521605,
+            "skeleton_precision_hits": 332008,
+            "skeleton_recall_hits": 308645,
+            "boundary_intersection": 659816,
+            "boundary_union": 6306219
+          },
+          "scores": {
+            "road_iou": 0.5260905979872273,
+            "cldice": 0.6552312570478565,
+            "boundary_iou": 0.10462941423379049,
+            "skeleton_precision": 0.7340129421934519,
+            "skeleton_recall": 0.5917217051216918,
+            "quality": 0.4805405589547287,
+            "counts": {
+              "valid": 512411151,
+              "intersection": 9017579,
+              "union": 17140734,
+              "predicted_skeleton": 452319,
+              "true_skeleton": 521605,
+              "skeleton_precision_hits": 332008,
+              "skeleton_recall_hits": 308645,
+              "boundary_intersection": 659816,
+              "boundary_union": 6306219
+            }
+          },
+          "delta_native": 0.0,
+          "delta_y0": 0.02593744414661847
+        },
+        "Overall": {
+          "counts": {
+            "valid": 853198334,
+            "intersection": 31327619,
+            "union": 50350006,
+            "predicted_skeleton": 1107224,
+            "true_skeleton": 1057677,
+            "skeleton_precision_hits": 813040,
+            "skeleton_recall_hits": 682293,
+            "boundary_intersection": 1221932,
+            "boundary_union": 13104234
+          },
+          "scores": {
+            "road_iou": 0.6221969268484298,
+            "cldice": 0.6868103115520477,
+            "boundary_iou": 0.09324711387174557,
+            "skeleton_precision": 0.734304892234995,
+            "skeleton_recall": 0.645086354340692,
+            "quality": 0.5357909796641783,
+            "counts": {
+              "valid": 853198334,
+              "intersection": 31327619,
+              "union": 50350006,
+              "predicted_skeleton": 1107224,
+              "true_skeleton": 1057677,
+              "skeleton_precision_hits": 813040,
+              "skeleton_recall_hits": 682293,
+              "boundary_intersection": 1221932,
+              "boundary_union": 13104234
+            }
+          },
+          "delta_native": 0.003862772417538074,
+          "delta_y0": 0.009740908481718047
+        }
+      }
+    },
+    {
+      "checkpoint": "e0_v2_s0",
+      "selected_on": "Val-sel",
+      "optimistic": false,
+      "thresholds": {
+        "Urban": 0.85,
+        "Rural": 0.5
+      },
+      "K": 4,
+      "groups": {
+        "Urban": {
+          "counts": {
+            "valid": 340787183,
+            "intersection": 22179987,
+            "union": 32973945,
+            "predicted_skeleton": 666698,
+            "true_skeleton": 536072,
+            "skeleton_precision_hits": 493575,
+            "skeleton_recall_hits": 371950,
+            "boundary_intersection": 566061,
+            "boundary_union": 6794361
+          },
+          "scores": {
+            "road_iou": 0.6726519074378271,
+            "cldice": 0.7163322094437163,
+            "boundary_iou": 0.08331335352949307,
+            "skeleton_precision": 0.7403277045978839,
+            "skeleton_recall": 0.6938433643241952,
+            "quality": 0.5678882872579271,
+            "counts": {
+              "valid": 340787183,
+              "intersection": 22179987,
+              "union": 32973945,
+              "predicted_skeleton": 666698,
+              "true_skeleton": 536072,
+              "skeleton_precision_hits": 493575,
+              "skeleton_recall_hits": 371950,
+              "boundary_intersection": 566061,
+              "boundary_union": 6794361
+            }
+          },
+          "delta_native": 0.0068925587653340115,
+          "delta_y0": 0.0012808242034547668
+        },
+        "Rural": {
+          "counts": {
+            "valid": 512411151,
+            "intersection": 8985955,
+            "union": 17058897,
+            "predicted_skeleton": 459363,
+            "true_skeleton": 521605,
+            "skeleton_precision_hits": 337834,
+            "skeleton_recall_hits": 308433,
+            "boundary_intersection": 666106,
+            "boundary_union": 6307306
+          },
+          "scores": {
+            "road_iou": 0.5267606106068874,
+            "cldice": 0.6555496014828242,
+            "boundary_iou": 0.10560863861686749,
+            "skeleton_precision": 0.7354401638791108,
+            "skeleton_recall": 0.5913152672999684,
+            "quality": 0.4811669134716644,
+            "counts": {
+              "valid": 512411151,
+              "intersection": 8985955,
+              "union": 17058897,
+              "predicted_skeleton": 459363,
+              "true_skeleton": 521605,
+              "skeleton_precision_hits": 337834,
+              "skeleton_recall_hits": 308433,
+              "boundary_intersection": 666106,
+              "boundary_union": 6307306
+            }
+          },
+          "delta_native": 0.0,
+          "delta_y0": 0.026563798663554183
+        },
+        "Overall": {
+          "counts": {
+            "valid": 853198334,
+            "intersection": 31165942,
+            "union": 50032842,
+            "predicted_skeleton": 1126061,
+            "true_skeleton": 1057677,
+            "skeleton_precision_hits": 831409,
+            "skeleton_recall_hits": 680383,
+            "boundary_intersection": 1232167,
+            "boundary_union": 13101667
+          },
+          "scores": {
+            "road_iou": 0.6229096880005337,
+            "cldice": 0.6875374224758269,
+            "boundary_iou": 0.09404658201128147,
+            "skeleton_precision": 0.7383338913256031,
+            "skeleton_recall": 0.6432805100233814,
+            "quality": 0.5365253871452712,
+            "counts": {
+              "valid": 853198334,
+              "intersection": 31165942,
+              "union": 50032842,
+              "predicted_skeleton": 1126061,
+              "true_skeleton": 1057677,
+              "skeleton_precision_hits": 831409,
+              "skeleton_recall_hits": 680383,
+              "boundary_intersection": 1232167,
+              "boundary_union": 13101667
+            }
+          },
+          "delta_native": 0.0036888171904071454,
+          "delta_y0": 0.010475315962810927
+        }
+      }
+    },
+    {
+      "checkpoint": "e0_v2_s0",
+      "selected_on": "Val-rep",
+      "optimistic": true,
+      "thresholds": {
+        "Urban": 0.9,
+        "Rural": 0.5
+      },
+      "K": 1,
+      "groups": {
+        "Urban": {
+          "counts": {
+            "valid": 340787183,
+            "intersection": 22310040,
+            "union": 33209272,
+            "predicted_skeleton": 654905,
+            "true_skeleton": 536072,
+            "skeleton_precision_hits": 481032,
+            "skeleton_recall_hits": 373648,
+            "boundary_intersection": 562116,
+            "boundary_union": 6798015
+          },
+          "scores": {
+            "road_iou": 0.6718015378355779,
+            "cldice": 0.7152676288718199,
+            "boundary_iou": 0.0826882553215902,
+            "skeleton_precision": 0.7345065314816652,
+            "skeleton_recall": 0.6970108492889014,
+            "quality": 0.567018708643653,
+            "counts": {
+              "valid": 340787183,
+              "intersection": 22310040,
+              "union": 33209272,
+              "predicted_skeleton": 654905,
+              "true_skeleton": 536072,
+              "skeleton_precision_hits": 481032,
+              "skeleton_recall_hits": 373648,
+              "boundary_intersection": 562116,
+              "boundary_union": 6798015
+            }
+          },
+          "delta_native": 0.007178232759871839,
+          "delta_y0": 0.00041124558918070875
+        },
+        "Rural": {
+          "counts": {
+            "valid": 512411151,
+            "intersection": 9017579,
+            "union": 17140734,
+            "predicted_skeleton": 452319,
+            "true_skeleton": 521605,
+            "skeleton_precision_hits": 332008,
+            "skeleton_recall_hits": 308645,
+            "boundary_intersection": 659816,
+            "boundary_union": 6306219
+          },
+          "scores": {
+            "road_iou": 0.5260905979872273,
+            "cldice": 0.6552312570478565,
+            "boundary_iou": 0.10462941423379049,
+            "skeleton_precision": 0.7340129421934519,
+            "skeleton_recall": 0.5917217051216918,
+            "quality": 0.4805405589547287,
+            "counts": {
+              "valid": 512411151,
+              "intersection": 9017579,
+              "union": 17140734,
+              "predicted_skeleton": 452319,
+              "true_skeleton": 521605,
+              "skeleton_precision_hits": 332008,
+              "skeleton_recall_hits": 308645,
+              "boundary_intersection": 659816,
+              "boundary_union": 6306219
+            }
+          },
+          "delta_native": 0.0,
+          "delta_y0": 0.02593744414661847
+        },
+        "Overall": {
+          "counts": {
+            "valid": 853198334,
+            "intersection": 31327619,
+            "union": 50350006,
+            "predicted_skeleton": 1107224,
+            "true_skeleton": 1057677,
+            "skeleton_precision_hits": 813040,
+            "skeleton_recall_hits": 682293,
+            "boundary_intersection": 1221932,
+            "boundary_union": 13104234
+          },
+          "scores": {
+            "road_iou": 0.6221969268484298,
+            "cldice": 0.6868103115520477,
+            "boundary_iou": 0.09324711387174557,
+            "skeleton_precision": 0.734304892234995,
+            "skeleton_recall": 0.645086354340692,
+            "quality": 0.5357909796641783,
+            "counts": {
+              "valid": 853198334,
+              "intersection": 31327619,
+              "union": 50350006,
+              "predicted_skeleton": 1107224,
+              "true_skeleton": 1057677,
+              "skeleton_precision_hits": 813040,
+              "skeleton_recall_hits": 682293,
+              "boundary_intersection": 1221932,
+              "boundary_union": 13104234
+            }
+          },
+          "delta_native": 0.003862772417538074,
+          "delta_y0": 0.009740908481718047
+        }
+      }
+    },
+    {
+      "checkpoint": "e0_v2_s0",
+      "selected_on": "Val-rep",
+      "optimistic": true,
+      "thresholds": {
+        "Urban": 0.9,
+        "Rural": 0.5
+      },
+      "K": 4,
+      "groups": {
+        "Urban": {
+          "counts": {
+            "valid": 340787183,
+            "intersection": 22179977,
+            "union": 32973856,
+            "predicted_skeleton": 666663,
+            "true_skeleton": 536072,
+            "skeleton_precision_hits": 493566,
+            "skeleton_recall_hits": 371948,
+            "boundary_intersection": 566062,
+            "boundary_union": 6794273
+          },
+          "scores": {
+            "road_iou": 0.672653419727435,
+            "cldice": 0.7163420956483487,
+            "boundary_iou": 0.08331457979389406,
+            "skeleton_precision": 0.7403530719418957,
+            "skeleton_recall": 0.6938396334820696,
+            "quality": 0.5678922545170009,
+            "counts": {
+              "valid": 340787183,
+              "intersection": 22179977,
+              "union": 32973856,
+              "predicted_skeleton": 666663,
+              "true_skeleton": 536072,
+              "skeleton_precision_hits": 493566,
+              "skeleton_recall_hits": 371948,
+              "boundary_intersection": 566062,
+              "boundary_union": 6794273
+            }
+          },
+          "delta_native": 0.006896526024407823,
+          "delta_y0": 0.0012847914625285783
+        },
+        "Rural": {
+          "counts": {
+            "valid": 512411151,
+            "intersection": 8985955,
+            "union": 17058897,
+            "predicted_skeleton": 459363,
+            "true_skeleton": 521605,
+            "skeleton_precision_hits": 337834,
+            "skeleton_recall_hits": 308433,
+            "boundary_intersection": 666106,
+            "boundary_union": 6307306
+          },
+          "scores": {
+            "road_iou": 0.5267606106068874,
+            "cldice": 0.6555496014828242,
+            "boundary_iou": 0.10560863861686749,
+            "skeleton_precision": 0.7354401638791108,
+            "skeleton_recall": 0.5913152672999684,
+            "quality": 0.4811669134716644,
+            "counts": {
+              "valid": 512411151,
+              "intersection": 8985955,
+              "union": 17058897,
+              "predicted_skeleton": 459363,
+              "true_skeleton": 521605,
+              "skeleton_precision_hits": 337834,
+              "skeleton_recall_hits": 308433,
+              "boundary_intersection": 666106,
+              "boundary_union": 6307306
+            }
+          },
+          "delta_native": 0.0,
+          "delta_y0": 0.026563798663554183
+        },
+        "Overall": {
+          "counts": {
+            "valid": 853198334,
+            "intersection": 31165932,
+            "union": 50032753,
+            "predicted_skeleton": 1126026,
+            "true_skeleton": 1057677,
+            "skeleton_precision_hits": 831400,
+            "skeleton_recall_hits": 680381,
+            "boundary_intersection": 1232168,
+            "boundary_union": 13101579
+          },
+          "scores": {
+            "road_iou": 0.6229105961848631,
+            "cldice": 0.687542827111119,
+            "boundary_iou": 0.09404729002511834,
+            "skeleton_precision": 0.7383488480727799,
+            "skeleton_recall": 0.6432786190869235,
+            "quality": 0.5365276042307909,
+            "counts": {
+              "valid": 853198334,
+              "intersection": 31165932,
+              "union": 50032753,
+              "predicted_skeleton": 1126026,
+              "true_skeleton": 1057677,
+              "skeleton_precision_hits": 831400,
+              "skeleton_recall_hits": 680381,
+              "boundary_intersection": 1232168,
+              "boundary_union": 13101579
+            }
+          },
+          "delta_native": 0.0036910342759268744,
+          "delta_y0": 0.010477533048330656
+        }
+      }
+    },
+    {
+      "checkpoint": "e0_v2_s1",
+      "selected_on": "Val-sel",
+      "optimistic": false,
+      "thresholds": {
+        "Urban": 0.55,
+        "Rural": 0.5
+      },
+      "K": 1,
+      "groups": {
+        "Urban": {
+          "counts": {
+            "valid": 340787183,
+            "intersection": 22343890,
+            "union": 33275600,
+            "predicted_skeleton": 659338,
+            "true_skeleton": 536072,
+            "skeleton_precision_hits": 481728,
+            "skeleton_recall_hits": 375175,
+            "boundary_intersection": 564719,
+            "boundary_union": 6825316
+          },
+          "scores": {
+            "road_iou": 0.6714797028453281,
+            "cldice": 0.7149107328358758,
+            "boundary_iou": 0.08273887978226942,
+            "skeleton_precision": 0.7306237468491122,
+            "skeleton_recall": 0.6998593472518617,
+            "quality": 0.5667608472298806,
+            "counts": {
+              "valid": 340787183,
+              "intersection": 22343890,
+              "union": 33275600,
+              "predicted_skeleton": 659338,
+              "true_skeleton": 536072,
+              "skeleton_precision_hits": 481728,
+              "skeleton_recall_hits": 375175,
+              "boundary_intersection": 564719,
+              "boundary_union": 6825316
+            }
+          },
+          "delta_native": 1.8975301746659845e-05,
+          "delta_y0": 0.00015338417540833316
+        },
+        "Rural": {
+          "counts": {
+            "valid": 512411151,
+            "intersection": 8501368,
+            "union": 16560150,
+            "predicted_skeleton": 399059,
+            "true_skeleton": 521605,
+            "skeleton_precision_hits": 304201,
+            "skeleton_recall_hits": 278280,
+            "boundary_intersection": 580946,
+            "boundary_union": 5986121
+          },
+          "scores": {
+            "road_iou": 0.5133629828232232,
+            "cldice": 0.6277038688736964,
+            "boundary_iou": 0.09704882343674644,
+            "skeleton_precision": 0.7622958008715504,
+            "skeleton_recall": 0.5335071557979697,
+            "quality": 0.4644024167610698,
+            "counts": {
+              "valid": 512411151,
+              "intersection": 8501368,
+              "union": 16560150,
+              "predicted_skeleton": 399059,
+              "true_skeleton": 521605,
+              "skeleton_precision_hits": 304201,
+              "skeleton_recall_hits": 278280,
+              "boundary_intersection": 580946,
+              "boundary_union": 5986121
+            }
+          },
+          "delta_native": 0.0,
+          "delta_y0": 0.009799301952959583
+        },
+        "Overall": {
+          "counts": {
+            "valid": 853198334,
+            "intersection": 30845258,
+            "union": 49835750,
+            "predicted_skeleton": 1058397,
+            "true_skeleton": 1057677,
+            "skeleton_precision_hits": 785929,
+            "skeleton_recall_hits": 653455,
+            "boundary_intersection": 1145665,
+            "boundary_union": 12811437
+          },
+          "scores": {
+            "road_iou": 0.6189383725538393,
+            "cldice": 0.674473776735075,
+            "boundary_iou": 0.08942517533357108,
+            "skeleton_precision": 0.7425654078762506,
+            "skeleton_recall": 0.6178209415539905,
+            "quality": 0.5296963543641564,
+            "counts": {
+              "valid": 853198334,
+              "intersection": 30845258,
+              "union": 49835750,
+              "predicted_skeleton": 1058397,
+              "true_skeleton": 1057677,
+              "skeleton_precision_hits": 785929,
+              "skeleton_recall_hits": 653455,
+              "boundary_intersection": 1145665,
+              "boundary_union": 12811437
+            }
+          },
+          "delta_native": -0.00015502971989578285,
+          "delta_y0": 0.0036462831816961305
+        }
+      }
+    },
+    {
+      "checkpoint": "e0_v2_s1",
+      "selected_on": "Val-sel",
+      "optimistic": false,
+      "thresholds": {
+        "Urban": 0.55,
+        "Rural": 0.5
+      },
+      "K": 4,
+      "groups": {
+        "Urban": {
+          "counts": {
+            "valid": 340787183,
+            "intersection": 22368687,
+            "union": 33307876,
+            "predicted_skeleton": 665049,
+            "true_skeleton": 536072,
+            "skeleton_precision_hits": 484055,
+            "skeleton_recall_hits": 376722,
+            "boundary_intersection": 569451,
+            "boundary_union": 6850463
+          },
+          "scores": {
+            "road_iou": 0.6715735041165639,
+            "cldice": 0.7150766364709288,
+            "boundary_iou": 0.08312591426302135,
+            "skeleton_precision": 0.727848624687805,
+            "skeleton_recall": 0.7027451536360787,
+            "quality": 0.5669349258521649,
+            "counts": {
+              "valid": 340787183,
+              "intersection": 22368687,
+              "union": 33307876,
+              "predicted_skeleton": 665049,
+              "true_skeleton": 536072,
+              "skeleton_precision_hits": 484055,
+              "skeleton_recall_hits": 376722,
+              "boundary_intersection": 569451,
+              "boundary_union": 6850463
+            }
+          },
+          "delta_native": 0.00024476812806306647,
+          "delta_y0": 0.00032746279769257924
+        },
+        "Rural": {
+          "counts": {
+            "valid": 512411151,
+            "intersection": 8573188,
+            "union": 16638926,
+            "predicted_skeleton": 409881,
+            "true_skeleton": 521605,
+            "skeleton_precision_hits": 309750,
+            "skeleton_recall_hits": 283278,
+            "boundary_intersection": 595241,
+            "boundary_union": 6038607
+          },
+          "scores": {
+            "road_iou": 0.5152488808472374,
+            "cldice": 0.6319949308151064,
+            "boundary_iou": 0.09857256814361326,
+            "skeleton_precision": 0.7557071442687023,
+            "skeleton_recall": 0.543089119161051,
+            "quality": 0.4669374332968733,
+            "counts": {
+              "valid": 512411151,
+              "intersection": 8573188,
+              "union": 16638926,
+              "predicted_skeleton": 409881,
+              "true_skeleton": 521605,
+              "skeleton_precision_hits": 309750,
+              "skeleton_recall_hits": 283278,
+              "boundary_intersection": 595241,
+              "boundary_union": 6038607
+            }
+          },
+          "delta_native": 0.0,
+          "delta_y0": 0.012334318488763096
+        },
+        "Overall": {
+          "counts": {
+            "valid": 853198334,
+            "intersection": 30941875,
+            "union": 49946802,
+            "predicted_skeleton": 1074930,
+            "true_skeleton": 1057677,
+            "skeleton_precision_hits": 793805,
+            "skeleton_recall_hits": 660000,
+            "boundary_intersection": 1164692,
+            "boundary_union": 12889070
+          },
+          "scores": {
+            "road_iou": 0.6194966196234145,
+            "cldice": 0.676432183260773,
+            "boundary_iou": 0.0903627647301163,
+            "skeleton_precision": 0.738471342319965,
+            "skeleton_recall": 0.624009031112523,
+            "quality": 0.5307505177359624,
+            "counts": {
+              "valid": 853198334,
+              "intersection": 30941875,
+              "union": 49946802,
+              "predicted_skeleton": 1074930,
+              "true_skeleton": 1057677,
+              "skeleton_precision_hits": 793805,
+              "skeleton_recall_hits": 660000,
+              "boundary_intersection": 1164692,
+              "boundary_union": 12889070
+            }
+          },
+          "delta_native": -2.9190037404536184e-05,
+          "delta_y0": 0.004700446553502102
+        }
+      }
+    },
+    {
+      "checkpoint": "e0_v2_s1",
+      "selected_on": "Val-rep",
+      "optimistic": true,
+      "thresholds": {
+        "Urban": 0.55,
+        "Rural": 0.5
+      },
+      "K": 1,
+      "groups": {
+        "Urban": {
+          "counts": {
+            "valid": 340787183,
+            "intersection": 22343890,
+            "union": 33275600,
+            "predicted_skeleton": 659338,
+            "true_skeleton": 536072,
+            "skeleton_precision_hits": 481728,
+            "skeleton_recall_hits": 375175,
+            "boundary_intersection": 564719,
+            "boundary_union": 6825316
+          },
+          "scores": {
+            "road_iou": 0.6714797028453281,
+            "cldice": 0.7149107328358758,
+            "boundary_iou": 0.08273887978226942,
+            "skeleton_precision": 0.7306237468491122,
+            "skeleton_recall": 0.6998593472518617,
+            "quality": 0.5667608472298806,
+            "counts": {
+              "valid": 340787183,
+              "intersection": 22343890,
+              "union": 33275600,
+              "predicted_skeleton": 659338,
+              "true_skeleton": 536072,
+              "skeleton_precision_hits": 481728,
+              "skeleton_recall_hits": 375175,
+              "boundary_intersection": 564719,
+              "boundary_union": 6825316
+            }
+          },
+          "delta_native": 1.8975301746659845e-05,
+          "delta_y0": 0.00015338417540833316
+        },
+        "Rural": {
+          "counts": {
+            "valid": 512411151,
+            "intersection": 8501368,
+            "union": 16560150,
+            "predicted_skeleton": 399059,
+            "true_skeleton": 521605,
+            "skeleton_precision_hits": 304201,
+            "skeleton_recall_hits": 278280,
+            "boundary_intersection": 580946,
+            "boundary_union": 5986121
+          },
+          "scores": {
+            "road_iou": 0.5133629828232232,
+            "cldice": 0.6277038688736964,
+            "boundary_iou": 0.09704882343674644,
+            "skeleton_precision": 0.7622958008715504,
+            "skeleton_recall": 0.5335071557979697,
+            "quality": 0.4644024167610698,
+            "counts": {
+              "valid": 512411151,
+              "intersection": 8501368,
+              "union": 16560150,
+              "predicted_skeleton": 399059,
+              "true_skeleton": 521605,
+              "skeleton_precision_hits": 304201,
+              "skeleton_recall_hits": 278280,
+              "boundary_intersection": 580946,
+              "boundary_union": 5986121
+            }
+          },
+          "delta_native": 0.0,
+          "delta_y0": 0.009799301952959583
+        },
+        "Overall": {
+          "counts": {
+            "valid": 853198334,
+            "intersection": 30845258,
+            "union": 49835750,
+            "predicted_skeleton": 1058397,
+            "true_skeleton": 1057677,
+            "skeleton_precision_hits": 785929,
+            "skeleton_recall_hits": 653455,
+            "boundary_intersection": 1145665,
+            "boundary_union": 12811437
+          },
+          "scores": {
+            "road_iou": 0.6189383725538393,
+            "cldice": 0.674473776735075,
+            "boundary_iou": 0.08942517533357108,
+            "skeleton_precision": 0.7425654078762506,
+            "skeleton_recall": 0.6178209415539905,
+            "quality": 0.5296963543641564,
+            "counts": {
+              "valid": 853198334,
+              "intersection": 30845258,
+              "union": 49835750,
+              "predicted_skeleton": 1058397,
+              "true_skeleton": 1057677,
+              "skeleton_precision_hits": 785929,
+              "skeleton_recall_hits": 653455,
+              "boundary_intersection": 1145665,
+              "boundary_union": 12811437
+            }
+          },
+          "delta_native": -0.00015502971989578285,
+          "delta_y0": 0.0036462831816961305
+        }
+      }
+    },
+    {
+      "checkpoint": "e0_v2_s1",
+      "selected_on": "Val-rep",
+      "optimistic": true,
+      "thresholds": {
+        "Urban": 0.55,
+        "Rural": 0.5
+      },
+      "K": 4,
+      "groups": {
+        "Urban": {
+          "counts": {
+            "valid": 340787183,
+            "intersection": 22368687,
+            "union": 33307876,
+            "predicted_skeleton": 665049,
+            "true_skeleton": 536072,
+            "skeleton_precision_hits": 484055,
+            "skeleton_recall_hits": 376722,
+            "boundary_intersection": 569451,
+            "boundary_union": 6850463
+          },
+          "scores": {
+            "road_iou": 0.6715735041165639,
+            "cldice": 0.7150766364709288,
+            "boundary_iou": 0.08312591426302135,
+            "skeleton_precision": 0.727848624687805,
+            "skeleton_recall": 0.7027451536360787,
+            "quality": 0.5669349258521649,
+            "counts": {
+              "valid": 340787183,
+              "intersection": 22368687,
+              "union": 33307876,
+              "predicted_skeleton": 665049,
+              "true_skeleton": 536072,
+              "skeleton_precision_hits": 484055,
+              "skeleton_recall_hits": 376722,
+              "boundary_intersection": 569451,
+              "boundary_union": 6850463
+            }
+          },
+          "delta_native": 0.00024476812806306647,
+          "delta_y0": 0.00032746279769257924
+        },
+        "Rural": {
+          "counts": {
+            "valid": 512411151,
+            "intersection": 8573188,
+            "union": 16638926,
+            "predicted_skeleton": 409881,
+            "true_skeleton": 521605,
+            "skeleton_precision_hits": 309750,
+            "skeleton_recall_hits": 283278,
+            "boundary_intersection": 595241,
+            "boundary_union": 6038607
+          },
+          "scores": {
+            "road_iou": 0.5152488808472374,
+            "cldice": 0.6319949308151064,
+            "boundary_iou": 0.09857256814361326,
+            "skeleton_precision": 0.7557071442687023,
+            "skeleton_recall": 0.543089119161051,
+            "quality": 0.4669374332968733,
+            "counts": {
+              "valid": 512411151,
+              "intersection": 8573188,
+              "union": 16638926,
+              "predicted_skeleton": 409881,
+              "true_skeleton": 521605,
+              "skeleton_precision_hits": 309750,
+              "skeleton_recall_hits": 283278,
+              "boundary_intersection": 595241,
+              "boundary_union": 6038607
+            }
+          },
+          "delta_native": 0.0,
+          "delta_y0": 0.012334318488763096
+        },
+        "Overall": {
+          "counts": {
+            "valid": 853198334,
+            "intersection": 30941875,
+            "union": 49946802,
+            "predicted_skeleton": 1074930,
+            "true_skeleton": 1057677,
+            "skeleton_precision_hits": 793805,
+            "skeleton_recall_hits": 660000,
+            "boundary_intersection": 1164692,
+            "boundary_union": 12889070
+          },
+          "scores": {
+            "road_iou": 0.6194966196234145,
+            "cldice": 0.676432183260773,
+            "boundary_iou": 0.0903627647301163,
+            "skeleton_precision": 0.738471342319965,
+            "skeleton_recall": 0.624009031112523,
+            "quality": 0.5307505177359624,
+            "counts": {
+              "valid": 853198334,
+              "intersection": 30941875,
+              "union": 49946802,
+              "predicted_skeleton": 1074930,
+              "true_skeleton": 1057677,
+              "skeleton_precision_hits": 793805,
+              "skeleton_recall_hits": 660000,
+              "boundary_intersection": 1164692,
+              "boundary_union": 12889070
+            }
+          },
+          "delta_native": -2.9190037404536184e-05,
+          "delta_y0": 0.004700446553502102
+        }
+      }
+    },
+    {
+      "checkpoint": "e0_v2_s2",
+      "selected_on": "Val-sel",
+      "optimistic": false,
+      "thresholds": {
+        "Urban": 0.7,
+        "Rural": 0.5
+      },
+      "K": 1,
+      "groups": {
+        "Urban": {
+          "counts": {
+            "valid": 340787183,
+            "intersection": 22322522,
+            "union": 33241575,
+            "predicted_skeleton": 655849,
+            "true_skeleton": 536072,
+            "skeleton_precision_hits": 480662,
+            "skeleton_recall_hits": 373877,
+            "boundary_intersection": 561346,
+            "boundary_union": 6804997
+          },
+          "scores": {
+            "road_iou": 0.6715241982366961,
+            "cldice": 0.7147223598278547,
+            "boundary_iou": 0.08249026413971967,
+            "skeleton_precision": 0.7328851610660381,
+            "skeleton_recall": 0.6974380307122924,
+            "quality": 0.5666768598946483,
+            "counts": {
+              "valid": 340787183,
+              "intersection": 22322522,
+              "union": 33241575,
+              "predicted_skeleton": 655849,
+              "true_skeleton": 536072,
+              "skeleton_precision_hits": 480662,
+              "skeleton_recall_hits": 373877,
+              "boundary_intersection": 561346,
+              "boundary_union": 6804997
+            }
+          },
+          "delta_native": 0.0005908033411038405,
+          "delta_y0": 6.93968401760392e-05
+        },
+        "Rural": {
+          "counts": {
+            "valid": 512411151,
+            "intersection": 8414494,
+            "union": 16433849,
+            "predicted_skeleton": 385772,
+            "true_skeleton": 521605,
+            "skeleton_precision_hits": 297871,
+            "skeleton_recall_hits": 272114,
+            "boundary_intersection": 566917,
+            "boundary_union": 5909904
+          },
+          "scores": {
+            "road_iou": 0.5120221075415747,
+            "cldice": 0.6226728395190546,
+            "boundary_iou": 0.09592660049977123,
+            "skeleton_precision": 0.7721426127349834,
+            "skeleton_recall": 0.5216859500963372,
+            "quality": 0.461998225726458,
+            "counts": {
+              "valid": 512411151,
+              "intersection": 8414494,
+              "union": 16433849,
+              "predicted_skeleton": 385772,
+              "true_skeleton": 521605,
+              "skeleton_precision_hits": 297871,
+              "skeleton_recall_hits": 272114,
+              "boundary_intersection": 566917,
+              "boundary_union": 5909904
+            }
+          },
+          "delta_native": 0.0,
+          "delta_y0": 0.007395110918347769
+        },
+        "Overall": {
+          "counts": {
+            "valid": 853198334,
+            "intersection": 30737016,
+            "union": 49675424,
+            "predicted_skeleton": 1041621,
+            "true_skeleton": 1057677,
+            "skeleton_precision_hits": 778533,
+            "skeleton_recall_hits": 645991,
+            "boundary_intersection": 1128263,
+            "boundary_union": 12714901
+          },
+          "scores": {
+            "road_iou": 0.6187569933977816,
+            "cldice": 0.6722188401473875,
+            "boundary_iou": 0.08873549231724258,
+            "skeleton_precision": 0.7474244470877603,
+            "skeleton_recall": 0.6107639666930452,
+            "quality": 0.5287912472065555,
+            "counts": {
+              "valid": 853198334,
+              "intersection": 30737016,
+              "union": 49675424,
+              "predicted_skeleton": 1041621,
+              "true_skeleton": 1057677,
+              "skeleton_precision_hits": 778533,
+              "skeleton_recall_hits": 645991,
+              "boundary_intersection": 1128263,
+              "boundary_union": 12714901
+            }
+          },
+          "delta_native": 0.00020482052306280973,
+          "delta_y0": 0.002741176024095182
+        }
+      }
+    },
+    {
+      "checkpoint": "e0_v2_s2",
+      "selected_on": "Val-sel",
+      "optimistic": false,
+      "thresholds": {
+        "Urban": 0.7,
+        "Rural": 0.5
+      },
+      "K": 4,
+      "groups": {
+        "Urban": {
+          "counts": {
+            "valid": 340787183,
+            "intersection": 22318902,
+            "union": 33235881,
+            "predicted_skeleton": 656633,
+            "true_skeleton": 536072,
+            "skeleton_precision_hits": 481313,
+            "skeleton_recall_hits": 373865,
+            "boundary_intersection": 561548,
+            "boundary_union": 6806811
+          },
+          "scores": {
+            "road_iou": 0.6715303259149351,
+            "cldice": 0.7147659400380949,
+            "boundary_iou": 0.082497956825891,
+            "skeleton_precision": 0.7330015396728462,
+            "skeleton_recall": 0.6974156456595383,
+            "quality": 0.5666945363340742,
+            "counts": {
+              "valid": 340787183,
+              "intersection": 22318902,
+              "union": 33235881,
+              "predicted_skeleton": 656633,
+              "true_skeleton": 536072,
+              "skeleton_precision_hits": 481313,
+              "skeleton_recall_hits": 373865,
+              "boundary_intersection": 561548,
+              "boundary_union": 6806811
+            }
+          },
+          "delta_native": 0.004744820063326105,
+          "delta_y0": 8.707327960189026e-05
+        },
+        "Rural": {
+          "counts": {
+            "valid": 512411151,
+            "intersection": 8959744,
+            "union": 17038594,
+            "predicted_skeleton": 447792,
+            "true_skeleton": 521605,
+            "skeleton_precision_hits": 330353,
+            "skeleton_recall_hits": 305301,
+            "boundary_intersection": 660135,
+            "boundary_union": 6270177
+          },
+          "scores": {
+            "road_iou": 0.52584996156373,
+            "cldice": 0.6527437032581058,
+            "boundary_iou": 0.10528171692760827,
+            "skeleton_precision": 0.7377376103190767,
+            "skeleton_recall": 0.585310723631867,
+            "quality": 0.4798044351448184,
+            "counts": {
+              "valid": 512411151,
+              "intersection": 8959744,
+              "union": 17038594,
+              "predicted_skeleton": 447792,
+              "true_skeleton": 521605,
+              "skeleton_precision_hits": 330353,
+              "skeleton_recall_hits": 305301,
+              "boundary_intersection": 660135,
+              "boundary_union": 6270177
+            }
+          },
+          "delta_native": 0.0,
+          "delta_y0": 0.02520132033670819
+        },
+        "Overall": {
+          "counts": {
+            "valid": 853198334,
+            "intersection": 31278646,
+            "union": 50274475,
+            "predicted_skeleton": 1104425,
+            "true_skeleton": 1057677,
+            "skeleton_precision_hits": 811666,
+            "skeleton_recall_hits": 679166,
+            "boundary_intersection": 1221683,
+            "boundary_union": 13076988
+          },
+          "scores": {
+            "road_iou": 0.6221575859320262,
+            "cldice": 0.6853994658003295,
+            "boundary_iou": 0.09342235383254921,
+            "skeleton_precision": 0.7349217918826538,
+            "skeleton_recall": 0.6421298751887391,
+            "quality": 0.5353831034726217,
+            "counts": {
+              "valid": 853198334,
+              "intersection": 31278646,
+              "union": 50274475,
+              "predicted_skeleton": 1104425,
+              "true_skeleton": 1057677,
+              "skeleton_precision_hits": 811666,
+              "skeleton_recall_hits": 679166,
+              "boundary_intersection": 1221683,
+              "boundary_union": 13076988
+            }
+          },
+          "delta_native": 0.0024639650470567043,
+          "delta_y0": 0.00933303229016147
+        }
+      }
+    },
+    {
+      "checkpoint": "e0_v2_s2",
+      "selected_on": "Val-rep",
+      "optimistic": true,
+      "thresholds": {
+        "Urban": 0.65,
+        "Rural": 0.5
+      },
+      "K": 1,
+      "groups": {
+        "Urban": {
+          "counts": {
+            "valid": 340787183,
+            "intersection": 22322522,
+            "union": 33241575,
+            "predicted_skeleton": 655849,
+            "true_skeleton": 536072,
+            "skeleton_precision_hits": 480662,
+            "skeleton_recall_hits": 373877,
+            "boundary_intersection": 561346,
+            "boundary_union": 6804997
+          },
+          "scores": {
+            "road_iou": 0.6715241982366961,
+            "cldice": 0.7147223598278547,
+            "boundary_iou": 0.08249026413971967,
+            "skeleton_precision": 0.7328851610660381,
+            "skeleton_recall": 0.6974380307122924,
+            "quality": 0.5666768598946483,
+            "counts": {
+              "valid": 340787183,
+              "intersection": 22322522,
+              "union": 33241575,
+              "predicted_skeleton": 655849,
+              "true_skeleton": 536072,
+              "skeleton_precision_hits": 480662,
+              "skeleton_recall_hits": 373877,
+              "boundary_intersection": 561346,
+              "boundary_union": 6804997
+            }
+          },
+          "delta_native": 0.0005908033411038405,
+          "delta_y0": 6.93968401760392e-05
+        },
+        "Rural": {
+          "counts": {
+            "valid": 512411151,
+            "intersection": 8414494,
+            "union": 16433849,
+            "predicted_skeleton": 385772,
+            "true_skeleton": 521605,
+            "skeleton_precision_hits": 297871,
+            "skeleton_recall_hits": 272114,
+            "boundary_intersection": 566917,
+            "boundary_union": 5909904
+          },
+          "scores": {
+            "road_iou": 0.5120221075415747,
+            "cldice": 0.6226728395190546,
+            "boundary_iou": 0.09592660049977123,
+            "skeleton_precision": 0.7721426127349834,
+            "skeleton_recall": 0.5216859500963372,
+            "quality": 0.461998225726458,
+            "counts": {
+              "valid": 512411151,
+              "intersection": 8414494,
+              "union": 16433849,
+              "predicted_skeleton": 385772,
+              "true_skeleton": 521605,
+              "skeleton_precision_hits": 297871,
+              "skeleton_recall_hits": 272114,
+              "boundary_intersection": 566917,
+              "boundary_union": 5909904
+            }
+          },
+          "delta_native": 0.0,
+          "delta_y0": 0.007395110918347769
+        },
+        "Overall": {
+          "counts": {
+            "valid": 853198334,
+            "intersection": 30737016,
+            "union": 49675424,
+            "predicted_skeleton": 1041621,
+            "true_skeleton": 1057677,
+            "skeleton_precision_hits": 778533,
+            "skeleton_recall_hits": 645991,
+            "boundary_intersection": 1128263,
+            "boundary_union": 12714901
+          },
+          "scores": {
+            "road_iou": 0.6187569933977816,
+            "cldice": 0.6722188401473875,
+            "boundary_iou": 0.08873549231724258,
+            "skeleton_precision": 0.7474244470877603,
+            "skeleton_recall": 0.6107639666930452,
+            "quality": 0.5287912472065555,
+            "counts": {
+              "valid": 853198334,
+              "intersection": 30737016,
+              "union": 49675424,
+              "predicted_skeleton": 1041621,
+              "true_skeleton": 1057677,
+              "skeleton_precision_hits": 778533,
+              "skeleton_recall_hits": 645991,
+              "boundary_intersection": 1128263,
+              "boundary_union": 12714901
+            }
+          },
+          "delta_native": 0.00020482052306280973,
+          "delta_y0": 0.002741176024095182
+        }
+      }
+    },
+    {
+      "checkpoint": "e0_v2_s2",
+      "selected_on": "Val-rep",
+      "optimistic": true,
+      "thresholds": {
+        "Urban": 0.65,
+        "Rural": 0.5
+      },
+      "K": 4,
+      "groups": {
+        "Urban": {
+          "counts": {
+            "valid": 340787183,
+            "intersection": 22326598,
+            "union": 33245603,
+            "predicted_skeleton": 659313,
+            "true_skeleton": 536072,
+            "skeleton_precision_hits": 482427,
+            "skeleton_recall_hits": 374590,
+            "boundary_intersection": 563695,
+            "boundary_union": 6818515
+          },
+          "scores": {
+            "road_iou": 0.6715654397966552,
+            "cldice": 0.7148605197750795,
+            "boundary_iou": 0.08267122679938374,
+            "skeleton_precision": 0.7317116453035205,
+            "skeleton_recall": 0.6987680759300989,
+            "quality": 0.5667751211907283,
+            "counts": {
+              "valid": 340787183,
+              "intersection": 22326598,
+              "union": 33245603,
+              "predicted_skeleton": 659313,
+              "true_skeleton": 536072,
+              "skeleton_precision_hits": 482427,
+              "skeleton_recall_hits": 374590,
+              "boundary_intersection": 563695,
+              "boundary_union": 6818515
+            }
+          },
+          "delta_native": 0.004825404919980181,
+          "delta_y0": 0.00016765813625596593
+        },
+        "Rural": {
+          "counts": {
+            "valid": 512411151,
+            "intersection": 8959744,
+            "union": 17038594,
+            "predicted_skeleton": 447792,
+            "true_skeleton": 521605,
+            "skeleton_precision_hits": 330353,
+            "skeleton_recall_hits": 305301,
+            "boundary_intersection": 660135,
+            "boundary_union": 6270177
+          },
+          "scores": {
+            "road_iou": 0.52584996156373,
+            "cldice": 0.6527437032581058,
+            "boundary_iou": 0.10528171692760827,
+            "skeleton_precision": 0.7377376103190767,
+            "skeleton_recall": 0.585310723631867,
+            "quality": 0.4798044351448184,
+            "counts": {
+              "valid": 512411151,
+              "intersection": 8959744,
+              "union": 17038594,
+              "predicted_skeleton": 447792,
+              "true_skeleton": 521605,
+              "skeleton_precision_hits": 330353,
+              "skeleton_recall_hits": 305301,
+              "boundary_intersection": 660135,
+              "boundary_union": 6270177
+            }
+          },
+          "delta_native": 0.0,
+          "delta_y0": 0.02520132033670819
+        },
+        "Overall": {
+          "counts": {
+            "valid": 853198334,
+            "intersection": 31286342,
+            "union": 50284197,
+            "predicted_skeleton": 1107105,
+            "true_skeleton": 1057677,
+            "skeleton_precision_hits": 812780,
+            "skeleton_recall_hits": 679891,
+            "boundary_intersection": 1223830,
+            "boundary_union": 13088692
+          },
+          "scores": {
+            "road_iou": 0.6221903473968173,
+            "cldice": 0.6854530904497952,
+            "boundary_iou": 0.0935028496353952,
+            "skeleton_precision": 0.734148974126212,
+            "skeleton_recall": 0.6428153396547339,
+            "quality": 0.5354316707604263,
+            "counts": {
+              "valid": 853198334,
+              "intersection": 31286342,
+              "union": 50284197,
+              "predicted_skeleton": 1107105,
+              "true_skeleton": 1057677,
+              "skeleton_precision_hits": 812780,
+              "skeleton_recall_hits": 679891,
+              "boundary_intersection": 1223830,
+              "boundary_union": 13088692
+            }
+          },
+          "delta_native": 0.0025125323348612616,
+          "delta_y0": 0.009381599577966027
+        }
+      }
+    },
+    {
+      "checkpoint": "e5_noadd_s0",
+      "selected_on": "Val-sel",
+      "optimistic": false,
+      "thresholds": {
+        "Urban": 0.55,
+        "Rural": 0.5
+      },
+      "K": 1,
+      "groups": {
+        "Urban": {
+          "counts": {
+            "valid": 340787183,
+            "intersection": 22327874,
+            "union": 33252858,
+            "predicted_skeleton": 654790,
+            "true_skeleton": 536072,
+            "skeleton_precision_hits": 479940,
+            "skeleton_recall_hits": 373935,
+            "boundary_intersection": 560741,
+            "boundary_union": 6804271
+          },
+          "scores": {
+            "road_iou": 0.6714572924829499,
+            "cldice": 0.714818478459759,
+            "boundary_iou": 0.0824101509184452,
+            "skeleton_precision": 0.732967821744376,
+            "skeleton_recall": 0.6975462251339373,
+            "quality": 0.5666562199630917,
+            "counts": {
+              "valid": 340787183,
+              "intersection": 22327874,
+              "union": 33252858,
+              "predicted_skeleton": 654790,
+              "true_skeleton": 536072,
+              "skeleton_precision_hits": 479940,
+              "skeleton_recall_hits": 373935,
+              "boundary_intersection": 560741,
+              "boundary_union": 6804271
+            }
+          },
+          "delta_native": 0.000830207307531583,
+          "delta_y0": 4.8756908619385086e-05
+        },
+        "Rural": {
+          "counts": {
+            "valid": 512411151,
+            "intersection": 8454314,
+            "union": 16522951,
+            "predicted_skeleton": 385089,
+            "true_skeleton": 521605,
+            "skeleton_precision_hits": 296686,
+            "skeleton_recall_hits": 273024,
+            "boundary_intersection": 561371,
+            "boundary_union": 5920362
+          },
+          "scores": {
+            "road_iou": 0.5116709478833412,
+            "cldice": 0.6233556473600014,
+            "boundary_iou": 0.0948203842940685,
+            "skeleton_precision": 0.7704348864807875,
+            "skeleton_recall": 0.5234305652744893,
+            "quality": 0.4618062450084847,
+            "counts": {
+              "valid": 512411151,
+              "intersection": 8454314,
+              "union": 16522951,
+              "predicted_skeleton": 385089,
+              "true_skeleton": 521605,
+              "skeleton_precision_hits": 296686,
+              "skeleton_recall_hits": 273024,
+              "boundary_intersection": 561371,
+              "boundary_union": 5920362
+            }
+          },
+          "delta_native": 0.0,
+          "delta_y0": 0.007203130200374497
+        },
+        "Overall": {
+          "counts": {
+            "valid": 853198334,
+            "intersection": 30782188,
+            "union": 49775809,
+            "predicted_skeleton": 1039879,
+            "true_skeleton": 1057677,
+            "skeleton_precision_hits": 776626,
+            "skeleton_recall_hits": 646959,
+            "boundary_intersection": 1122112,
+            "boundary_union": 12724633
+          },
+          "scores": {
+            "road_iou": 0.6184166288487647,
+            "cldice": 0.6725370072023249,
+            "boundary_iou": 0.08818423289693306,
+            "skeleton_precision": 0.7468426615019632,
+            "skeleton_recall": 0.6116791799386769,
+            "quality": 0.5286062631644664,
+            "counts": {
+              "valid": 853198334,
+              "intersection": 30782188,
+              "union": 49775809,
+              "predicted_skeleton": 1039879,
+              "true_skeleton": 1057677,
+              "skeleton_precision_hits": 776626,
+              "skeleton_recall_hits": 646959,
+              "boundary_intersection": 1122112,
+              "boundary_union": 12724633
+            }
+          },
+          "delta_native": 0.00027953471414021713,
+          "delta_y0": 0.002556191982006073
+        }
+      }
+    },
+    {
+      "checkpoint": "e5_noadd_s0",
+      "selected_on": "Val-sel",
+      "optimistic": false,
+      "thresholds": {
+        "Urban": 0.55,
+        "Rural": 0.5
+      },
+      "K": 4,
+      "groups": {
+        "Urban": {
+          "counts": {
+            "valid": 340787183,
+            "intersection": 22416012,
+            "union": 33378239,
+            "predicted_skeleton": 667605,
+            "true_skeleton": 536072,
+            "skeleton_precision_hits": 485118,
+            "skeleton_recall_hits": 378000,
+            "boundary_intersection": 571252,
+            "boundary_union": 6869961
+          },
+          "scores": {
+            "road_iou": 0.6715756334538799,
+            "cldice": 0.715729896690373,
+            "boundary_iou": 0.0831521459874372,
+            "skeleton_precision": 0.7266542341654122,
+            "skeleton_recall": 0.7051291617543912,
+            "quality": 0.5671372149315393,
+            "counts": {
+              "valid": 340787183,
+              "intersection": 22416012,
+              "union": 33378239,
+              "predicted_skeleton": 667605,
+              "true_skeleton": 536072,
+              "skeleton_precision_hits": 485118,
+              "skeleton_recall_hits": 378000,
+              "boundary_intersection": 571252,
+              "boundary_union": 6869961
+            }
+          },
+          "delta_native": 0.0020419927700450202,
+          "delta_y0": 0.0005297518770670528
+        },
+        "Rural": {
+          "counts": {
+            "valid": 512411151,
+            "intersection": 8704588,
+            "union": 16815041,
+            "predicted_skeleton": 412978,
+            "true_skeleton": 521605,
+            "skeleton_precision_hits": 311188,
+            "skeleton_recall_hits": 288358,
+            "boundary_intersection": 601614,
+            "boundary_union": 6081815
+          },
+          "scores": {
+            "road_iou": 0.5176667722665678,
+            "cldice": 0.6377589180034323,
+            "boundary_iou": 0.0989201414380411,
+            "skeleton_precision": 0.7535219793790469,
+            "skeleton_recall": 0.5528282896061196,
+            "quality": 0.4699450898219218,
+            "counts": {
+              "valid": 512411151,
+              "intersection": 8704588,
+              "union": 16815041,
+              "predicted_skeleton": 412978,
+              "true_skeleton": 521605,
+              "skeleton_precision_hits": 311188,
+              "skeleton_recall_hits": 288358,
+              "boundary_intersection": 601614,
+              "boundary_union": 6081815
+            }
+          },
+          "delta_native": 0.0,
+          "delta_y0": 0.01534197501381157
+        },
+        "Overall": {
+          "counts": {
+            "valid": 853198334,
+            "intersection": 31120600,
+            "union": 50193280,
+            "predicted_skeleton": 1080583,
+            "true_skeleton": 1057677,
+            "skeleton_precision_hits": 796306,
+            "skeleton_recall_hits": 666358,
+            "boundary_intersection": 1172866,
+            "boundary_union": 12951776
+          },
+          "scores": {
+            "road_iou": 0.6200152689762454,
+            "cldice": 0.6792912792790947,
+            "boundary_iou": 0.09055638392757874,
+            "skeleton_precision": 0.7369225686504415,
+            "skeleton_recall": 0.6300203181122404,
+            "quality": 0.5319062950573669,
+            "counts": {
+              "valid": 853198334,
+              "intersection": 31120600,
+              "union": 50193280,
+              "predicted_skeleton": 1080583,
+              "true_skeleton": 1057677,
+              "skeleton_precision_hits": 796306,
+              "skeleton_recall_hits": 666358,
+              "boundary_intersection": 1172866,
+              "boundary_union": 12951776
+            }
+          },
+          "delta_native": 0.0009334578371419378,
+          "delta_y0": 0.005856223874906585
+        }
+      }
+    },
+    {
+      "checkpoint": "e5_noadd_s0",
+      "selected_on": "Val-rep",
+      "optimistic": true,
+      "thresholds": {
+        "Urban": 0.55,
+        "Rural": 0.5
+      },
+      "K": 1,
+      "groups": {
+        "Urban": {
+          "counts": {
+            "valid": 340787183,
+            "intersection": 22327874,
+            "union": 33252858,
+            "predicted_skeleton": 654790,
+            "true_skeleton": 536072,
+            "skeleton_precision_hits": 479940,
+            "skeleton_recall_hits": 373935,
+            "boundary_intersection": 560741,
+            "boundary_union": 6804271
+          },
+          "scores": {
+            "road_iou": 0.6714572924829499,
+            "cldice": 0.714818478459759,
+            "boundary_iou": 0.0824101509184452,
+            "skeleton_precision": 0.732967821744376,
+            "skeleton_recall": 0.6975462251339373,
+            "quality": 0.5666562199630917,
+            "counts": {
+              "valid": 340787183,
+              "intersection": 22327874,
+              "union": 33252858,
+              "predicted_skeleton": 654790,
+              "true_skeleton": 536072,
+              "skeleton_precision_hits": 479940,
+              "skeleton_recall_hits": 373935,
+              "boundary_intersection": 560741,
+              "boundary_union": 6804271
+            }
+          },
+          "delta_native": 0.000830207307531583,
+          "delta_y0": 4.8756908619385086e-05
+        },
+        "Rural": {
+          "counts": {
+            "valid": 512411151,
+            "intersection": 8454314,
+            "union": 16522951,
+            "predicted_skeleton": 385089,
+            "true_skeleton": 521605,
+            "skeleton_precision_hits": 296686,
+            "skeleton_recall_hits": 273024,
+            "boundary_intersection": 561371,
+            "boundary_union": 5920362
+          },
+          "scores": {
+            "road_iou": 0.5116709478833412,
+            "cldice": 0.6233556473600014,
+            "boundary_iou": 0.0948203842940685,
+            "skeleton_precision": 0.7704348864807875,
+            "skeleton_recall": 0.5234305652744893,
+            "quality": 0.4618062450084847,
+            "counts": {
+              "valid": 512411151,
+              "intersection": 8454314,
+              "union": 16522951,
+              "predicted_skeleton": 385089,
+              "true_skeleton": 521605,
+              "skeleton_precision_hits": 296686,
+              "skeleton_recall_hits": 273024,
+              "boundary_intersection": 561371,
+              "boundary_union": 5920362
+            }
+          },
+          "delta_native": 0.0,
+          "delta_y0": 0.007203130200374497
+        },
+        "Overall": {
+          "counts": {
+            "valid": 853198334,
+            "intersection": 30782188,
+            "union": 49775809,
+            "predicted_skeleton": 1039879,
+            "true_skeleton": 1057677,
+            "skeleton_precision_hits": 776626,
+            "skeleton_recall_hits": 646959,
+            "boundary_intersection": 1122112,
+            "boundary_union": 12724633
+          },
+          "scores": {
+            "road_iou": 0.6184166288487647,
+            "cldice": 0.6725370072023249,
+            "boundary_iou": 0.08818423289693306,
+            "skeleton_precision": 0.7468426615019632,
+            "skeleton_recall": 0.6116791799386769,
+            "quality": 0.5286062631644664,
+            "counts": {
+              "valid": 853198334,
+              "intersection": 30782188,
+              "union": 49775809,
+              "predicted_skeleton": 1039879,
+              "true_skeleton": 1057677,
+              "skeleton_precision_hits": 776626,
+              "skeleton_recall_hits": 646959,
+              "boundary_intersection": 1122112,
+              "boundary_union": 12724633
+            }
+          },
+          "delta_native": 0.00027953471414021713,
+          "delta_y0": 0.002556191982006073
+        }
+      }
+    },
+    {
+      "checkpoint": "e5_noadd_s0",
+      "selected_on": "Val-rep",
+      "optimistic": true,
+      "thresholds": {
+        "Urban": 0.55,
+        "Rural": 0.5
+      },
+      "K": 4,
+      "groups": {
+        "Urban": {
+          "counts": {
+            "valid": 340787183,
+            "intersection": 22416012,
+            "union": 33378239,
+            "predicted_skeleton": 667605,
+            "true_skeleton": 536072,
+            "skeleton_precision_hits": 485118,
+            "skeleton_recall_hits": 378000,
+            "boundary_intersection": 571252,
+            "boundary_union": 6869961
+          },
+          "scores": {
+            "road_iou": 0.6715756334538799,
+            "cldice": 0.715729896690373,
+            "boundary_iou": 0.0831521459874372,
+            "skeleton_precision": 0.7266542341654122,
+            "skeleton_recall": 0.7051291617543912,
+            "quality": 0.5671372149315393,
+            "counts": {
+              "valid": 340787183,
+              "intersection": 22416012,
+              "union": 33378239,
+              "predicted_skeleton": 667605,
+              "true_skeleton": 536072,
+              "skeleton_precision_hits": 485118,
+              "skeleton_recall_hits": 378000,
+              "boundary_intersection": 571252,
+              "boundary_union": 6869961
+            }
+          },
+          "delta_native": 0.0020419927700450202,
+          "delta_y0": 0.0005297518770670528
+        },
+        "Rural": {
+          "counts": {
+            "valid": 512411151,
+            "intersection": 8704588,
+            "union": 16815041,
+            "predicted_skeleton": 412978,
+            "true_skeleton": 521605,
+            "skeleton_precision_hits": 311188,
+            "skeleton_recall_hits": 288358,
+            "boundary_intersection": 601614,
+            "boundary_union": 6081815
+          },
+          "scores": {
+            "road_iou": 0.5176667722665678,
+            "cldice": 0.6377589180034323,
+            "boundary_iou": 0.0989201414380411,
+            "skeleton_precision": 0.7535219793790469,
+            "skeleton_recall": 0.5528282896061196,
+            "quality": 0.4699450898219218,
+            "counts": {
+              "valid": 512411151,
+              "intersection": 8704588,
+              "union": 16815041,
+              "predicted_skeleton": 412978,
+              "true_skeleton": 521605,
+              "skeleton_precision_hits": 311188,
+              "skeleton_recall_hits": 288358,
+              "boundary_intersection": 601614,
+              "boundary_union": 6081815
+            }
+          },
+          "delta_native": 0.0,
+          "delta_y0": 0.01534197501381157
+        },
+        "Overall": {
+          "counts": {
+            "valid": 853198334,
+            "intersection": 31120600,
+            "union": 50193280,
+            "predicted_skeleton": 1080583,
+            "true_skeleton": 1057677,
+            "skeleton_precision_hits": 796306,
+            "skeleton_recall_hits": 666358,
+            "boundary_intersection": 1172866,
+            "boundary_union": 12951776
+          },
+          "scores": {
+            "road_iou": 0.6200152689762454,
+            "cldice": 0.6792912792790947,
+            "boundary_iou": 0.09055638392757874,
+            "skeleton_precision": 0.7369225686504415,
+            "skeleton_recall": 0.6300203181122404,
+            "quality": 0.5319062950573669,
+            "counts": {
+              "valid": 853198334,
+              "intersection": 31120600,
+              "union": 50193280,
+              "predicted_skeleton": 1080583,
+              "true_skeleton": 1057677,
+              "skeleton_precision_hits": 796306,
+              "skeleton_recall_hits": 666358,
+              "boundary_intersection": 1172866,
+              "boundary_union": 12951776
+            }
+          },
+          "delta_native": 0.0009334578371419378,
+          "delta_y0": 0.005856223874906585
+        }
+      }
+    },
+    {
+      "checkpoint": "e5_noadd_s1",
+      "selected_on": "Val-sel",
+      "optimistic": false,
+      "thresholds": {
+        "Urban": 0.65,
+        "Rural": 0.5
+      },
+      "K": 1,
+      "groups": {
+        "Urban": {
+          "counts": {
+            "valid": 340787183,
+            "intersection": 22327291,
+            "union": 33252106,
+            "predicted_skeleton": 655003,
+            "true_skeleton": 536072,
+            "skeleton_precision_hits": 480005,
+            "skeleton_recall_hits": 373928,
+            "boundary_intersection": 560775,
+            "boundary_union": 6804540
+          },
+          "scores": {
+            "road_iou": 0.6714549448386818,
+            "cldice": 0.7147454604432805,
+            "boundary_iou": 0.08241188970892963,
+            "skeleton_precision": 0.732828704601353,
+            "skeleton_recall": 0.6975331671864974,
+            "quality": 0.566633488494111,
+            "counts": {
+              "valid": 340787183,
+              "intersection": 22327291,
+              "union": 33252106,
+              "predicted_skeleton": 655003,
+              "true_skeleton": 536072,
+              "skeleton_precision_hits": 480005,
+              "skeleton_recall_hits": 373928,
+              "boundary_intersection": 560775,
+              "boundary_union": 6804540
+            }
+          },
+          "delta_native": 0.0005297077138262107,
+          "delta_y0": 2.602543963869941e-05
+        },
+        "Rural": {
+          "counts": {
+            "valid": 512411151,
+            "intersection": 8354920,
+            "union": 16401962,
+            "predicted_skeleton": 376035,
+            "true_skeleton": 521605,
+            "skeleton_precision_hits": 292163,
+            "skeleton_recall_hits": 267711,
+            "boundary_intersection": 549310,
+            "boundary_union": 5864739
+          },
+          "scores": {
+            "road_iou": 0.5093854015757383,
+            "cldice": 0.6181499326366705,
+            "boundary_iou": 0.09366316216288569,
+            "skeleton_precision": 0.77695693220046,
+            "skeleton_recall": 0.5132446966574323,
+            "quality": 0.4588703130114474,
+            "counts": {
+              "valid": 512411151,
+              "intersection": 8354920,
+              "union": 16401962,
+              "predicted_skeleton": 376035,
+              "true_skeleton": 521605,
+              "skeleton_precision_hits": 292163,
+              "skeleton_recall_hits": 267711,
+              "boundary_intersection": 549310,
+              "boundary_union": 5864739
+            }
+          },
+          "delta_native": 0.0,
+          "delta_y0": 0.0042671982033371525
+        },
+        "Overall": {
+          "counts": {
+            "valid": 853198334,
+            "intersection": 30682211,
+            "union": 49654068,
+            "predicted_skeleton": 1031038,
+            "true_skeleton": 1057677,
+            "skeleton_precision_hits": 772168,
+            "skeleton_recall_hits": 641639,
+            "boundary_intersection": 1110085,
+            "boundary_union": 12669279
+          },
+          "scores": {
+            "road_iou": 0.6179193817513602,
+            "cldice": 0.6703199676740806,
+            "boundary_iou": 0.08762021895642207,
+            "skeleton_precision": 0.74892293009569,
+            "skeleton_recall": 0.6066492889606184,
+            "quality": 0.5275797249691886,
+            "counts": {
+              "valid": 853198334,
+              "intersection": 30682211,
+              "union": 49654068,
+              "predicted_skeleton": 1031038,
+              "true_skeleton": 1057677,
+              "skeleton_precision_hits": 772168,
+              "skeleton_recall_hits": 641639,
+              "boundary_intersection": 1110085,
+              "boundary_union": 12669279
+            }
+          },
+          "delta_native": 0.00018688498207797277,
+          "delta_y0": 0.0015296537867283133
+        }
+      }
+    },
+    {
+      "checkpoint": "e5_noadd_s1",
+      "selected_on": "Val-sel",
+      "optimistic": false,
+      "thresholds": {
+        "Urban": 0.65,
+        "Rural": 0.5
+      },
+      "K": 4,
+      "groups": {
+        "Urban": {
+          "counts": {
+            "valid": 340787183,
+            "intersection": 22320755,
+            "union": 33236198,
+            "predicted_skeleton": 656106,
+            "true_skeleton": 536072,
+            "skeleton_precision_hits": 480787,
+            "skeleton_recall_hits": 373868,
+            "boundary_intersection": 561302,
+            "boundary_union": 6803068
+          },
+          "scores": {
+            "road_iou": 0.6715796734632523,
+            "cldice": 0.7146676270210437,
+            "boundary_iou": 0.08250718646351911,
+            "skeleton_precision": 0.7327886042804059,
+            "skeleton_recall": 0.6974212419227268,
+            "quality": 0.5666915621306431,
+            "counts": {
+              "valid": 340787183,
+              "intersection": 22320755,
+              "union": 33236198,
+              "predicted_skeleton": 656106,
+              "true_skeleton": 536072,
+              "skeleton_precision_hits": 480787,
+              "skeleton_recall_hits": 373868,
+              "boundary_intersection": 561302,
+              "boundary_union": 6803068
+            }
+          },
+          "delta_native": 0.001345954031127694,
+          "delta_y0": 8.409907617079604e-05
+        },
+        "Rural": {
+          "counts": {
+            "valid": 512411151,
+            "intersection": 8596493,
+            "union": 16653548,
+            "predicted_skeleton": 404180,
+            "true_skeleton": 521605,
+            "skeleton_precision_hits": 307390,
+            "skeleton_recall_hits": 282680,
+            "boundary_intersection": 591857,
+            "boundary_union": 6017433
+          },
+          "scores": {
+            "road_iou": 0.5161958881074471,
+            "cldice": 0.6328932596751152,
+            "boundary_iou": 0.09835705690449732,
+            "skeleton_precision": 0.7605274877529813,
+            "skeleton_recall": 0.5419426577582653,
+            "quality": 0.46763733333715757,
+            "counts": {
+              "valid": 512411151,
+              "intersection": 8596493,
+              "union": 16653548,
+              "predicted_skeleton": 404180,
+              "true_skeleton": 521605,
+              "skeleton_precision_hits": 307390,
+              "skeleton_recall_hits": 282680,
+              "boundary_intersection": 591857,
+              "boundary_union": 6017433
+            }
+          },
+          "delta_native": 0.0,
+          "delta_y0": 0.013034218529047348
+        },
+        "Overall": {
+          "counts": {
+            "valid": 853198334,
+            "intersection": 30917248,
+            "union": 49889746,
+            "predicted_skeleton": 1060286,
+            "true_skeleton": 1057677,
+            "skeleton_precision_hits": 788177,
+            "skeleton_recall_hits": 656548,
+            "boundary_intersection": 1153159,
+            "boundary_union": 12820501
+          },
+          "scores": {
+            "road_iou": 0.6197114733757113,
+            "cldice": 0.6765430230265217,
+            "boundary_iou": 0.08994648493065911,
+            "skeleton_precision": 0.743362639891501,
+            "skeleton_recall": 0.6207452747861587,
+            "quality": 0.530807940581944,
+            "counts": {
+              "valid": 853198334,
+              "intersection": 30917248,
+              "union": 49889746,
+              "predicted_skeleton": 1060286,
+              "true_skeleton": 1057677,
+              "skeleton_precision_hits": 788177,
+              "skeleton_recall_hits": 656548,
+              "boundary_intersection": 1153159,
+              "boundary_union": 12820501
+            }
+          },
+          "delta_native": 0.0005303468462389826,
+          "delta_y0": 0.0047578693994837495
+        }
+      }
+    },
+    {
+      "checkpoint": "e5_noadd_s1",
+      "selected_on": "Val-rep",
+      "optimistic": true,
+      "thresholds": {
+        "Urban": 0.55,
+        "Rural": 0.5
+      },
+      "K": 1,
+      "groups": {
+        "Urban": {
+          "counts": {
+            "valid": 340787183,
+            "intersection": 22327291,
+            "union": 33252106,
+            "predicted_skeleton": 655003,
+            "true_skeleton": 536072,
+            "skeleton_precision_hits": 480005,
+            "skeleton_recall_hits": 373928,
+            "boundary_intersection": 560775,
+            "boundary_union": 6804540
+          },
+          "scores": {
+            "road_iou": 0.6714549448386818,
+            "cldice": 0.7147454604432805,
+            "boundary_iou": 0.08241188970892963,
+            "skeleton_precision": 0.732828704601353,
+            "skeleton_recall": 0.6975331671864974,
+            "quality": 0.566633488494111,
+            "counts": {
+              "valid": 340787183,
+              "intersection": 22327291,
+              "union": 33252106,
+              "predicted_skeleton": 655003,
+              "true_skeleton": 536072,
+              "skeleton_precision_hits": 480005,
+              "skeleton_recall_hits": 373928,
+              "boundary_intersection": 560775,
+              "boundary_union": 6804540
+            }
+          },
+          "delta_native": 0.0005297077138262107,
+          "delta_y0": 2.602543963869941e-05
+        },
+        "Rural": {
+          "counts": {
+            "valid": 512411151,
+            "intersection": 8354920,
+            "union": 16401962,
+            "predicted_skeleton": 376035,
+            "true_skeleton": 521605,
+            "skeleton_precision_hits": 292163,
+            "skeleton_recall_hits": 267711,
+            "boundary_intersection": 549310,
+            "boundary_union": 5864739
+          },
+          "scores": {
+            "road_iou": 0.5093854015757383,
+            "cldice": 0.6181499326366705,
+            "boundary_iou": 0.09366316216288569,
+            "skeleton_precision": 0.77695693220046,
+            "skeleton_recall": 0.5132446966574323,
+            "quality": 0.4588703130114474,
+            "counts": {
+              "valid": 512411151,
+              "intersection": 8354920,
+              "union": 16401962,
+              "predicted_skeleton": 376035,
+              "true_skeleton": 521605,
+              "skeleton_precision_hits": 292163,
+              "skeleton_recall_hits": 267711,
+              "boundary_intersection": 549310,
+              "boundary_union": 5864739
+            }
+          },
+          "delta_native": 0.0,
+          "delta_y0": 0.0042671982033371525
+        },
+        "Overall": {
+          "counts": {
+            "valid": 853198334,
+            "intersection": 30682211,
+            "union": 49654068,
+            "predicted_skeleton": 1031038,
+            "true_skeleton": 1057677,
+            "skeleton_precision_hits": 772168,
+            "skeleton_recall_hits": 641639,
+            "boundary_intersection": 1110085,
+            "boundary_union": 12669279
+          },
+          "scores": {
+            "road_iou": 0.6179193817513602,
+            "cldice": 0.6703199676740806,
+            "boundary_iou": 0.08762021895642207,
+            "skeleton_precision": 0.74892293009569,
+            "skeleton_recall": 0.6066492889606184,
+            "quality": 0.5275797249691886,
+            "counts": {
+              "valid": 853198334,
+              "intersection": 30682211,
+              "union": 49654068,
+              "predicted_skeleton": 1031038,
+              "true_skeleton": 1057677,
+              "skeleton_precision_hits": 772168,
+              "skeleton_recall_hits": 641639,
+              "boundary_intersection": 1110085,
+              "boundary_union": 12669279
+            }
+          },
+          "delta_native": 0.00018688498207797277,
+          "delta_y0": 0.0015296537867283133
+        }
+      }
+    },
+    {
+      "checkpoint": "e5_noadd_s1",
+      "selected_on": "Val-rep",
+      "optimistic": true,
+      "thresholds": {
+        "Urban": 0.55,
+        "Rural": 0.5
+      },
+      "K": 4,
+      "groups": {
+        "Urban": {
+          "counts": {
+            "valid": 340787183,
+            "intersection": 22371384,
+            "union": 33313563,
+            "predicted_skeleton": 665995,
+            "true_skeleton": 536072,
+            "skeleton_precision_hits": 484602,
+            "skeleton_recall_hits": 376435,
+            "boundary_intersection": 568139,
+            "boundary_union": 6848875
+          },
+          "scores": {
+            "road_iou": 0.6715398169808495,
+            "cldice": 0.7146968631257388,
+            "boundary_iou": 0.08295362377032724,
+            "skeleton_precision": 0.7276360933640643,
+            "skeleton_recall": 0.702209777791043,
+            "quality": 0.5667696921822118,
+            "counts": {
+              "valid": 340787183,
+              "intersection": 22371384,
+              "union": 33313563,
+              "predicted_skeleton": 665995,
+              "true_skeleton": 536072,
+              "skeleton_precision_hits": 484602,
+              "skeleton_recall_hits": 376435,
+              "boundary_intersection": 568139,
+              "boundary_union": 6848875
+            }
+          },
+          "delta_native": 0.001424084082696453,
+          "delta_y0": 0.0001622291277395549
+        },
+        "Rural": {
+          "counts": {
+            "valid": 512411151,
+            "intersection": 8596493,
+            "union": 16653548,
+            "predicted_skeleton": 404180,
+            "true_skeleton": 521605,
+            "skeleton_precision_hits": 307390,
+            "skeleton_recall_hits": 282680,
+            "boundary_intersection": 591857,
+            "boundary_union": 6017433
+          },
+          "scores": {
+            "road_iou": 0.5161958881074471,
+            "cldice": 0.6328932596751152,
+            "boundary_iou": 0.09835705690449732,
+            "skeleton_precision": 0.7605274877529813,
+            "skeleton_recall": 0.5419426577582653,
+            "quality": 0.46763733333715757,
+            "counts": {
+              "valid": 512411151,
+              "intersection": 8596493,
+              "union": 16653548,
+              "predicted_skeleton": 404180,
+              "true_skeleton": 521605,
+              "skeleton_precision_hits": 307390,
+              "skeleton_recall_hits": 282680,
+              "boundary_intersection": 591857,
+              "boundary_union": 6017433
+            }
+          },
+          "delta_native": 0.0,
+          "delta_y0": 0.013034218529047348
+        },
+        "Overall": {
+          "counts": {
+            "valid": 853198334,
+            "intersection": 30967877,
+            "union": 49967111,
+            "predicted_skeleton": 1070175,
+            "true_skeleton": 1057677,
+            "skeleton_precision_hits": 791992,
+            "skeleton_recall_hits": 659115,
+            "boundary_intersection": 1159996,
+            "boundary_union": 12866308
+          },
+          "scores": {
+            "road_iou": 0.6197652091592808,
+            "cldice": 0.6766043229712657,
+            "boundary_iou": 0.09015764273636229,
+            "skeleton_precision": 0.7400584016632794,
+            "skeleton_recall": 0.6231722917298949,
+            "quality": 0.5308954300182925,
+            "counts": {
+              "valid": 853198334,
+              "intersection": 30967877,
+              "union": 49967111,
+              "predicted_skeleton": 1070175,
+              "true_skeleton": 1057677,
+              "skeleton_precision_hits": 791992,
+              "skeleton_recall_hits": 659115,
+              "boundary_intersection": 1159996,
+              "boundary_union": 12866308
+            }
+          },
+          "delta_native": 0.0006178362825874917,
+          "delta_y0": 0.004845358835832259
+        }
+      }
+    },
+    {
+      "checkpoint": "e5_noadd_s2",
+      "selected_on": "Val-sel",
+      "optimistic": false,
+      "thresholds": {
+        "Urban": 0.65,
+        "Rural": 0.5
+      },
+      "K": 1,
+      "groups": {
+        "Urban": {
+          "counts": {
+            "valid": 340787183,
+            "intersection": 22301785,
+            "union": 33204135,
+            "predicted_skeleton": 655936,
+            "true_skeleton": 536072,
+            "skeleton_precision_hits": 480903,
+            "skeleton_recall_hits": 373645,
+            "boundary_intersection": 561663,
+            "boundary_union": 6802117
+          },
+          "scores": {
+            "road_iou": 0.6716568584003167,
+            "cldice": 0.7146234283682765,
+            "boundary_iou": 0.08257179345783085,
+            "skeleton_precision": 0.7331553688164699,
+            "skeleton_recall": 0.6970052530257129,
+            "quality": 0.5667298164022074,
+            "counts": {
+              "valid": 340787183,
+              "intersection": 22301785,
+              "union": 33204135,
+              "predicted_skeleton": 655936,
+              "true_skeleton": 536072,
+              "skeleton_precision_hits": 480903,
+              "skeleton_recall_hits": 373645,
+              "boundary_intersection": 561663,
+              "boundary_union": 6802117
+            }
+          },
+          "delta_native": 0.0009311620592901138,
+          "delta_y0": 0.00012235334773513795
+        },
+        "Rural": {
+          "counts": {
+            "valid": 512411151,
+            "intersection": 8466213,
+            "union": 16503940,
+            "predicted_skeleton": 387340,
+            "true_skeleton": 521605,
+            "skeleton_precision_hits": 298106,
+            "skeleton_recall_hits": 274119,
+            "boundary_intersection": 567933,
+            "boundary_union": 5928176
+          },
+          "scores": {
+            "road_iou": 0.5129813244594927,
+            "cldice": 0.6245749095754238,
+            "boundary_iou": 0.09580231761000348,
+            "skeleton_precision": 0.7696235865131409,
+            "skeleton_recall": 0.5255298549668811,
+            "quality": 0.4630235986243742,
+            "counts": {
+              "valid": 512411151,
+              "intersection": 8466213,
+              "union": 16503940,
+              "predicted_skeleton": 387340,
+              "true_skeleton": 521605,
+              "skeleton_precision_hits": 298106,
+              "skeleton_recall_hits": 274119,
+              "boundary_intersection": 567933,
+              "boundary_union": 5928176
+            }
+          },
+          "delta_native": 0.0,
+          "delta_y0": 0.00842048381626398
+        },
+        "Overall": {
+          "counts": {
+            "valid": 853198334,
+            "intersection": 30767998,
+            "union": 49708075,
+            "predicted_skeleton": 1043276,
+            "true_skeleton": 1057677,
+            "skeleton_precision_hits": 779009,
+            "skeleton_recall_hits": 647764,
+            "boundary_intersection": 1129596,
+            "boundary_union": 12730293
+          },
+          "scores": {
+            "road_iou": 0.6189738387575862,
+            "cldice": 0.6729368438270811,
+            "boundary_iou": 0.08873291447416018,
+            "skeleton_precision": 0.7466950260525499,
+            "skeleton_recall": 0.6124402818629884,
+            "quality": 0.5291145554217493,
+            "counts": {
+              "valid": 853198334,
+              "intersection": 30767998,
+              "union": 49708075,
+              "predicted_skeleton": 1043276,
+              "true_skeleton": 1057677,
+              "skeleton_precision_hits": 779009,
+              "skeleton_recall_hits": 647764,
+              "boundary_intersection": 1129596,
+              "boundary_union": 12730293
+            }
+          },
+          "delta_native": 0.00031595164589359737,
+          "delta_y0": 0.003064484239289067
+        }
+      }
+    },
+    {
+      "checkpoint": "e5_noadd_s2",
+      "selected_on": "Val-sel",
+      "optimistic": false,
+      "thresholds": {
+        "Urban": 0.65,
+        "Rural": 0.5
+      },
+      "K": 4,
+      "groups": {
+        "Urban": {
+          "counts": {
+            "valid": 340787183,
+            "intersection": 22202027,
+            "union": 33059276,
+            "predicted_skeleton": 664084,
+            "true_skeleton": 536072,
+            "skeleton_precision_hits": 488426,
+            "skeleton_recall_hits": 372405,
+            "boundary_intersection": 562577,
+            "boundary_union": 6807841
+          },
+          "scores": {
+            "road_iou": 0.6715823722213397,
+            "cldice": 0.7145083475272638,
+            "boundary_iou": 0.08263662444525365,
+            "skeleton_precision": 0.7354882816029298,
+            "skeleton_recall": 0.6946921309077885,
+            "quality": 0.5666710152578996,
+            "counts": {
+              "valid": 340787183,
+              "intersection": 22202027,
+              "union": 33059276,
+              "predicted_skeleton": 664084,
+              "true_skeleton": 536072,
+              "skeleton_precision_hits": 488426,
+              "skeleton_recall_hits": 372405,
+              "boundary_intersection": 562577,
+              "boundary_union": 6807841
+            }
+          },
+          "delta_native": 0.001018369242990369,
+          "delta_y0": 6.35522034273528e-05
+        },
+        "Rural": {
+          "counts": {
+            "valid": 512411151,
+            "intersection": 8548343,
+            "union": 16558750,
+            "predicted_skeleton": 399959,
+            "true_skeleton": 521605,
+            "skeleton_precision_hits": 306122,
+            "skeleton_recall_hits": 279456,
+            "boundary_intersection": 585089,
+            "boundary_union": 5980734
+          },
+          "scores": {
+            "road_iou": 0.5162432550766212,
+            "cldice": 0.6303111603891873,
+            "boundary_iou": 0.09782896213073512,
+            "skeleton_precision": 0.7653834518038098,
+            "skeleton_recall": 0.5357617354128124,
+            "quality": 0.46678076808121377,
+            "counts": {
+              "valid": 512411151,
+              "intersection": 8548343,
+              "union": 16558750,
+              "predicted_skeleton": 399959,
+              "true_skeleton": 521605,
+              "skeleton_precision_hits": 306122,
+              "skeleton_recall_hits": 279456,
+              "boundary_intersection": 585089,
+              "boundary_union": 5980734
+            }
+          },
+          "delta_native": 0.0,
+          "delta_y0": 0.01217765327310355
+        },
+        "Overall": {
+          "counts": {
+            "valid": 853198334,
+            "intersection": 30750370,
+            "union": 49618026,
+            "predicted_skeleton": 1064043,
+            "true_skeleton": 1057677,
+            "skeleton_precision_hits": 794548,
+            "skeleton_recall_hits": 651861,
+            "boundary_intersection": 1147666,
+            "boundary_union": 12788575
+          },
+          "scores": {
+            "road_iou": 0.6197419058952486,
+            "cldice": 0.6752809641565654,
+            "boundary_iou": 0.0897415075565495,
+            "skeleton_precision": 0.7467254612830496,
+            "skeleton_recall": 0.6163138651970308,
+            "quality": 0.5304035437059038,
+            "counts": {
+              "valid": 853198334,
+              "intersection": 30750370,
+              "union": 49618026,
+              "predicted_skeleton": 1064043,
+              "true_skeleton": 1057677,
+              "skeleton_precision_hits": 794548,
+              "skeleton_recall_hits": 651861,
+              "boundary_intersection": 1147666,
+              "boundary_union": 12788575
+            }
+          },
+          "delta_native": 0.00030510929785065866,
+          "delta_y0": 0.004353472523443536
+        }
+      }
+    },
+    {
+      "checkpoint": "e5_noadd_s2",
+      "selected_on": "Val-rep",
+      "optimistic": true,
+      "thresholds": {
+        "Urban": 0.55,
+        "Rural": 0.5
+      },
+      "K": 1,
+      "groups": {
+        "Urban": {
+          "counts": {
+            "valid": 340787183,
+            "intersection": 22310981,
+            "union": 33218232,
+            "predicted_skeleton": 657848,
+            "true_skeleton": 536072,
+            "skeleton_precision_hits": 481667,
+            "skeleton_recall_hits": 374126,
+            "boundary_intersection": 562742,
+            "boundary_union": 6811735
+          },
+          "scores": {
+            "road_iou": 0.6716486596878485,
+            "cldice": 0.7146332524318104,
+            "boundary_iou": 0.08261360725277775,
+            "skeleton_precision": 0.7321858544831025,
+            "skeleton_recall": 0.6979025205569401,
+            "quality": 0.566737027024023,
+            "counts": {
+              "valid": 340787183,
+              "intersection": 22310981,
+              "union": 33218232,
+              "predicted_skeleton": 657848,
+              "true_skeleton": 536072,
+              "skeleton_precision_hits": 481667,
+              "skeleton_recall_hits": 374126,
+              "boundary_intersection": 562742,
+              "boundary_union": 6811735
+            }
+          },
+          "delta_native": 0.000938372681105637,
+          "delta_y0": 0.00012956396955066118
+        },
+        "Rural": {
+          "counts": {
+            "valid": 512411151,
+            "intersection": 8466213,
+            "union": 16503940,
+            "predicted_skeleton": 387340,
+            "true_skeleton": 521605,
+            "skeleton_precision_hits": 298106,
+            "skeleton_recall_hits": 274119,
+            "boundary_intersection": 567933,
+            "boundary_union": 5928176
+          },
+          "scores": {
+            "road_iou": 0.5129813244594927,
+            "cldice": 0.6245749095754238,
+            "boundary_iou": 0.09580231761000348,
+            "skeleton_precision": 0.7696235865131409,
+            "skeleton_recall": 0.5255298549668811,
+            "quality": 0.4630235986243742,
+            "counts": {
+              "valid": 512411151,
+              "intersection": 8466213,
+              "union": 16503940,
+              "predicted_skeleton": 387340,
+              "true_skeleton": 521605,
+              "skeleton_precision_hits": 298106,
+              "skeleton_recall_hits": 274119,
+              "boundary_intersection": 567933,
+              "boundary_union": 5928176
+            }
+          },
+          "delta_native": 0.0,
+          "delta_y0": 0.00842048381626398
+        },
+        "Overall": {
+          "counts": {
+            "valid": 853198334,
+            "intersection": 30777194,
+            "union": 49722172,
+            "predicted_skeleton": 1045188,
+            "true_skeleton": 1057677,
+            "skeleton_precision_hits": 779773,
+            "skeleton_recall_hits": 648245,
+            "boundary_intersection": 1130675,
+            "boundary_union": 12739911
+          },
+          "scores": {
+            "road_iou": 0.6189832978334092,
+            "cldice": 0.6729530790948792,
+            "boundary_iou": 0.0887506200004066,
+            "skeleton_precision": 0.7460600389594982,
+            "skeleton_recall": 0.6128950520811174,
+            "quality": 0.5291276966452497,
+            "counts": {
+              "valid": 853198334,
+              "intersection": 30777194,
+              "union": 49722172,
+              "predicted_skeleton": 1045188,
+              "true_skeleton": 1057677,
+              "skeleton_precision_hits": 779773,
+              "skeleton_recall_hits": 648245,
+              "boundary_intersection": 1130675,
+              "boundary_union": 12739911
+            }
+          },
+          "delta_native": 0.00032909286939397653,
+          "delta_y0": 0.003077625462789446
+        }
+      }
+    },
+    {
+      "checkpoint": "e5_noadd_s2",
+      "selected_on": "Val-rep",
+      "optimistic": true,
+      "thresholds": {
+        "Urban": 0.55,
+        "Rural": 0.5
+      },
+      "K": 4,
+      "groups": {
+        "Urban": {
+          "counts": {
+            "valid": 340787183,
+            "intersection": 22289445,
+            "union": 33190793,
+            "predicted_skeleton": 671685,
+            "true_skeleton": 536072,
+            "skeleton_precision_hits": 491244,
+            "skeleton_recall_hits": 375174,
+            "boundary_intersection": 567457,
+            "boundary_union": 6851875
+          },
+          "scores": {
+            "road_iou": 0.6715550604651115,
+            "cldice": 0.7152623664346625,
+            "boundary_iou": 0.08281776885888899,
+            "skeleton_precision": 0.7313606824627615,
+            "skeleton_recall": 0.6998574818307989,
+            "quality": 0.5669197939347322,
+            "counts": {
+              "valid": 340787183,
+              "intersection": 22289445,
+              "union": 33190793,
+              "predicted_skeleton": 671685,
+              "true_skeleton": 536072,
+              "skeleton_precision_hits": 491244,
+              "skeleton_recall_hits": 375174,
+              "boundary_intersection": 567457,
+              "boundary_union": 6851875
+            }
+          },
+          "delta_native": 0.001267147919822964,
+          "delta_y0": 0.0003123308802599478
+        },
+        "Rural": {
+          "counts": {
+            "valid": 512411151,
+            "intersection": 8548343,
+            "union": 16558750,
+            "predicted_skeleton": 399959,
+            "true_skeleton": 521605,
+            "skeleton_precision_hits": 306122,
+            "skeleton_recall_hits": 279456,
+            "boundary_intersection": 585089,
+            "boundary_union": 5980734
+          },
+          "scores": {
+            "road_iou": 0.5162432550766212,
+            "cldice": 0.6303111603891873,
+            "boundary_iou": 0.09782896213073512,
+            "skeleton_precision": 0.7653834518038098,
+            "skeleton_recall": 0.5357617354128124,
+            "quality": 0.46678076808121377,
+            "counts": {
+              "valid": 512411151,
+              "intersection": 8548343,
+              "union": 16558750,
+              "predicted_skeleton": 399959,
+              "true_skeleton": 521605,
+              "skeleton_precision_hits": 306122,
+              "skeleton_recall_hits": 279456,
+              "boundary_intersection": 585089,
+              "boundary_union": 5980734
+            }
+          },
+          "delta_native": 0.0,
+          "delta_y0": 0.01217765327310355
+        },
+        "Overall": {
+          "counts": {
+            "valid": 853198334,
+            "intersection": 30837788,
+            "union": 49749543,
+            "predicted_skeleton": 1071644,
+            "true_skeleton": 1057677,
+            "skeleton_precision_hits": 797366,
+            "skeleton_recall_hits": 654630,
+            "boundary_intersection": 1152546,
+            "boundary_union": 12832609
+          },
+          "scores": {
+            "road_iou": 0.6198607291729293,
+            "cldice": 0.675751748399746,
+            "boundary_iou": 0.08981384845435562,
+            "skeleton_precision": 0.7440586612718403,
+            "skeleton_recall": 0.6189318667230166,
+            "quality": 0.5306186587972596,
+            "counts": {
+              "valid": 853198334,
+              "intersection": 30837788,
+              "union": 49749543,
+              "predicted_skeleton": 1071644,
+              "true_skeleton": 1057677,
+              "skeleton_precision_hits": 797366,
+              "skeleton_recall_hits": 654630,
+              "boundary_intersection": 1152546,
+              "boundary_union": 12832609
+            }
+          },
+          "delta_native": 0.0005202243892064029,
+          "delta_y0": 0.00456858761479928
+        }
+      }
+    }
+  ],
+  "equal_threshold_regression": true
+}
