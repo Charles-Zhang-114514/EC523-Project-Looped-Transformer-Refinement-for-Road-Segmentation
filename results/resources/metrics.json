@@ -1,0 +1,1204 @@
+{
+  "parameters": [
+    {
+      "experiment": "e0_v2",
+      "values": {
+        "core": 789760,
+        "feature_projection": 262400,
+        "answer_projection": 65792,
+        "initializer": 65792,
+        "output_head": 9281,
+        "trainable_total": 1193025
+      },
+      "source": "runs/logs/ec523-e0-s0.o8339750:4",
+      "json_source": "results/exp/e0_v2_s0/metrics.json: parameters"
+    },
+    {
+      "experiment": "e1_reset",
+      "values": {
+        "core": 789760,
+        "feature_projection": 262400,
+        "answer_projection": 65792,
+        "initializer": 65792,
+        "output_head": 9281,
+        "trainable_total": 1193025
+      },
+      "source": "runs/logs/ec523-e1-s0.o8339753:4",
+      "json_source": "results/exp/e1_reset_s0/metrics.json: parameters"
+    },
+    {
+      "experiment": "e2_nofb",
+      "values": {
+        "core": 789760,
+        "feature_projection": 262400,
+        "answer_projection": 65792,
+        "initializer": 65792,
+        "output_head": 9281,
+        "trainable_total": 1193025
+      },
+      "source": "runs/logs/ec523-e2-s0.o8339754:4",
+      "json_source": "results/exp/e2_nofb_s0/metrics.json: parameters"
+    },
+    {
+      "experiment": "e3_single",
+      "values": {
+        "core": 789760,
+        "feature_projection": 262400,
+        "answer_projection": 65792,
+        "initializer": 65792,
+        "output_head": 9281,
+        "trainable_total": 1193025
+      },
+      "source": "runs/logs/ec523-e3-s0.o8339755:4",
+      "json_source": "results/exp/e3_single_s0/metrics.json: parameters"
+    },
+    {
+      "experiment": "e4_untied",
+      "values": {
+        "core": 3159040,
+        "feature_projection": 262400,
+        "answer_projection": 65792,
+        "initializer": 65792,
+        "output_head": 9281,
+        "trainable_total": 3562305
+      },
+      "source": "runs/logs/ec523-e4-s0.o8432874:4",
+      "json_source": "results/exp/e4_untied_s0/metrics.json: parameters"
+    },
+    {
+      "experiment": "e5_noadd",
+      "values": {
+        "core": 789760,
+        "feature_projection": 262400,
+        "answer_projection": 65792,
+        "initializer": 65792,
+        "output_head": 9281,
+        "trainable_total": 1193025
+      },
+      "source": "runs/logs/ec523-e5-s0.o8451634:4",
+      "json_source": "results/exp/e5_noadd_s0/metrics.json: parameters"
+    }
+  ],
+  "training": [
+    {
+      "run": "e0_v2_s0",
+      "experiment": "e0_v2",
+      "seed": 0,
+      "rerun": false,
+      "job": "8339750",
+      "gpu": "NVIDIA L40S",
+      "train_seconds": 2152.1214886379894,
+      "peak_train_cuda_bytes": 6625817088,
+      "job_seconds": 2616.0,
+      "allocated_gpu_hours": 0.7266666666666667,
+      "train_gpu_hours": 0.5978115246216638,
+      "sources": {
+        "gpu": "runs/logs/ec523-e0-s0.o8339750:1",
+        "epochs": [
+          "runs/logs/ec523-e0-s0.o8339750:636",
+          "runs/logs/ec523-e0-s0.o8339750:1269",
+          "runs/logs/ec523-e0-s0.o8339750:1902",
+          "runs/logs/ec523-e0-s0.o8339750:2535",
+          "runs/logs/ec523-e0-s0.o8339750:3168",
+          "runs/logs/ec523-e0-s0.o8339750:3801",
+          "runs/logs/ec523-e0-s0.o8339750:4434",
+          "runs/logs/ec523-e0-s0.o8339750:5067",
+          "runs/logs/ec523-e0-s0.o8339750:5700",
+          "runs/logs/ec523-e0-s0.o8339750:6333"
+        ],
+        "json": "results/exp/e0_v2_s0/metrics.json: epochs[*].seconds / peak_cuda_bytes",
+        "job": "SGE accounting:19348535 job=8339750 fields wallclock/exit_status/failed"
+      },
+      "exit_status": 0,
+      "failed": 0
+    },
+    {
+      "run": "e0_v2_s1",
+      "experiment": "e0_v2",
+      "seed": 1,
+      "rerun": false,
+      "job": "8339751",
+      "gpu": "NVIDIA L40S",
+      "train_seconds": 2109.297856678022,
+      "peak_train_cuda_bytes": 6625817088,
+      "job_seconds": 2602.0,
+      "allocated_gpu_hours": 0.7227777777777777,
+      "train_gpu_hours": 0.5859160712994506,
+      "sources": {
+        "gpu": "runs/logs/ec523-e0-s1.o8339751:1",
+        "epochs": [
+          "runs/logs/ec523-e0-s1.o8339751:636",
+          "runs/logs/ec523-e0-s1.o8339751:1269",
+          "runs/logs/ec523-e0-s1.o8339751:1902",
+          "runs/logs/ec523-e0-s1.o8339751:2535",
+          "runs/logs/ec523-e0-s1.o8339751:3168",
+          "runs/logs/ec523-e0-s1.o8339751:3801",
+          "runs/logs/ec523-e0-s1.o8339751:4434",
+          "runs/logs/ec523-e0-s1.o8339751:5067",
+          "runs/logs/ec523-e0-s1.o8339751:5700",
+          "runs/logs/ec523-e0-s1.o8339751:6333"
+        ],
+        "json": "results/exp/e0_v2_s1/metrics.json: epochs[*].seconds / peak_cuda_bytes",
+        "job": "SGE accounting:19348518 job=8339751 fields wallclock/exit_status/failed"
+      },
+      "exit_status": 0,
+      "failed": 0
+    },
+    {
+      "run": "e0_v2_s2",
+      "experiment": "e0_v2",
+      "seed": 2,
+      "rerun": false,
+      "job": "8339752",
+      "gpu": "NVIDIA A40",
+      "train_seconds": 3754.6159853551653,
+      "peak_train_cuda_bytes": 6861562880,
+      "job_seconds": 4401.0,
+      "allocated_gpu_hours": 1.2225,
+      "train_gpu_hours": 1.0429488848208792,
+      "sources": {
+        "gpu": "runs/logs/ec523-e0-s2.o8339752:1",
+        "epochs": [
+          "runs/logs/ec523-e0-s2.o8339752:636",
+          "runs/logs/ec523-e0-s2.o8339752:1269",
+          "runs/logs/ec523-e0-s2.o8339752:1902",
+          "runs/logs/ec523-e0-s2.o8339752:2535",
+          "runs/logs/ec523-e0-s2.o8339752:3168",
+          "runs/logs/ec523-e0-s2.o8339752:3801",
+          "runs/logs/ec523-e0-s2.o8339752:4434",
+          "runs/logs/ec523-e0-s2.o8339752:5067",
+          "runs/logs/ec523-e0-s2.o8339752:5700",
+          "runs/logs/ec523-e0-s2.o8339752:6333"
+        ],
+        "json": "results/exp/e0_v2_s2/metrics.json: epochs[*].seconds / peak_cuda_bytes",
+        "job": "SGE accounting:19350058 job=8339752 fields wallclock/exit_status/failed"
+      },
+      "exit_status": 0,
+      "failed": 0
+    },
+    {
+      "run": "e0_v2_s0_rerun",
+      "experiment": "e0_v2",
+      "seed": "0_rerun",
+      "rerun": true,
+      "job": "8451637",
+      "gpu": "NVIDIA L40S",
+      "train_seconds": 2081.7228955730243,
+      "peak_train_cuda_bytes": 6625817088,
+      "job_seconds": 2487.0,
+      "allocated_gpu_hours": 0.6908333333333333,
+      "train_gpu_hours": 0.5782563598813957,
+      "sources": {
+        "gpu": "runs/logs/ec523-e0-s0-rerun.o8451637:1",
+        "epochs": [
+          "runs/logs/ec523-e0-s0-rerun.o8451637:636",
+          "runs/logs/ec523-e0-s0-rerun.o8451637:1269",
+          "runs/logs/ec523-e0-s0-rerun.o8451637:1902",
+          "runs/logs/ec523-e0-s0-rerun.o8451637:2535",
+          "runs/logs/ec523-e0-s0-rerun.o8451637:3168",
+          "runs/logs/ec523-e0-s0-rerun.o8451637:3801",
+          "runs/logs/ec523-e0-s0-rerun.o8451637:4434",
+          "runs/logs/ec523-e0-s0-rerun.o8451637:5067",
+          "runs/logs/ec523-e0-s0-rerun.o8451637:5700",
+          "runs/logs/ec523-e0-s0-rerun.o8451637:6333"
+        ],
+        "json": "results/exp/e0_v2_s0_rerun/metrics.json: epochs[*].seconds / peak_cuda_bytes",
+        "job": "SGE accounting:19874023 job=8451637 fields wallclock/exit_status/failed"
+      },
+      "exit_status": 0,
+      "failed": 0
+    },
+    {
+      "run": "e1_reset_s0",
+      "experiment": "e1_reset",
+      "seed": 0,
+      "rerun": false,
+      "job": "8339753",
+      "gpu": "NVIDIA L40S",
+      "train_seconds": 2139.979898028134,
+      "peak_train_cuda_bytes": 6625817088,
+      "job_seconds": 2629.0,
+      "allocated_gpu_hours": 0.7302777777777778,
+      "train_gpu_hours": 0.5944388605633705,
+      "sources": {
+        "gpu": "runs/logs/ec523-e1-s0.o8339753:1",
+        "epochs": [
+          "runs/logs/ec523-e1-s0.o8339753:636",
+          "runs/logs/ec523-e1-s0.o8339753:1269",
+          "runs/logs/ec523-e1-s0.o8339753:1902",
+          "runs/logs/ec523-e1-s0.o8339753:2535",
+          "runs/logs/ec523-e1-s0.o8339753:3168",
+          "runs/logs/ec523-e1-s0.o8339753:3801",
+          "runs/logs/ec523-e1-s0.o8339753:4434",
+          "runs/logs/ec523-e1-s0.o8339753:5067",
+          "runs/logs/ec523-e1-s0.o8339753:5700",
+          "runs/logs/ec523-e1-s0.o8339753:6333"
+        ],
+        "json": "results/exp/e1_reset_s0/metrics.json: epochs[*].seconds / peak_cuda_bytes",
+        "job": "SGE accounting:19348548 job=8339753 fields wallclock/exit_status/failed"
+      },
+      "exit_status": 0,
+      "failed": 0
+    },
+    {
+      "run": "e1_reset_s1",
+      "experiment": "e1_reset",
+      "seed": 1,
+      "rerun": false,
+      "job": "8346482",
+      "gpu": "NVIDIA A40",
+      "train_seconds": 3717.744783304981,
+      "peak_train_cuda_bytes": 6861562880,
+      "job_seconds": 4383.0,
+      "allocated_gpu_hours": 1.2175,
+      "train_gpu_hours": 1.0327068842513836,
+      "sources": {
+        "gpu": "runs/logs/ec523-e1-s1.o8346482:1",
+        "epochs": [
+          "runs/logs/ec523-e1-s1.o8346482:636",
+          "runs/logs/ec523-e1-s1.o8346482:1269",
+          "runs/logs/ec523-e1-s1.o8346482:1902",
+          "runs/logs/ec523-e1-s1.o8346482:2535",
+          "runs/logs/ec523-e1-s1.o8346482:3168",
+          "runs/logs/ec523-e1-s1.o8346482:3801",
+          "runs/logs/ec523-e1-s1.o8346482:4434",
+          "runs/logs/ec523-e1-s1.o8346482:5067",
+          "runs/logs/ec523-e1-s1.o8346482:5700",
+          "runs/logs/ec523-e1-s1.o8346482:6333"
+        ],
+        "json": "results/exp/e1_reset_s1/metrics.json: epochs[*].seconds / peak_cuda_bytes",
+        "job": "SGE accounting:19386026 job=8346482 fields wallclock/exit_status/failed"
+      },
+      "exit_status": 0,
+      "failed": 0
+    },
+    {
+      "run": "e1_reset_s2",
+      "experiment": "e1_reset",
+      "seed": 2,
+      "rerun": false,
+      "job": "8346485",
+      "gpu": "NVIDIA L40S",
+      "train_seconds": 2111.8634097558097,
+      "peak_train_cuda_bytes": 6625817088,
+      "job_seconds": 2644.0,
+      "allocated_gpu_hours": 0.7344444444444445,
+      "train_gpu_hours": 0.5866287249321693,
+      "sources": {
+        "gpu": "runs/logs/ec523-e1-s2.o8346485:1",
+        "epochs": [
+          "runs/logs/ec523-e1-s2.o8346485:636",
+          "runs/logs/ec523-e1-s2.o8346485:1269",
+          "runs/logs/ec523-e1-s2.o8346485:1902",
+          "runs/logs/ec523-e1-s2.o8346485:2535",
+          "runs/logs/ec523-e1-s2.o8346485:3168",
+          "runs/logs/ec523-e1-s2.o8346485:3801",
+          "runs/logs/ec523-e1-s2.o8346485:4434",
+          "runs/logs/ec523-e1-s2.o8346485:5067",
+          "runs/logs/ec523-e1-s2.o8346485:5700",
+          "runs/logs/ec523-e1-s2.o8346485:6333"
+        ],
+        "json": "results/exp/e1_reset_s2/metrics.json: epochs[*].seconds / peak_cuda_bytes",
+        "job": "SGE accounting:19383175 job=8346485 fields wallclock/exit_status/failed"
+      },
+      "exit_status": 0,
+      "failed": 0
+    },
+    {
+      "run": "e2_nofb_s0",
+      "experiment": "e2_nofb",
+      "seed": 0,
+      "rerun": false,
+      "job": "8339754",
+      "gpu": "NVIDIA L40S",
+      "train_seconds": 2070.2334271859145,
+      "peak_train_cuda_bytes": 6508376576,
+      "job_seconds": 2544.0,
+      "allocated_gpu_hours": 0.7066666666666667,
+      "train_gpu_hours": 0.5750648408849762,
+      "sources": {
+        "gpu": "runs/logs/ec523-e2-s0.o8339754:1",
+        "epochs": [
+          "runs/logs/ec523-e2-s0.o8339754:636",
+          "runs/logs/ec523-e2-s0.o8339754:1269",
+          "runs/logs/ec523-e2-s0.o8339754:1902",
+          "runs/logs/ec523-e2-s0.o8339754:2535",
+          "runs/logs/ec523-e2-s0.o8339754:3168",
+          "runs/logs/ec523-e2-s0.o8339754:3801",
+          "runs/logs/ec523-e2-s0.o8339754:4434",
+          "runs/logs/ec523-e2-s0.o8339754:5067",
+          "runs/logs/ec523-e2-s0.o8339754:5700",
+          "runs/logs/ec523-e2-s0.o8339754:6333"
+        ],
+        "json": "results/exp/e2_nofb_s0/metrics.json: epochs[*].seconds / peak_cuda_bytes",
+        "job": "SGE accounting:19349210 job=8339754 fields wallclock/exit_status/failed"
+      },
+      "exit_status": 0,
+      "failed": 0
+    },
+    {
+      "run": "e2_nofb_s1",
+      "experiment": "e2_nofb",
+      "seed": 1,
+      "rerun": false,
+      "job": "8346483",
+      "gpu": "NVIDIA A40",
+      "train_seconds": 3702.883633289952,
+      "peak_train_cuda_bytes": 6744122368,
+      "job_seconds": 4373.0,
+      "allocated_gpu_hours": 1.2147222222222223,
+      "train_gpu_hours": 1.0285787870249867,
+      "sources": {
+        "gpu": "runs/logs/ec523-e2-s1.o8346483:1",
+        "epochs": [
+          "runs/logs/ec523-e2-s1.o8346483:636",
+          "runs/logs/ec523-e2-s1.o8346483:1269",
+          "runs/logs/ec523-e2-s1.o8346483:1902",
+          "runs/logs/ec523-e2-s1.o8346483:2535",
+          "runs/logs/ec523-e2-s1.o8346483:3168",
+          "runs/logs/ec523-e2-s1.o8346483:3801",
+          "runs/logs/ec523-e2-s1.o8346483:4434",
+          "runs/logs/ec523-e2-s1.o8346483:5067",
+          "runs/logs/ec523-e2-s1.o8346483:5700",
+          "runs/logs/ec523-e2-s1.o8346483:6333"
+        ],
+        "json": "results/exp/e2_nofb_s1/metrics.json: epochs[*].seconds / peak_cuda_bytes",
+        "job": "SGE accounting:19386001 job=8346483 fields wallclock/exit_status/failed"
+      },
+      "exit_status": 0,
+      "failed": 0
+    },
+    {
+      "run": "e2_nofb_s2",
+      "experiment": "e2_nofb",
+      "seed": 2,
+      "rerun": false,
+      "job": "8346486",
+      "gpu": "NVIDIA A100 80GB PCIe",
+      "train_seconds": 2030.8927444599103,
+      "peak_train_cuda_bytes": 6745893376,
+      "job_seconds": 2605.0,
+      "allocated_gpu_hours": 0.7236111111111111,
+      "train_gpu_hours": 0.5641368734610862,
+      "sources": {
+        "gpu": "runs/logs/ec523-e2-s2.o8346486:1",
+        "epochs": [
+          "runs/logs/ec523-e2-s2.o8346486:636",
+          "runs/logs/ec523-e2-s2.o8346486:1269",
+          "runs/logs/ec523-e2-s2.o8346486:1902",
+          "runs/logs/ec523-e2-s2.o8346486:2535",
+          "runs/logs/ec523-e2-s2.o8346486:3168",
+          "runs/logs/ec523-e2-s2.o8346486:3801",
+          "runs/logs/ec523-e2-s2.o8346486:4434",
+          "runs/logs/ec523-e2-s2.o8346486:5067",
+          "runs/logs/ec523-e2-s2.o8346486:5700",
+          "runs/logs/ec523-e2-s2.o8346486:6333"
+        ],
+        "json": "results/exp/e2_nofb_s2/metrics.json: epochs[*].seconds / peak_cuda_bytes",
+        "job": "SGE accounting:19385824 job=8346486 fields wallclock/exit_status/failed"
+      },
+      "exit_status": 0,
+      "failed": 0
+    },
+    {
+      "run": "e3_single_s0",
+      "experiment": "e3_single",
+      "seed": 0,
+      "rerun": false,
+      "job": "8339755",
+      "gpu": "NVIDIA A100 80GB PCIe",
+      "train_seconds": 1341.0272584529012,
+      "peak_train_cuda_bytes": 3236701184,
+      "job_seconds": 1863.0,
+      "allocated_gpu_hours": 0.5175,
+      "train_gpu_hours": 0.37250757179247257,
+      "sources": {
+        "gpu": "runs/logs/ec523-e3-s0.o8339755:1",
+        "epochs": [
+          "runs/logs/ec523-e3-s0.o8339755:636",
+          "runs/logs/ec523-e3-s0.o8339755:1269",
+          "runs/logs/ec523-e3-s0.o8339755:1902",
+          "runs/logs/ec523-e3-s0.o8339755:2535",
+          "runs/logs/ec523-e3-s0.o8339755:3168",
+          "runs/logs/ec523-e3-s0.o8339755:3801",
+          "runs/logs/ec523-e3-s0.o8339755:4434",
+          "runs/logs/ec523-e3-s0.o8339755:5067",
+          "runs/logs/ec523-e3-s0.o8339755:5700",
+          "runs/logs/ec523-e3-s0.o8339755:6333"
+        ],
+        "json": "results/exp/e3_single_s0/metrics.json: epochs[*].seconds / peak_cuda_bytes",
+        "job": "SGE accounting:19349810 job=8339755 fields wallclock/exit_status/failed"
+      },
+      "exit_status": 0,
+      "failed": 0
+    },
+    {
+      "run": "e3_single_s1",
+      "experiment": "e3_single",
+      "seed": 1,
+      "rerun": false,
+      "job": "8346484",
+      "gpu": "NVIDIA A40",
+      "train_seconds": 2404.579315405921,
+      "peak_train_cuda_bytes": 3234930176,
+      "job_seconds": 2951.0,
+      "allocated_gpu_hours": 0.8197222222222222,
+      "train_gpu_hours": 0.667938698723867,
+      "sources": {
+        "gpu": "runs/logs/ec523-e3-s1.o8346484:1",
+        "epochs": [
+          "runs/logs/ec523-e3-s1.o8346484:636",
+          "runs/logs/ec523-e3-s1.o8346484:1269",
+          "runs/logs/ec523-e3-s1.o8346484:1902",
+          "runs/logs/ec523-e3-s1.o8346484:2535",
+          "runs/logs/ec523-e3-s1.o8346484:3168",
+          "runs/logs/ec523-e3-s1.o8346484:3801",
+          "runs/logs/ec523-e3-s1.o8346484:4434",
+          "runs/logs/ec523-e3-s1.o8346484:5067",
+          "runs/logs/ec523-e3-s1.o8346484:5700",
+          "runs/logs/ec523-e3-s1.o8346484:6333"
+        ],
+        "json": "results/exp/e3_single_s1/metrics.json: epochs[*].seconds / peak_cuda_bytes",
+        "job": "SGE accounting:19383889 job=8346484 fields wallclock/exit_status/failed"
+      },
+      "exit_status": 0,
+      "failed": 0
+    },
+    {
+      "run": "e3_single_s2",
+      "experiment": "e3_single",
+      "seed": 2,
+      "rerun": false,
+      "job": "8346487",
+      "gpu": "NVIDIA L40S",
+      "train_seconds": 1408.068239305925,
+      "peak_train_cuda_bytes": 2999184384,
+      "job_seconds": 1787.0,
+      "allocated_gpu_hours": 0.4963888888888889,
+      "train_gpu_hours": 0.39113006647386805,
+      "sources": {
+        "gpu": "runs/logs/ec523-e3-s2.o8346487:1",
+        "epochs": [
+          "runs/logs/ec523-e3-s2.o8346487:636",
+          "runs/logs/ec523-e3-s2.o8346487:1269",
+          "runs/logs/ec523-e3-s2.o8346487:1902",
+          "runs/logs/ec523-e3-s2.o8346487:2535",
+          "runs/logs/ec523-e3-s2.o8346487:3168",
+          "runs/logs/ec523-e3-s2.o8346487:3801",
+          "runs/logs/ec523-e3-s2.o8346487:4434",
+          "runs/logs/ec523-e3-s2.o8346487:5067",
+          "runs/logs/ec523-e3-s2.o8346487:5700",
+          "runs/logs/ec523-e3-s2.o8346487:6333"
+        ],
+        "json": "results/exp/e3_single_s2/metrics.json: epochs[*].seconds / peak_cuda_bytes",
+        "job": "SGE accounting:19386850 job=8346487 fields wallclock/exit_status/failed"
+      },
+      "exit_status": 0,
+      "failed": 0
+    },
+    {
+      "run": "e4_untied_s0",
+      "experiment": "e4_untied",
+      "seed": 0,
+      "rerun": false,
+      "job": "8432874",
+      "gpu": "NVIDIA A100 80GB PCIe",
+      "train_seconds": 2104.9461265390273,
+      "peak_train_cuda_bytes": 6891765248,
+      "job_seconds": 2899.0,
+      "allocated_gpu_hours": 0.8052777777777778,
+      "train_gpu_hours": 0.5847072573719521,
+      "sources": {
+        "gpu": "runs/logs/ec523-e4-s0.o8432874:1",
+        "epochs": [
+          "runs/logs/ec523-e4-s0.o8432874:636",
+          "runs/logs/ec523-e4-s0.o8432874:1269",
+          "runs/logs/ec523-e4-s0.o8432874:1902",
+          "runs/logs/ec523-e4-s0.o8432874:2535",
+          "runs/logs/ec523-e4-s0.o8432874:3168",
+          "runs/logs/ec523-e4-s0.o8432874:3801",
+          "runs/logs/ec523-e4-s0.o8432874:4434",
+          "runs/logs/ec523-e4-s0.o8432874:5067",
+          "runs/logs/ec523-e4-s0.o8432874:5700",
+          "runs/logs/ec523-e4-s0.o8432874:6333"
+        ],
+        "json": "results/exp/e4_untied_s0/metrics.json: epochs[*].seconds / peak_cuda_bytes",
+        "job": "SGE accounting:19829864 job=8432874 fields wallclock/exit_status/failed"
+      },
+      "exit_status": 0,
+      "failed": 0
+    },
+    {
+      "run": "e4_untied_s1",
+      "experiment": "e4_untied",
+      "seed": 1,
+      "rerun": false,
+      "job": "8432875",
+      "gpu": "NVIDIA L40S",
+      "train_seconds": 2106.142730189138,
+      "peak_train_cuda_bytes": 6654248448,
+      "job_seconds": 2560.0,
+      "allocated_gpu_hours": 0.7111111111111111,
+      "train_gpu_hours": 0.5850396472747605,
+      "sources": {
+        "gpu": "runs/logs/ec523-e4-s1.o8432875:1",
+        "epochs": [
+          "runs/logs/ec523-e4-s1.o8432875:636",
+          "runs/logs/ec523-e4-s1.o8432875:1269",
+          "runs/logs/ec523-e4-s1.o8432875:1902",
+          "runs/logs/ec523-e4-s1.o8432875:2535",
+          "runs/logs/ec523-e4-s1.o8432875:3168",
+          "runs/logs/ec523-e4-s1.o8432875:3801",
+          "runs/logs/ec523-e4-s1.o8432875:4434",
+          "runs/logs/ec523-e4-s1.o8432875:5067",
+          "runs/logs/ec523-e4-s1.o8432875:5700",
+          "runs/logs/ec523-e4-s1.o8432875:6333"
+        ],
+        "json": "results/exp/e4_untied_s1/metrics.json: epochs[*].seconds / peak_cuda_bytes",
+        "job": "SGE accounting:19829651 job=8432875 fields wallclock/exit_status/failed"
+      },
+      "exit_status": 0,
+      "failed": 0
+    },
+    {
+      "run": "e4_untied_s2",
+      "experiment": "e4_untied",
+      "seed": 2,
+      "rerun": false,
+      "job": "8432876",
+      "gpu": "NVIDIA A40",
+      "train_seconds": 3755.7521329870506,
+      "peak_train_cuda_bytes": 6889994240,
+      "job_seconds": 4264.0,
+      "allocated_gpu_hours": 1.1844444444444444,
+      "train_gpu_hours": 1.0432644813852918,
+      "sources": {
+        "gpu": "runs/logs/ec523-e4-s2.o8432876:1",
+        "epochs": [
+          "runs/logs/ec523-e4-s2.o8432876:636",
+          "runs/logs/ec523-e4-s2.o8432876:1269",
+          "runs/logs/ec523-e4-s2.o8432876:1902",
+          "runs/logs/ec523-e4-s2.o8432876:2535",
+          "runs/logs/ec523-e4-s2.o8432876:3168",
+          "runs/logs/ec523-e4-s2.o8432876:3801",
+          "runs/logs/ec523-e4-s2.o8432876:4434",
+          "runs/logs/ec523-e4-s2.o8432876:5067",
+          "runs/logs/ec523-e4-s2.o8432876:5700",
+          "runs/logs/ec523-e4-s2.o8432876:6333"
+        ],
+        "json": "results/exp/e4_untied_s2/metrics.json: epochs[*].seconds / peak_cuda_bytes",
+        "job": "SGE accounting:19831523 job=8432876 fields wallclock/exit_status/failed"
+      },
+      "exit_status": 0,
+      "failed": 0
+    },
+    {
+      "run": "e5_noadd_s0",
+      "experiment": "e5_noadd",
+      "seed": 0,
+      "rerun": false,
+      "job": "8451634",
+      "gpu": "NVIDIA A40",
+      "train_seconds": 3745.6138116749935,
+      "peak_train_cuda_bytes": 6861565952,
+      "job_seconds": 4379.0,
+      "allocated_gpu_hours": 1.216388888888889,
+      "train_gpu_hours": 1.0404482810208315,
+      "sources": {
+        "gpu": "runs/logs/ec523-e5-s0.o8451634:1",
+        "epochs": [
+          "runs/logs/ec523-e5-s0.o8451634:636",
+          "runs/logs/ec523-e5-s0.o8451634:1269",
+          "runs/logs/ec523-e5-s0.o8451634:1902",
+          "runs/logs/ec523-e5-s0.o8451634:2535",
+          "runs/logs/ec523-e5-s0.o8451634:3168",
+          "runs/logs/ec523-e5-s0.o8451634:3801",
+          "runs/logs/ec523-e5-s0.o8451634:4434",
+          "runs/logs/ec523-e5-s0.o8451634:5067",
+          "runs/logs/ec523-e5-s0.o8451634:5700",
+          "runs/logs/ec523-e5-s0.o8451634:6333"
+        ],
+        "json": "results/exp/e5_noadd_s0/metrics.json: epochs[*].seconds / peak_cuda_bytes",
+        "job": "SGE accounting:19873769 job=8451634 fields wallclock/exit_status/failed"
+      },
+      "exit_status": 0,
+      "failed": 0
+    },
+    {
+      "run": "e5_noadd_s1",
+      "experiment": "e5_noadd",
+      "seed": 1,
+      "rerun": false,
+      "job": "8451635",
+      "gpu": "NVIDIA L40S",
+      "train_seconds": 2090.5415637749975,
+      "peak_train_cuda_bytes": 6625820160,
+      "job_seconds": 2553.0,
+      "allocated_gpu_hours": 0.7091666666666666,
+      "train_gpu_hours": 0.5807059899374993,
+      "sources": {
+        "gpu": "runs/logs/ec523-e5-s1.o8451635:1",
+        "epochs": [
+          "runs/logs/ec523-e5-s1.o8451635:636",
+          "runs/logs/ec523-e5-s1.o8451635:1269",
+          "runs/logs/ec523-e5-s1.o8451635:1902",
+          "runs/logs/ec523-e5-s1.o8451635:2535",
+          "runs/logs/ec523-e5-s1.o8451635:3168",
+          "runs/logs/ec523-e5-s1.o8451635:3801",
+          "runs/logs/ec523-e5-s1.o8451635:4434",
+          "runs/logs/ec523-e5-s1.o8451635:5067",
+          "runs/logs/ec523-e5-s1.o8451635:5700",
+          "runs/logs/ec523-e5-s1.o8451635:6333"
+        ],
+        "json": "results/exp/e5_noadd_s1/metrics.json: epochs[*].seconds / peak_cuda_bytes",
+        "job": "SGE accounting:19872648 job=8451635 fields wallclock/exit_status/failed"
+      },
+      "exit_status": 0,
+      "failed": 0
+    },
+    {
+      "run": "e5_noadd_s2",
+      "experiment": "e5_noadd",
+      "seed": 2,
+      "rerun": false,
+      "job": "8451636",
+      "gpu": "NVIDIA A100 80GB PCIe",
+      "train_seconds": 2243.0027538049617,
+      "peak_train_cuda_bytes": 6863336960,
+      "job_seconds": 2832.0,
+      "allocated_gpu_hours": 0.7866666666666666,
+      "train_gpu_hours": 0.6230563205013783,
+      "sources": {
+        "gpu": "runs/logs/ec523-e5-s2.o8451636:1",
+        "epochs": [
+          "runs/logs/ec523-e5-s2.o8451636:636",
+          "runs/logs/ec523-e5-s2.o8451636:1269",
+          "runs/logs/ec523-e5-s2.o8451636:1902",
+          "runs/logs/ec523-e5-s2.o8451636:2535",
+          "runs/logs/ec523-e5-s2.o8451636:3168",
+          "runs/logs/ec523-e5-s2.o8451636:3801",
+          "runs/logs/ec523-e5-s2.o8451636:4434",
+          "runs/logs/ec523-e5-s2.o8451636:5067",
+          "runs/logs/ec523-e5-s2.o8451636:5700",
+          "runs/logs/ec523-e5-s2.o8451636:6333"
+        ],
+        "json": "results/exp/e5_noadd_s2/metrics.json: epochs[*].seconds / peak_cuda_bytes",
+        "job": "SGE accounting:19873100 job=8451636 fields wallclock/exit_status/failed"
+      },
+      "exit_status": 0,
+      "failed": 0
+    }
+  ],
+  "inference": [
+    {
+      "gpu": "NVIDIA A40",
+      "source": "runs/submission_check/8386872/job.log:5143; GPU job.log:1; image count none_k1_run.json:images",
+      "phase": "encoding",
+      "K": 1,
+      "images": 835,
+      "seconds_per_image": 0.14873023432049298,
+      "peak_cuda_bytes": 1400381952,
+      "measurement": "two-phase CLI phase wall time including I/O, not pure model latency"
+    },
+    {
+      "gpu": "NVIDIA A40",
+      "source": "runs/submission_check/8386872/job.log:5143; GPU job.log:1; image count none_k1_run.json:images",
+      "phase": "refinement",
+      "K": 1,
+      "images": 835,
+      "seconds_per_image": 0.04471035690373089,
+      "peak_cuda_bytes": 579493376,
+      "measurement": "two-phase CLI phase wall time including I/O, not pure model latency"
+    },
+    {
+      "gpu": "NVIDIA A40",
+      "source": "runs/submission_check/8386872/job.log:5156; GPU job.log:1; image count none_k2_run.json:images",
+      "phase": "encoding",
+      "K": 2,
+      "images": 835,
+      "seconds_per_image": 0.14356583737821213,
+      "peak_cuda_bytes": 1400381952,
+      "measurement": "two-phase CLI phase wall time including I/O, not pure model latency"
+    },
+    {
+      "gpu": "NVIDIA A40",
+      "source": "runs/submission_check/8386872/job.log:5156; GPU job.log:1; image count none_k2_run.json:images",
+      "phase": "refinement",
+      "K": 2,
+      "images": 835,
+      "seconds_per_image": 0.054117377255318275,
+      "peak_cuda_bytes": 583687680,
+      "measurement": "two-phase CLI phase wall time including I/O, not pure model latency"
+    },
+    {
+      "gpu": "NVIDIA A40",
+      "source": "runs/submission_check/8386872/job.log:5169; GPU job.log:1; image count none_k4_run.json:images",
+      "phase": "encoding",
+      "K": 4,
+      "images": 835,
+      "seconds_per_image": 0.14788486475883397,
+      "peak_cuda_bytes": 1400381952,
+      "measurement": "two-phase CLI phase wall time including I/O, not pure model latency"
+    },
+    {
+      "gpu": "NVIDIA A40",
+      "source": "runs/submission_check/8386872/job.log:5169; GPU job.log:1; image count none_k4_run.json:images",
+      "phase": "refinement",
+      "K": 4,
+      "images": 835,
+      "seconds_per_image": 0.07912591229273776,
+      "peak_cuda_bytes": 583687680,
+      "measurement": "two-phase CLI phase wall time including I/O, not pure model latency"
+    },
+    {
+      "gpu": "NVIDIA A40",
+      "source": "runs/submission_check/8386872/job.log:5182; GPU job.log:1; image count none_k8_run.json:images",
+      "phase": "encoding",
+      "K": 8,
+      "images": 835,
+      "seconds_per_image": 0.14454101059755903,
+      "peak_cuda_bytes": 1400381952,
+      "measurement": "two-phase CLI phase wall time including I/O, not pure model latency"
+    },
+    {
+      "gpu": "NVIDIA A40",
+      "source": "runs/submission_check/8386872/job.log:5182; GPU job.log:1; image count none_k8_run.json:images",
+      "phase": "refinement",
+      "K": 8,
+      "images": 835,
+      "seconds_per_image": 0.127345212218268,
+      "peak_cuda_bytes": 583687680,
+      "measurement": "two-phase CLI phase wall time including I/O, not pure model latency"
+    },
+    {
+      "gpu": "NVIDIA A40",
+      "phase": "encoding",
+      "K": null,
+      "images": 835,
+      "seconds_per_image": 0.12622711006826462,
+      "peak_cuda_bytes": 1400381952,
+      "source": "results/stress/v2/metrics.json:9691 datasets.ordinary.encoding; runs/logs/ec523-stress-eval.o8411770:1",
+      "measurement": "encoding wall time includes loading and float32 cache I/O"
+    },
+    {
+      "gpu": "NVIDIA A40",
+      "phase": "refiner",
+      "K": 1,
+      "images": 835,
+      "seconds_per_image": 0.01215647978922157,
+      "peak_cuda_bytes": 562716160,
+      "source": "results/stress/v2/metrics.json:3285 / 3291 datasets.ordinary.models.0.refiner_seconds / peak_cuda_bytes; runs/logs/ec523-stress-eval.o8411770:1",
+      "measurement": "cumulative synchronized init+steps, excludes encoder/metrics/output writing"
+    },
+    {
+      "gpu": "NVIDIA A40",
+      "phase": "refiner",
+      "K": 2,
+      "images": 835,
+      "seconds_per_image": 0.023510226356846763,
+      "peak_cuda_bytes": 566910464,
+      "source": "results/stress/v2/metrics.json:3285 / 3291 datasets.ordinary.models.0.refiner_seconds / peak_cuda_bytes; runs/logs/ec523-stress-eval.o8411770:1",
+      "measurement": "cumulative synchronized init+steps, excludes encoder/metrics/output writing"
+    },
+    {
+      "gpu": "NVIDIA A40",
+      "phase": "refiner",
+      "K": 4,
+      "images": 835,
+      "seconds_per_image": 0.046088598427614744,
+      "peak_cuda_bytes": 571104768,
+      "source": "results/stress/v2/metrics.json:3285 / 3291 datasets.ordinary.models.0.refiner_seconds / peak_cuda_bytes; runs/logs/ec523-stress-eval.o8411770:1",
+      "measurement": "cumulative synchronized init+steps, excludes encoder/metrics/output writing"
+    },
+    {
+      "gpu": "NVIDIA A40",
+      "phase": "refiner",
+      "K": 6,
+      "images": 835,
+      "seconds_per_image": null,
+      "peak_cuda_bytes": null,
+      "source": "results/stress/v2/metrics.json:3285 / 3291 datasets.ordinary.models.0.refiner_seconds / peak_cuda_bytes; runs/logs/ec523-stress-eval.o8411770:1",
+      "measurement": "cumulative synchronized init+steps, excludes encoder/metrics/output writing"
+    },
+    {
+      "gpu": "NVIDIA A40",
+      "phase": "refiner",
+      "K": 8,
+      "images": 835,
+      "seconds_per_image": 0.09108610895947165,
+      "peak_cuda_bytes": 571104768,
+      "source": "results/stress/v2/metrics.json:3285 / 3291 datasets.ordinary.models.0.refiner_seconds / peak_cuda_bytes; runs/logs/ec523-stress-eval.o8411770:1",
+      "measurement": "cumulative synchronized init+steps, excludes encoder/metrics/output writing"
+    }
+  ],
+  "gpu_hours": [
+    {
+      "experiment": "e0_v2",
+      "train_gpu_hours": 2.2266764807419936,
+      "allocated_gpu_hours": 2.6719444444444442,
+      "allocated_gpu_hours_including_rerun": 3.3627777777777776,
+      "sources": [
+        {
+          "gpu": "runs/logs/ec523-e0-s0.o8339750:1",
+          "epochs": [
+            "runs/logs/ec523-e0-s0.o8339750:636",
+            "runs/logs/ec523-e0-s0.o8339750:1269",
+            "runs/logs/ec523-e0-s0.o8339750:1902",
+            "runs/logs/ec523-e0-s0.o8339750:2535",
+            "runs/logs/ec523-e0-s0.o8339750:3168",
+            "runs/logs/ec523-e0-s0.o8339750:3801",
+            "runs/logs/ec523-e0-s0.o8339750:4434",
+            "runs/logs/ec523-e0-s0.o8339750:5067",
+            "runs/logs/ec523-e0-s0.o8339750:5700",
+            "runs/logs/ec523-e0-s0.o8339750:6333"
+          ],
+          "json": "results/exp/e0_v2_s0/metrics.json: epochs[*].seconds / peak_cuda_bytes",
+          "job": "SGE accounting:19348535 job=8339750 fields wallclock/exit_status/failed"
+        },
+        {
+          "gpu": "runs/logs/ec523-e0-s1.o8339751:1",
+          "epochs": [
+            "runs/logs/ec523-e0-s1.o8339751:636",
+            "runs/logs/ec523-e0-s1.o8339751:1269",
+            "runs/logs/ec523-e0-s1.o8339751:1902",
+            "runs/logs/ec523-e0-s1.o8339751:2535",
+            "runs/logs/ec523-e0-s1.o8339751:3168",
+            "runs/logs/ec523-e0-s1.o8339751:3801",
+            "runs/logs/ec523-e0-s1.o8339751:4434",
+            "runs/logs/ec523-e0-s1.o8339751:5067",
+            "runs/logs/ec523-e0-s1.o8339751:5700",
+            "runs/logs/ec523-e0-s1.o8339751:6333"
+          ],
+          "json": "results/exp/e0_v2_s1/metrics.json: epochs[*].seconds / peak_cuda_bytes",
+          "job": "SGE accounting:19348518 job=8339751 fields wallclock/exit_status/failed"
+        },
+        {
+          "gpu": "runs/logs/ec523-e0-s2.o8339752:1",
+          "epochs": [
+            "runs/logs/ec523-e0-s2.o8339752:636",
+            "runs/logs/ec523-e0-s2.o8339752:1269",
+            "runs/logs/ec523-e0-s2.o8339752:1902",
+            "runs/logs/ec523-e0-s2.o8339752:2535",
+            "runs/logs/ec523-e0-s2.o8339752:3168",
+            "runs/logs/ec523-e0-s2.o8339752:3801",
+            "runs/logs/ec523-e0-s2.o8339752:4434",
+            "runs/logs/ec523-e0-s2.o8339752:5067",
+            "runs/logs/ec523-e0-s2.o8339752:5700",
+            "runs/logs/ec523-e0-s2.o8339752:6333"
+          ],
+          "json": "results/exp/e0_v2_s2/metrics.json: epochs[*].seconds / peak_cuda_bytes",
+          "job": "SGE accounting:19350058 job=8339752 fields wallclock/exit_status/failed"
+        }
+      ]
+    },
+    {
+      "experiment": "e1_reset",
+      "train_gpu_hours": 2.2137744697469235,
+      "allocated_gpu_hours": 2.6822222222222223,
+      "allocated_gpu_hours_including_rerun": 2.6822222222222223,
+      "sources": [
+        {
+          "gpu": "runs/logs/ec523-e1-s0.o8339753:1",
+          "epochs": [
+            "runs/logs/ec523-e1-s0.o8339753:636",
+            "runs/logs/ec523-e1-s0.o8339753:1269",
+            "runs/logs/ec523-e1-s0.o8339753:1902",
+            "runs/logs/ec523-e1-s0.o8339753:2535",
+            "runs/logs/ec523-e1-s0.o8339753:3168",
+            "runs/logs/ec523-e1-s0.o8339753:3801",
+            "runs/logs/ec523-e1-s0.o8339753:4434",
+            "runs/logs/ec523-e1-s0.o8339753:5067",
+            "runs/logs/ec523-e1-s0.o8339753:5700",
+            "runs/logs/ec523-e1-s0.o8339753:6333"
+          ],
+          "json": "results/exp/e1_reset_s0/metrics.json: epochs[*].seconds / peak_cuda_bytes",
+          "job": "SGE accounting:19348548 job=8339753 fields wallclock/exit_status/failed"
+        },
+        {
+          "gpu": "runs/logs/ec523-e1-s1.o8346482:1",
+          "epochs": [
+            "runs/logs/ec523-e1-s1.o8346482:636",
+            "runs/logs/ec523-e1-s1.o8346482:1269",
+            "runs/logs/ec523-e1-s1.o8346482:1902",
+            "runs/logs/ec523-e1-s1.o8346482:2535",
+            "runs/logs/ec523-e1-s1.o8346482:3168",
+            "runs/logs/ec523-e1-s1.o8346482:3801",
+            "runs/logs/ec523-e1-s1.o8346482:4434",
+            "runs/logs/ec523-e1-s1.o8346482:5067",
+            "runs/logs/ec523-e1-s1.o8346482:5700",
+            "runs/logs/ec523-e1-s1.o8346482:6333"
+          ],
+          "json": "results/exp/e1_reset_s1/metrics.json: epochs[*].seconds / peak_cuda_bytes",
+          "job": "SGE accounting:19386026 job=8346482 fields wallclock/exit_status/failed"
+        },
+        {
+          "gpu": "runs/logs/ec523-e1-s2.o8346485:1",
+          "epochs": [
+            "runs/logs/ec523-e1-s2.o8346485:636",
+            "runs/logs/ec523-e1-s2.o8346485:1269",
+            "runs/logs/ec523-e1-s2.o8346485:1902",
+            "runs/logs/ec523-e1-s2.o8346485:2535",
+            "runs/logs/ec523-e1-s2.o8346485:3168",
+            "runs/logs/ec523-e1-s2.o8346485:3801",
+            "runs/logs/ec523-e1-s2.o8346485:4434",
+            "runs/logs/ec523-e1-s2.o8346485:5067",
+            "runs/logs/ec523-e1-s2.o8346485:5700",
+            "runs/logs/ec523-e1-s2.o8346485:6333"
+          ],
+          "json": "results/exp/e1_reset_s2/metrics.json: epochs[*].seconds / peak_cuda_bytes",
+          "job": "SGE accounting:19383175 job=8346485 fields wallclock/exit_status/failed"
+        }
+      ]
+    },
+    {
+      "experiment": "e2_nofb",
+      "train_gpu_hours": 2.167780501371049,
+      "allocated_gpu_hours": 2.645,
+      "allocated_gpu_hours_including_rerun": 2.645,
+      "sources": [
+        {
+          "gpu": "runs/logs/ec523-e2-s0.o8339754:1",
+          "epochs": [
+            "runs/logs/ec523-e2-s0.o8339754:636",
+            "runs/logs/ec523-e2-s0.o8339754:1269",
+            "runs/logs/ec523-e2-s0.o8339754:1902",
+            "runs/logs/ec523-e2-s0.o8339754:2535",
+            "runs/logs/ec523-e2-s0.o8339754:3168",
+            "runs/logs/ec523-e2-s0.o8339754:3801",
+            "runs/logs/ec523-e2-s0.o8339754:4434",
+            "runs/logs/ec523-e2-s0.o8339754:5067",
+            "runs/logs/ec523-e2-s0.o8339754:5700",
+            "runs/logs/ec523-e2-s0.o8339754:6333"
+          ],
+          "json": "results/exp/e2_nofb_s0/metrics.json: epochs[*].seconds / peak_cuda_bytes",
+          "job": "SGE accounting:19349210 job=8339754 fields wallclock/exit_status/failed"
+        },
+        {
+          "gpu": "runs/logs/ec523-e2-s1.o8346483:1",
+          "epochs": [
+            "runs/logs/ec523-e2-s1.o8346483:636",
+            "runs/logs/ec523-e2-s1.o8346483:1269",
+            "runs/logs/ec523-e2-s1.o8346483:1902",
+            "runs/logs/ec523-e2-s1.o8346483:2535",
+            "runs/logs/ec523-e2-s1.o8346483:3168",
+            "runs/logs/ec523-e2-s1.o8346483:3801",
+            "runs/logs/ec523-e2-s1.o8346483:4434",
+            "runs/logs/ec523-e2-s1.o8346483:5067",
+            "runs/logs/ec523-e2-s1.o8346483:5700",
+            "runs/logs/ec523-e2-s1.o8346483:6333"
+          ],
+          "json": "results/exp/e2_nofb_s1/metrics.json: epochs[*].seconds / peak_cuda_bytes",
+          "job": "SGE accounting:19386001 job=8346483 fields wallclock/exit_status/failed"
+        },
+        {
+          "gpu": "runs/logs/ec523-e2-s2.o8346486:1",
+          "epochs": [
+            "runs/logs/ec523-e2-s2.o8346486:636",
+            "runs/logs/ec523-e2-s2.o8346486:1269",
+            "runs/logs/ec523-e2-s2.o8346486:1902",
+            "runs/logs/ec523-e2-s2.o8346486:2535",
+            "runs/logs/ec523-e2-s2.o8346486:3168",
+            "runs/logs/ec523-e2-s2.o8346486:3801",
+            "runs/logs/ec523-e2-s2.o8346486:4434",
+            "runs/logs/ec523-e2-s2.o8346486:5067",
+            "runs/logs/ec523-e2-s2.o8346486:5700",
+            "runs/logs/ec523-e2-s2.o8346486:6333"
+          ],
+          "json": "results/exp/e2_nofb_s2/metrics.json: epochs[*].seconds / peak_cuda_bytes",
+          "job": "SGE accounting:19385824 job=8346486 fields wallclock/exit_status/failed"
+        }
+      ]
+    },
+    {
+      "experiment": "e3_single",
+      "train_gpu_hours": 1.4315763369902077,
+      "allocated_gpu_hours": 1.833611111111111,
+      "allocated_gpu_hours_including_rerun": 1.833611111111111,
+      "sources": [
+        {
+          "gpu": "runs/logs/ec523-e3-s0.o8339755:1",
+          "epochs": [
+            "runs/logs/ec523-e3-s0.o8339755:636",
+            "runs/logs/ec523-e3-s0.o8339755:1269",
+            "runs/logs/ec523-e3-s0.o8339755:1902",
+            "runs/logs/ec523-e3-s0.o8339755:2535",
+            "runs/logs/ec523-e3-s0.o8339755:3168",
+            "runs/logs/ec523-e3-s0.o8339755:3801",
+            "runs/logs/ec523-e3-s0.o8339755:4434",
+            "runs/logs/ec523-e3-s0.o8339755:5067",
+            "runs/logs/ec523-e3-s0.o8339755:5700",
+            "runs/logs/ec523-e3-s0.o8339755:6333"
+          ],
+          "json": "results/exp/e3_single_s0/metrics.json: epochs[*].seconds / peak_cuda_bytes",
+          "job": "SGE accounting:19349810 job=8339755 fields wallclock/exit_status/failed"
+        },
+        {
+          "gpu": "runs/logs/ec523-e3-s1.o8346484:1",
+          "epochs": [
+            "runs/logs/ec523-e3-s1.o8346484:636",
+            "runs/logs/ec523-e3-s1.o8346484:1269",
+            "runs/logs/ec523-e3-s1.o8346484:1902",
+            "runs/logs/ec523-e3-s1.o8346484:2535",
+            "runs/logs/ec523-e3-s1.o8346484:3168",
+            "runs/logs/ec523-e3-s1.o8346484:3801",
+            "runs/logs/ec523-e3-s1.o8346484:4434",
+            "runs/logs/ec523-e3-s1.o8346484:5067",
+            "runs/logs/ec523-e3-s1.o8346484:5700",
+            "runs/logs/ec523-e3-s1.o8346484:6333"
+          ],
+          "json": "results/exp/e3_single_s1/metrics.json: epochs[*].seconds / peak_cuda_bytes",
+          "job": "SGE accounting:19383889 job=8346484 fields wallclock/exit_status/failed"
+        },
+        {
+          "gpu": "runs/logs/ec523-e3-s2.o8346487:1",
+          "epochs": [
+            "runs/logs/ec523-e3-s2.o8346487:636",
+            "runs/logs/ec523-e3-s2.o8346487:1269",
+            "runs/logs/ec523-e3-s2.o8346487:1902",
+            "runs/logs/ec523-e3-s2.o8346487:2535",
+            "runs/logs/ec523-e3-s2.o8346487:3168",
+            "runs/logs/ec523-e3-s2.o8346487:3801",
+            "runs/logs/ec523-e3-s2.o8346487:4434",
+            "runs/logs/ec523-e3-s2.o8346487:5067",
+            "runs/logs/ec523-e3-s2.o8346487:5700",
+            "runs/logs/ec523-e3-s2.o8346487:6333"
+          ],
+          "json": "results/exp/e3_single_s2/metrics.json: epochs[*].seconds / peak_cuda_bytes",
+          "job": "SGE accounting:19386850 job=8346487 fields wallclock/exit_status/failed"
+        }
+      ]
+    },
+    {
+      "experiment": "e4_untied",
+      "train_gpu_hours": 2.2130113860320044,
+      "allocated_gpu_hours": 2.700833333333333,
+      "allocated_gpu_hours_including_rerun": 2.700833333333333,
+      "sources": [
+        {
+          "gpu": "runs/logs/ec523-e4-s0.o8432874:1",
+          "epochs": [
+            "runs/logs/ec523-e4-s0.o8432874:636",
+            "runs/logs/ec523-e4-s0.o8432874:1269",
+            "runs/logs/ec523-e4-s0.o8432874:1902",
+            "runs/logs/ec523-e4-s0.o8432874:2535",
+            "runs/logs/ec523-e4-s0.o8432874:3168",
+            "runs/logs/ec523-e4-s0.o8432874:3801",
+            "runs/logs/ec523-e4-s0.o8432874:4434",
+            "runs/logs/ec523-e4-s0.o8432874:5067",
+            "runs/logs/ec523-e4-s0.o8432874:5700",
+            "runs/logs/ec523-e4-s0.o8432874:6333"
+          ],
+          "json": "results/exp/e4_untied_s0/metrics.json: epochs[*].seconds / peak_cuda_bytes",
+          "job": "SGE accounting:19829864 job=8432874 fields wallclock/exit_status/failed"
+        },
+        {
+          "gpu": "runs/logs/ec523-e4-s1.o8432875:1",
+          "epochs": [
+            "runs/logs/ec523-e4-s1.o8432875:636",
+            "runs/logs/ec523-e4-s1.o8432875:1269",
+            "runs/logs/ec523-e4-s1.o8432875:1902",
+            "runs/logs/ec523-e4-s1.o8432875:2535",
+            "runs/logs/ec523-e4-s1.o8432875:3168",
+            "runs/logs/ec523-e4-s1.o8432875:3801",
+            "runs/logs/ec523-e4-s1.o8432875:4434",
+            "runs/logs/ec523-e4-s1.o8432875:5067",
+            "runs/logs/ec523-e4-s1.o8432875:5700",
+            "runs/logs/ec523-e4-s1.o8432875:6333"
+          ],
+          "json": "results/exp/e4_untied_s1/metrics.json: epochs[*].seconds / peak_cuda_bytes",
+          "job": "SGE accounting:19829651 job=8432875 fields wallclock/exit_status/failed"
+        },
+        {
+          "gpu": "runs/logs/ec523-e4-s2.o8432876:1",
+          "epochs": [
+            "runs/logs/ec523-e4-s2.o8432876:636",
+            "runs/logs/ec523-e4-s2.o8432876:1269",
+            "runs/logs/ec523-e4-s2.o8432876:1902",
+            "runs/logs/ec523-e4-s2.o8432876:2535",
+            "runs/logs/ec523-e4-s2.o8432876:3168",
+            "runs/logs/ec523-e4-s2.o8432876:3801",
+            "runs/logs/ec523-e4-s2.o8432876:4434",
+            "runs/logs/ec523-e4-s2.o8432876:5067",
+            "runs/logs/ec523-e4-s2.o8432876:5700",
+            "runs/logs/ec523-e4-s2.o8432876:6333"
+          ],
+          "json": "results/exp/e4_untied_s2/metrics.json: epochs[*].seconds / peak_cuda_bytes",
+          "job": "SGE accounting:19831523 job=8432876 fields wallclock/exit_status/failed"
+        }
+      ]
+    },
+    {
+      "experiment": "e5_noadd",
+      "train_gpu_hours": 2.244210591459709,
+      "allocated_gpu_hours": 2.712222222222222,
+      "allocated_gpu_hours_including_rerun": 2.712222222222222,
+      "sources": [
+        {
+          "gpu": "runs/logs/ec523-e5-s0.o8451634:1",
+          "epochs": [
+            "runs/logs/ec523-e5-s0.o8451634:636",
+            "runs/logs/ec523-e5-s0.o8451634:1269",
+            "runs/logs/ec523-e5-s0.o8451634:1902",
+            "runs/logs/ec523-e5-s0.o8451634:2535",
+            "runs/logs/ec523-e5-s0.o8451634:3168",
+            "runs/logs/ec523-e5-s0.o8451634:3801",
+            "runs/logs/ec523-e5-s0.o8451634:4434",
+            "runs/logs/ec523-e5-s0.o8451634:5067",
+            "runs/logs/ec523-e5-s0.o8451634:5700",
+            "runs/logs/ec523-e5-s0.o8451634:6333"
+          ],
+          "json": "results/exp/e5_noadd_s0/metrics.json: epochs[*].seconds / peak_cuda_bytes",
+          "job": "SGE accounting:19873769 job=8451634 fields wallclock/exit_status/failed"
+        },
+        {
+          "gpu": "runs/logs/ec523-e5-s1.o8451635:1",
+          "epochs": [
+            "runs/logs/ec523-e5-s1.o8451635:636",
+            "runs/logs/ec523-e5-s1.o8451635:1269",
+            "runs/logs/ec523-e5-s1.o8451635:1902",
+            "runs/logs/ec523-e5-s1.o8451635:2535",
+            "runs/logs/ec523-e5-s1.o8451635:3168",
+            "runs/logs/ec523-e5-s1.o8451635:3801",
+            "runs/logs/ec523-e5-s1.o8451635:4434",
+            "runs/logs/ec523-e5-s1.o8451635:5067",
+            "runs/logs/ec523-e5-s1.o8451635:5700",
+            "runs/logs/ec523-e5-s1.o8451635:6333"
+          ],
+          "json": "results/exp/e5_noadd_s1/metrics.json: epochs[*].seconds / peak_cuda_bytes",
+          "job": "SGE accounting:19872648 job=8451635 fields wallclock/exit_status/failed"
+        },
+        {
+          "gpu": "runs/logs/ec523-e5-s2.o8451636:1",
+          "epochs": [
+            "runs/logs/ec523-e5-s2.o8451636:636",
+            "runs/logs/ec523-e5-s2.o8451636:1269",
+            "runs/logs/ec523-e5-s2.o8451636:1902",
+            "runs/logs/ec523-e5-s2.o8451636:2535",
+            "runs/logs/ec523-e5-s2.o8451636:3168",
+            "runs/logs/ec523-e5-s2.o8451636:3801",
+            "runs/logs/ec523-e5-s2.o8451636:4434",
+            "runs/logs/ec523-e5-s2.o8451636:5067",
+            "runs/logs/ec523-e5-s2.o8451636:5700",
+            "runs/logs/ec523-e5-s2.o8451636:6333"
+          ],
+          "json": "results/exp/e5_noadd_s2/metrics.json: epochs[*].seconds / peak_cuda_bytes",
+          "job": "SGE accounting:19873100 job=8451636 fields wallclock/exit_status/failed"
+        }
+      ]
+    }
+  ],
+  "notes": [
+    "GPU hours mean allocated one-GPU job wallclock, not GPU utilization. Training GPU hours use summed epoch wallclock.",
+    "No time averages combine GPU types. Submission CLI phase times include feature I/O/output; stress refiner times are synchronized init+step time.",
+    "CUDA peaks are allocator peaks, not nvidia-smi process memory; existing training peaks include encoder/probe/refiner/optimizer allocations.",
+    "Missing measurements remain null/NA. No interpolation supplies K6.",
+    "Inference measurements describe the submitted e0_v2 seed-0 model. Training totals cover all controlled experiment seeds."
+  ],
+  "frozen_parameters": {
+    "values": {
+      "encoder": 303129600,
+      "probe": 3073
+    },
+    "source": "results/exp/e0_v2_s0/metrics.json:63 frozen_parameters"
+  }
+}
