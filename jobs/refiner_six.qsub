@@ -1,0 +1,26 @@
+#!/bin/bash -l
+#$ -N ec523-six
+#$ -P ec523kb
+#$ -cwd
+#$ -pe omp 8
+#$ -l gpus=1
+#$ -l mem_per_core=8G
+#$ -l h_rt=04:00:00
+#$ -t 1-6
+#$ -tc 2
+#$ -j y
+
+# Use scripts/six_run_batch.py submit; it selects one GPU model for all tasks.
+set -eo pipefail
+batch="${1:?Pass the prepared batch directory}"
+test -d "$batch/logs"
+exec >> "$batch/logs/task_${SGE_TASK_ID:?Array task ID missing}.log" 2>&1
+source "${SGE_O_WORKDIR:?Submit from the repository root}/scripts/activate_scc.sh" || exit 1
+set -u
+export OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 MKL_NUM_THREADS=1
+export HF_HUB_CACHE="$HF_HOME/hub" HF_HUB_OFFLINE=1 TRANSFORMERS_OFFLINE=1
+export PYTHONDONTWRITEBYTECODE=1
+export EC523_PROJECT_DIR="$batch/source"
+export PYTHONPATH="$batch/source/src:$batch/source"
+cd "$batch/source"
+python -u scripts/six_run_batch.py task --batch "$batch" --task "$SGE_TASK_ID"
