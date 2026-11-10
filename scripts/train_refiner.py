@@ -22,6 +22,8 @@ sys.path.insert(0, str(ROOT))
 from analysis import y0_error_analysis as y0
 from scripts import train_linear_probe as probe
 from looproad.models.refiner import LoopRefiner
+from looproad.models.refiner_losses import RefinerObjective
+from looproad.data.augmentation import D4TrainingDataset
 
 DOMAINS = ("Urban", "Rural")
 INFER_ABLATIONS = ("none", "reset-state", "no-mask-feedback")
@@ -109,8 +111,8 @@ def inference_steps(model, features, draft, ks, device, ablation="none"):
                     yield str(step), current, elapsed, peak
 
 
-def deep_supervision(outputs, targets, valid):
-    losses = [probe.masked_bce_with_logits(answer, targets, valid, pos_weight=4.) for answer in outputs]
+def deep_supervision(outputs, targets, valid, pos_weight=4.):
+    losses = [probe.masked_bce_with_logits(answer, targets, valid, pos_weight=pos_weight) for answer in outputs]
     return torch.stack(losses).mean(), losses
 
 
@@ -125,9 +127,9 @@ def noadd_penalties(outputs, draft, targets, valid):
     return torch.stack(penalties).mean(), penalties
 
 
-def refiner_objective(outputs, targets, valid, draft, noadd_lambda=0.):
+def refiner_objective(outputs, targets, valid, draft, noadd_lambda=0., pos_weight=4.):
     """Return total, per-step BCE, mean BCE, mean penalty and per-step penalty."""
-    bce, losses = deep_supervision(outputs, targets, valid)
+    bce, losses = deep_supervision(outputs, targets, valid, pos_weight=pos_weight)
     if noadd_lambda == 0:
         # No new tensor operation, sigmoid, graph branch or RNG use at lambda=0.
         return bce, losses, bce, 0., [0.] * len(outputs)
@@ -543,6 +545,16 @@ def build_parser():
     parser.add_argument("--epochs", type=int, default=20, help="Zero evaluates an untrained zero-output refiner")
     parser.add_argument("--batch-size", type=int, default=4)
     parser.add_argument("--lr", type=float, default=3e-4)
+    parser.add_argument("--pos-weight", type=float, default=4.,
+                        help="Positive-class BCE weight for the refiner only; does not change the frozen probe")
+    parser.add_argument('--loss', choices=('bce', 'false_add', 'lovasz', 'soft_cldice'), default='bce')
+    parser.add_argument('--aux-weight', type=float, default=.1,
+                        help='Coefficient for Lovasz or soft-clDice; false_add is calibrated on Train')
+    parser.add_argument('--skeleton-iterations', type=int, default=20)
+    parser.add_argument('--false-add-gradient-ratio', type=float, default=.1)
+    parser.add_argument('--false-add-warmup-steps', type=int, default=500)
+    parser.add_argument('--false-add-calibration-batches', type=int, default=8)
+    parser.add_argument('--augmentation', choices=('none', 'd4'), default='none')
     parser.add_argument("--k-train", type=int, default=4)
     parser.add_argument("--eval-k", type=parse_ks, default=parse_ks("1,2,4,6,8"))
     parser.add_argument("--limit-per-domain", type=int)
@@ -602,11 +614,18 @@ def main():
         explicit = {value.split("=", 1)[0] for value in sys.argv[1:] if value.startswith("--")}
         if '--eval-extra' not in explicit:
             args.eval_extra = restored['config'].get('eval_extra', False)
-        settings = ["dimension", "layers", "heads", "mlp_ratio", "patch", "no_mask_feedback", "reset_state", "k_train", "head_type", "selection_ks", "untied_steps", "noadd_lambda"]
+        settings = ["dimension", "layers", "heads", "mlp_ratio", "patch", "no_mask_feedback", "reset_state", "k_train", "head_type", "selection_ks", "untied_steps", "noadd_lambda", "pos_weight",
+                    'loss', 'aux_weight', 'skeleton_iterations', 'false_add_gradient_ratio',
+                    'false_add_warmup_steps', 'false_add_calibration_batches', 'augmentation']
         if args.resume:
             settings += ["batch_size", "lr", "seed", "limit_per_domain", "monitor_every", "monitor_per_domain", "select_every", "select_per_domain"]
+        legacy_defaults = {'untied_steps': 0, 'noadd_lambda': 0., 'head_type': 'patch_linear', 'select_every': 0, 'select_per_domain': 100,
+                           'selection_ks': parse_selection_ks('1:0.25,2:0.25,4:0.5'), 'pos_weight': 4.,
+                           'loss': 'bce', 'aux_weight': .1, 'skeleton_iterations': 20,
+                           'false_add_gradient_ratio': .1, 'false_add_warmup_steps': 500,
+                           'false_add_calibration_batches': 8, 'augmentation': 'none'}
         for name in settings:
-            saved = restored["config"].get(name, {"head_type": "patch_linear", "select_every": 0, "select_per_domain": 100, 'selection_ks': parse_selection_ks('1:0.25,2:0.25,4:0.5'), 'untied_steps': 0, 'noadd_lambda': 0.}.get(name))
+            saved = restored["config"].get(name, legacy_defaults.get(name))
             if "--" + name.replace("_", "-") in explicit and getattr(args, name) != saved:
                 parser.error(f"Checkpoint setting {name}={saved!r} conflicts with the requested value")
             setattr(args, name, saved)
@@ -626,6 +645,8 @@ def main():
     try:
         validate_untied_settings(args)
         validate_noadd_lambda(args.noadd_lambda)
+        if args.noadd_lambda and args.loss != 'bce':
+            raise ValueError('--noadd-lambda is a BCE experiment; select one auxiliary objective per run')
     except ValueError as error:
         parser.error(str(error))
     split = None
@@ -649,6 +670,14 @@ def main():
         parser.error("--epochs is the total target and cannot precede the saved epoch")
     if args.lr <= 0 or min(args.loader_workers, args.eval_loader_workers) < 0:
         parser.error("Learning rate must be positive and loader workers nonnegative")
+    if not math.isfinite(args.pos_weight) or args.pos_weight <= 0:
+        parser.error("--pos-weight must be finite and positive")
+    if not math.isfinite(args.aux_weight) or args.aux_weight <= 0:
+        parser.error('--aux-weight must be finite and positive')
+    if not math.isfinite(args.false_add_gradient_ratio) or args.false_add_gradient_ratio <= 0:
+        parser.error('--false-add-gradient-ratio must be finite and positive')
+    if min(args.skeleton_iterations, args.false_add_calibration_batches) < 1 or args.false_add_warmup_steps < 0:
+        parser.error('Skeleton/calibration counts must be positive and warmup steps nonnegative')
     if args.select_every < 0 or args.select_per_domain < 1:
         parser.error("Selection interval must be nonnegative and subset size positive")
     if args.limit_per_domain is not None and args.limit_per_domain < 1:
@@ -689,14 +718,21 @@ def main():
         raise AssertionError("Encoder and probe must be completely frozen")
     config = {key: (str(value.resolve().relative_to(ROOT)) if value.resolve().is_relative_to(ROOT) else value.name)
               if isinstance(value, Path) else value for key, value in vars(args).items()}
-    config.update(weight_decay=.01, warmup_steps=500, clip_grad_norm=1., pos_weight=4.,
+    config.update(weight_decay=.01, warmup_steps=500, clip_grad_norm=1.,
                   refiner_dtype="float32", encoder=y0.ENCODER, probe_head=checkpoint["head"])
     if args.infer_ablations is None:
         config.pop('infer_ablations')
+    objective = RefinerObjective(args.loss, args.pos_weight, args.aux_weight, args.skeleton_iterations,
+                                 args.false_add_gradient_ratio, args.false_add_warmup_steps,
+                                 args.false_add_calibration_batches,
+                                 state=restored['config'].get('objective_state') if restored else None)
+    config.update(loss_implementation_version=1, objective_state=objective.state)
     if split is not None:
         config['val_split_sha256'] = split_hash
     train_sets = ([probe.RoadDataset("Train", domain, limit=args.limit_per_domain, seed=args.seed + i)
                    for i, domain in enumerate(DOMAINS)] if args.epochs and not args.eval_only else [])
+    if args.augmentation == 'd4':
+        train_sets = [D4TrainingDataset(dataset, args.seed + i) for i, dataset in enumerate(train_sets)]
     loader = (make_loader(ConcatDataset(train_sets), args.batch_size, args.loader_workers, True, args.seed)
               if train_sets else None)
     optimizer = torch.optim.AdamW(model.parameters(), lr=args.lr, weight_decay=.01) if loader else None
@@ -735,6 +771,9 @@ def main():
     if args.eval_only:
         print(f"EVAL_ONLY loaded_epoch={start_epoch}; Train is not constructed", flush=True)
     for epoch in range(start_epoch, args.epochs) if not args.eval_only else ():
+        for dataset in train_sets:
+            if isinstance(dataset, D4TrainingDataset):
+                dataset.set_epoch(epoch)
         model.train()
         if device.type == "cuda":
             torch.cuda.reset_peak_memory_stats(device)
@@ -749,8 +788,15 @@ def main():
             phase = stamp(device)
             with torch.autocast(device_type=device.type, enabled=False):
                 logits = refine_steps(model, features.float(), draft.float(), args.k_train)
-                loss, losses, bce, penalty, penalties = refiner_objective(
-                    logits, targets, valid, draft, args.noadd_lambda)
+                if args.loss == 'bce':
+                    loss, losses, bce, penalty, penalties = refiner_objective(
+                        logits, targets, valid, draft, args.noadd_lambda, pos_weight=args.pos_weight)
+                    loss_terms = {'bce': float(bce.detach()),
+                                  'auxiliary': float(penalty.detach()) if args.noadd_lambda else 0.,
+                                  'auxiliary_weight_used': args.noadd_lambda, 'phase': 'active'}
+                else:
+                    loss, losses, loss_terms = objective(logits, targets, valid, draft,
+                                                         step=epoch * len(loader) + batch_index + 1)
                 if not torch.isfinite(loss):
                     raise FloatingPointError("Nonfinite training loss")
                 loss.backward()
@@ -762,15 +808,18 @@ def main():
             batch = {"batch": batch_index + 1, "samples": images.shape[0], "loss": float(loss.detach()),
                      "step_losses": [float(value.detach()) for value in losses],
                      "encoder_seconds": encoder_time, "refiner_forward_backward_seconds": refiner_time,
-                     "lr": learning_rate, "gradient_norm_before_clip": float(gradient_norm)}
-            batch.update(bce=float(bce.detach()), step_bce=batch['step_losses'],
-                         penalty=float(penalty.detach()) if isinstance(penalty, torch.Tensor) else penalty,
-                         step_penalties=[float(value.detach()) if isinstance(value, torch.Tensor) else value
-                                         for value in penalties])
+                     "lr": learning_rate, "gradient_norm_before_clip": float(gradient_norm),
+                     "loss_terms": loss_terms}
+            if args.loss == 'bce':
+                batch.update(bce=float(bce.detach()), step_bce=batch['step_losses'],
+                             penalty=float(penalty.detach()) if isinstance(penalty, torch.Tensor) else penalty,
+                             step_penalties=[float(value.detach()) if isinstance(value, torch.Tensor) else value
+                                             for value in penalties])
+                del bce, penalty, penalties
             batches.append(batch)
             seen += images.shape[0]
             print(f"BATCH epoch={epoch + 1} " + json.dumps(batch), flush=True)
-            del logits, loss, losses, features, draft, bce, penalty, penalties
+            del logits, loss, losses, features, draft
         record = {"epoch": epoch + 1, "loss": sum(row["loss"] * row["samples"] for row in batches) / seen,
                   "step_losses": [sum(row["step_losses"][step] * row["samples"] for row in batches) / seen
                                   for step in range(args.k_train)],
@@ -779,11 +828,12 @@ def main():
                   "refiner_forward_backward_seconds": sum(row["refiner_forward_backward_seconds"] for row in batches),
                   "peak_cuda_bytes": torch.cuda.max_memory_allocated(device) if device.type == "cuda" else None,
                   "batches": batches}
-        record.update(bce=sum(row['bce'] * row['samples'] for row in batches) / seen,
-                      step_bce=record['step_losses'],
-                      penalty=sum(row['penalty'] * row['samples'] for row in batches) / seen,
-                      step_penalties=[sum(row['step_penalties'][step] * row['samples'] for row in batches) / seen
-                                      for step in range(args.k_train)])
+        if args.loss == 'bce':
+            record.update(bce=sum(row['bce'] * row['samples'] for row in batches) / seen,
+                          step_bce=record['step_losses'],
+                          penalty=sum(row['penalty'] * row['samples'] for row in batches) / seen,
+                          step_penalties=[sum(row['step_penalties'][step] * row['samples'] for row in batches) / seen
+                                          for step in range(args.k_train)])
         epochs.append(record)
         print("EPOCH " + json.dumps({key: value for key, value in record.items() if key != "batches"}), flush=True)
         if split is None and (epoch == 0 or (epoch + 1) % args.monitor_every == 0):
@@ -821,6 +871,8 @@ def main():
         torch.save(payload, args.ckpt_dir / "last.pt")
         if improved:
             torch.save(payload, args.ckpt_dir / "best.pt")
+    if args.loss == 'false_add' and not args.eval_only and objective.state.get('effective_aux_weight') is None:
+        raise RuntimeError('Training ended before false-add calibration completed; no final report will be written')
     del loader, train_sets
     datasets = (protocol_datasets(split, 'Val-rep', args.limit_per_domain) if split is not None else
                 {domain: probe.RoadDataset("Val", domain, limit=args.limit_per_domain, seed=args.seed + i + 10) for i, domain in enumerate(DOMAINS)})
