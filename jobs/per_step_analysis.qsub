@@ -1,0 +1,44 @@
+#!/bin/bash -l
+#$ -N ec523-per-step-analysis
+#$ -P ec523kb
+#$ -cwd
+#$ -pe omp 8
+#$ -l gpus=1
+#$ -l gpu_c=8.0
+#$ -l mem_per_core=8G
+#$ -l h_rt=01:00:00
+#$ -m ea
+#$ -j y
+#$ -o runs/logs/
+
+# Submit from this branch's repository root after mkdir -p runs/logs.
+# Encoder+draft exactly once/image, then three resident frozen refiners.
+# Encoder upper estimate: 835*.15=125.25 s (A40 supplied GPU rate).
+# Refiner: 835*3*8*.012=240.48 s. Official metrics upper bound:
+# 835*3*9*.125/6=469.69 s (y0 is actually scored only once/image).
+# Four-image CPU smoke: region EDT .169714 s/image; fixed-y0 skeleton
+# .111787 s/image; update statistics .059213 s/(seed*step*image).
+# Six workers: region+skeleton ( .169714+.111787 )*835/6=39.18 s;
+# update statistics .059213*835*3*8/6=197.77 s. Total ~1072 s (18 min).
+# Add 15 min for model/image I/O, spawn and float32 IPC, then request
+# 60 min for CPU/GPU/node variance. CPU encoder speed is not extrapolated.
+# At most six pending image tasks, ~100 MiB float32 probabilities each;
+# no features/probability maps/per-image artifacts are saved to disk.
+# Main + one single-thread loader + six single-thread metric workers = 8.
+source "${SGE_O_WORKDIR:?Submit from repository root}/env.sh" || exit 1
+set -euo pipefail
+cd "$SGE_O_WORKDIR"
+export PYTHONPATH="$PWD/src:$PWD"
+export OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 MKL_NUM_THREADS=1
+export HF_HUB_OFFLINE=1 TRANSFORMERS_OFFLINE=1 HF_HUB_DISABLE_TELEMETRY=1
+python - <<'PY'
+import torch, numpy, transformers, scipy, PIL
+print('GPU:',torch.cuda.get_device_name(),flush=True)
+print('Versions:',torch.__version__,numpy.__version__,transformers.__version__,scipy.__version__,PIL.__version__,flush=True)
+PY
+git rev-parse HEAD
+# Full-scope regression is built into the script: seed0 t=1/2/4/8
+# vs results/exp/e0_v2_s0/metrics.json, tolerance 1e-5. FAIL prints
+# the actual difference and is recorded, but does not abort evaluation.
+python -u analysis/per_step_analysis.py --device cuda --steps 8 --model-seeds 0,1,2 \
+    --loader-workers 1 --metric-workers 6 --out-dir results/per_step/v2
