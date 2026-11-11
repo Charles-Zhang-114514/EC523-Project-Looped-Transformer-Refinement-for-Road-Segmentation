@@ -49,6 +49,8 @@ def frozen_draft(encoder, head, images):
     with torch.no_grad():
         features = encoder(images)
         draft = head(features).float()
+        if hasattr(head, "refiner_features"):
+            features = head.refiner_features(features)
     return features, draft
 
 

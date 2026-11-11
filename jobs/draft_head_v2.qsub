@@ -1,0 +1,60 @@
+#!/bin/bash -l
+#$ -N ec523-draft-head-v2
+#$ -P ec523kb
+#$ -cwd
+#$ -pe omp 8
+#$ -l gpus=1
+#$ -l gpu_c=8.0
+#$ -l mem_per_core=8G
+#$ -l h_rt=03:00:00
+#$ -j y
+#$ -m ea
+#$ -o runs/logs/
+
+# Submit from the repository root after mkdir -p runs/logs.
+# One variant per job: A1-i (last) or A1-ii (blocks 6,12,18,24).
+# A40 encoder estimate uses the supplied GPU rate, NOT CPU encoder seconds:
+# Train: 10*2522*.15 = 3783 s; selection: 10*200*.15 = 300 s;
+# Val-rep: 835*.15 = 125.25 s. Total encoder: 4208.25 s (~70 min).
+# Official metrics: (10*200+835)*.125/6 = 59.06 s. These runs use only
+# threshold .5, not the previous 19-threshold grid. The previous five-probe
+# 2.2-hour job is historical context, not a multiplier for encoder/metrics.
+# Four-image CPU smoke: head forward+backward / encoder is 12.2905/178.4684
+# = .06887 (A1-i), 12.9654/181.6744 = .07137 (A1-ii). As a rough relative
+# head allowance, charge .07137*4208.25 = 300.34 s, conservatively using
+# the training ratio for validation too. This is not a measured GPU ratio:
+# the encoder uses bf16 on GPU and the head is float32. No absolute CPU
+# encoder rate is extrapolated. Add 900 s for I/O/loading: about 5468 s
+# (~91 min). Request 180 min (~2x) for head/node variance. The previous
+# 2.2-hour five-encoder observation is not scaled by CPU model speed.
+# Train: seven single-thread loaders + main. Selection/report: all train
+# workers have exited, then one loader + six spawn metric workers + main.
+source "${SGE_O_WORKDIR:?Submit from the repository root}/env.sh" || exit 1
+set -euo pipefail
+cd "$SGE_O_WORKDIR"
+: "${EC523_DATA_DIR:?Set EC523_DATA_DIR in env.sh}"
+: "${EC523_STARTER_DIR:?Set EC523_STARTER_DIR in env.sh}"
+export PYTHONPATH="$PWD/src:$PWD"
+export OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1
+export HF_HUB_OFFLINE=1 TRANSFORMERS_OFFLINE=1 HF_HUB_DISABLE_TELEMETRY=1
+if [[ $# != 1 ]]; then
+    echo "Usage: qsub jobs/draft_head_v2.qsub A1-i|A1-ii" >&2
+    exit 2
+fi
+case "$1" in
+    A1-i) LAYERS=last ;;
+    A1-ii) LAYERS=6,12,18,24 ;;
+    *) echo "Unknown variant: $1" >&2; exit 2 ;;
+esac
+python - <<'PY'
+import sys, torch, numpy, scipy, PIL, transformers
+print('Python:', sys.executable, flush=True)
+print('GPU:', torch.cuda.get_device_name(), flush=True)
+print('Versions:', torch.__version__, numpy.__version__, scipy.__version__, PIL.__version__, transformers.__version__, flush=True)
+PY
+git rev-parse HEAD
+python -u scripts/train_draft_head.py --draft-layers "$LAYERS" \
+    --epochs 10 --batch-size 8 --lr 1e-3 --seed 0 --select-per-domain 100 \
+    --val-split configs/val_split_seed0.json --device cuda \
+    --loader-workers 7 --eval-loader-workers 1 --metric-workers 6 \
+    --out-dir "results/draft_head/$1" --ckpt-dir "runs/draft_head/$1"
