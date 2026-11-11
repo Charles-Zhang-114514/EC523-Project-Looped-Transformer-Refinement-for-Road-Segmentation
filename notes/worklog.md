@@ -527,3 +527,32 @@ Limited CPU smoke results will verify execution only and will not adjudicate the
 - Verified that selection files belong to Val-sel, report files belong to Val-rep, the sets are disjoint and both contain two images/domain in smoke mode. Urban plus Rural Counts equal Overall. Both real trial best checkpoints load through the extended frozen loader with matching state tensors, matching layer selections, eval/frozen encoder and head, and 1024 refiner feature channels. Both trial best.pt files were then deleted. Reports/logs remain ignored under runs/draft_head/trial; no feature cache was written.
 - jobs/draft_head_v2.qsub runs one A1-i or A1-ii variant, requesting eight cores, one gpu_c=8.0 GPU, 8G/core, email and ignored logs. Supplied A40 encoder rate 0.15 s/image gives 3783 s for training, 300 s for selection and 125.25 s for reporting: 4208.25 s total. Official metrics at 0.125 s/image over 2835 scored images / six workers add 59.06 s. CPU head/encoder ratios 0.0688665 and 0.0713661 are rough relative overhead indicators only. Charging the larger ratio to all encoder work gives about 300.34 s head allowance; adding 900 s loading/I/O gives about 5468 s (91 minutes). Request 03:00:00 (about 2x) for GPU dtype/architecture and node variance. No absolute CPU encoder speed is extrapolated; the historical five-probe 2.2-hour job is context only. GPU batch-8 peak memory, ten-epoch stability and full-data quality remain unmeasured.
 - Preregistration above was recorded at 2026-11-10T21:11:23-05:00, before full GPU jobs/results. Its block SHA-256 is 4044cfe3129ea066d3804316f8731722cfc19cb8a4e0182c194aeca8df4d95aa. Full jobs remain for manual submission. No network access, installation, qsub submission, push, feature export, existing result modification or new tracked image occurred.
+
+## 2026-11-11 - Draft-head v2 GPU result verification
+
+- Observed the required initial state: charles/draft-head-v2 at 53f6630, tracked files unchanged, with only the generated results/draft_head directory untracked. The job logs record source commit 0d5669b; 53f6630 adds only the overfit test and does not change the running training code.
+- Observed SGE accounting records failed=0 and exit_status=0 for both jobs: A1-i job 8566804 ran 1918 seconds (00:50:36 to 01:22:34, America/New_York); A1-ii job 8566805 ran 1922 seconds (00:50:36 to 01:22:38). Both used NVIDIA L40S, recorded at line 2 of their respective ec523-draft-A1-i.o8566804 / ec523-draft-A1-ii.o8566805 logs. No Traceback, OOM, NaN or killed-job indication was found. Both logs end with FINAL at line 3176 after epoch 10 at line 3175.
+- Observed training peak allocated CUDA memory: A1-i 6809209344 bytes (6.341570 GiB), A1-ii 7858871808 bytes (7.319145 GiB), where one GiB is 1073741824 bytes. These are maxima over the saved epoch peak_cuda_bytes fields, not reserved-memory measurements.
+- Observed ten epochs and 2522 training images/epoch for each variant. Val-sel selection uses the same fixed 100 files/domain every epoch; report files equal the full Val-rep split (339 Urban, 496 Rural, 835 total) and do not overlap selection files. The split SHA-256 matches config. All report floats are finite and domain Counts sum to Overall.
+
+Observed saved Val-rep scores (threshold 0.5):
+
+| Variant | Domain | IoU | clDice | BIoU | A |
+|---|---|---:|---:|---:|---:|
+| A1-i | Urban | 0.665863264302 | 0.721756819423 | 0.086455521927 | 0.566749782363 |
+| A1-i | Rural | 0.530191816764 | 0.662104901432 | 0.100134165598 | 0.483754211931 |
+| A1-i | Overall | 0.622292764207 | 0.695215839897 | 0.092674934174 | 0.538246120907 |
+| A1-ii | Urban | 0.644908474901 | 0.697852954253 | 0.078761238939 | 0.547562371514 |
+| A1-ii | Rural | 0.498076714147 | 0.596839896404 | 0.082653173222 | 0.444620960639 |
+| A1-ii | Overall | 0.600481130341 | 0.656030911317 | 0.080381023242 | 0.513126043214 |
+
+- Observed A1-i best epoch 6, selected only on Val-sel A=0.543394424648. Mean train losses for epochs 1-10: 0.301798398, 0.159016102, 0.135914346, 0.127168269, 0.125668067, 0.120260023, 0.116338869, 0.115247263, 0.111645558, 0.109710850.
+- Observed A1-i Val-sel A for epochs 1-10: 0.541088028, 0.532993089, 0.529287784, 0.537157808, 0.529072459, 0.543394425, 0.530161436, 0.529126820, 0.532422987, 0.521990667.
+
+- Observed A1-ii best epoch 4, selected only on Val-sel A=0.519146663579. Mean train losses for epochs 1-10: 0.288201711, 0.152113171, 0.128368082, 0.117409635, 0.119257820, 0.110594729, 0.105585123, 0.103424935, 0.100522834, 0.096416595.
+- Observed A1-ii Val-sel A for epochs 1-10: 0.496176507, 0.500138585, 0.509289607, 0.519146664, 0.503462067, 0.515018373, 0.503829569, 0.505187907, 0.489010031, 0.494685686.
+
+- Observed P1 is not met: A1-ii Val-rep BIoU=0.080381023242 (<0.100) and A=0.513126043214 (<0.535). Observed P2 is not met: A1-ii minus A1-i BIoU=-0.012293910932, below the required +0.005.
+- Observed the preregistered A2 threshold is met by A1-i (A=0.538246120907). A1-i minus A1-ii A=0.025120077693, so the <0.003 parameter-count tie rule does not apply; A1-i is the rule-selected candidate. Neither the both-below-0.530 stop case nor the intermediate discussion case applies. No A2 training or submission was started.
+- Observed both best.pt files exist and contain the expected selected epoch (6/4). Each was loaded through load_frozen_probe and frozen_draft and forwarded exactly one Val-rep image (urban/3515.png) on CPU. Features were [1,1024,64,64], logits [1,1,1024,1024], both float32 and finite; encoder/head remained eval and fully frozen. No official scores were recomputed and no checkpoint or prediction file was written.
+- Observed full unittest result: 159 tests in 81.191 seconds, 158 passed and one existing CUDA-only test skipped, with no failures. Raw job results were not edited. All four result files are below 50 MB (largest 788909 bytes); the personal-account/absolute-path scan is empty. Only the four result files and this appended worklog entry are committed. No code change, network access, package installation, dataset training/evaluation rerun, qsub submission, push or A2 execution occurred.
