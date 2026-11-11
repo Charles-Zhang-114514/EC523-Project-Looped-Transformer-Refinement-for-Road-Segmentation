@@ -1,0 +1,65 @@
+#!/bin/bash -l
+#$ -N ec523-a2-convdraft
+#$ -P ec523kb
+#$ -cwd
+#$ -pe omp 8
+#$ -l gpus=1
+#$ -l gpu_c=8.0
+#$ -l mem_per_core=8G
+#$ -l h_rt=02:00:00
+#$ -m ea
+#$ -j y
+#$ -o runs/logs/
+
+# Submit from the repository root after mkdir -p runs/logs. One seed/job.
+# Existing e0 walltime: 35-41 min on L40S; 62-73 min on A40.
+# A1 L40S head forward+backward costs ~.086 s/batch of 8. Refiner training
+# freezes this head, so charge that entire rate as a conservative forward
+# allowance: .086/8=.01075 s/image. Train 10*2522 + selection 10*200 +
+# report 835 = 28055 images, adding ~301.6 s (~5.03 min) without scaling
+# encoder or geometry time. Budget ~46 min L40S / ~78 min A40; request
+# 120 min for I/O, worker/node variation and the approximate batch scaling.
+# Geometry may change with predictions; these timings are an estimate.
+# Train 7 loaders + main; eval 1 loader + 6 spawn metric workers + main.
+set -euo pipefail
+if [[ $# != 1 ]]; then
+    echo "Usage: qsub jobs/a2_refiner_conv_draft.qsub 0|1|2" >&2
+    exit 2
+fi
+case "$1" in
+    0|1|2) SEED="$1" ;;
+    *) echo "Seed must be exactly 0, 1 or 2." >&2; exit 2 ;;
+esac
+source "${SGE_O_WORKDIR:?Submit from repository root}/env.sh" || exit 1
+cd "$SGE_O_WORKDIR"
+export PYTHONPATH="$PWD/src:$PWD"
+export OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 MKL_NUM_THREADS=1
+export HF_HUB_OFFLINE=1 TRANSFORMERS_OFFLINE=1 HF_HUB_DISABLE_TELEMETRY=1
+python - <<'PY'
+import torch, numpy, transformers
+print('GPU:', torch.cuda.get_device_name(), flush=True)
+print('Versions:', torch.__version__, numpy.__version__, transformers.__version__, flush=True)
+PY
+git rev-parse HEAD
+OUT_DIR="results/exp/e6_convdraft_s${SEED}"
+CKPT_DIR="runs/exp/e6_convdraft_s${SEED}"
+python -u scripts/train_refiner.py \
+    --head-type conv_upsample --epochs 10 --batch-size 4 --lr 3e-4 \
+    --k-train 4 --seed "$SEED" --device cuda \
+    --select-every 1 --select-per-domain 100 \
+    --selection-ks 1:0.25,2:0.25,4:0.5 \
+    --val-split configs/val_split_seed0.json --eval-extra --eval-k 1,2,4,6,8 \
+    --probe-ckpt runs/draft_head/A1-i/best.pt \
+    --out-dir "$OUT_DIR" --ckpt-dir "$CKPT_DIR"
+# Read saved metrics only; a draft-score mismatch is nonfatal.
+python - "$OUT_DIR/metrics.json" <<'PY'
+import json, math, sys
+with open(sys.argv[1]) as handle:
+    report = json.load(handle)
+actual = report['evaluation']['groups']['Overall']['y0_draft']['scores']['A']
+reference = 0.538246
+difference = actual - reference
+passed = math.isfinite(actual) and abs(difference) <= 1e-5
+print(f"{'PASS' if passed else 'FAIL'} e6 y0_draft Overall_A={actual:.12f} "
+      f"reference={reference:.12f} delta={difference:+.12g} tolerance=1e-5", flush=True)
+PY
