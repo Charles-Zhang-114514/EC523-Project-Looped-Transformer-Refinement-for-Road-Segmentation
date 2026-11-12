@@ -23,13 +23,13 @@ _ec523_activate_scc() {
     export PYTHONPATH="$EC523_PROJECT_DIR/src${PYTHONPATH:+:$PYTHONPATH}"
     export EC523_DATA_DIR="${EC523_DATA_DIR:-/projectnb/ec523kb/projects/RoadSeg/dataset}"
     export EC523_STARTER_DIR="${EC523_STARTER_DIR:-$(dirname -- "$ec523_repo_dir")/project_a/cli}"
-    export TMPDIR="$EC523_PROJECT_DIR/tmp"
-    export TMP="$TMPDIR"
-    export TEMP="$TMPDIR"
-    export XDG_CACHE_HOME="$EC523_PROJECT_DIR/cache/xdg"
-    export TORCH_HOME="$EC523_PROJECT_DIR/cache/torch"
-    export HF_HOME="$EC523_PROJECT_DIR/cache/huggingface"
-    export PYTHONPYCACHEPREFIX="$EC523_PROJECT_DIR/cache/pycache"
+    export TMPDIR="${TMPDIR:-$EC523_PROJECT_DIR/tmp}"
+    export TMP="${TMP:-$TMPDIR}"
+    export TEMP="${TEMP:-$TMPDIR}"
+    export XDG_CACHE_HOME="${XDG_CACHE_HOME:-$EC523_PROJECT_DIR/cache/xdg}"
+    export TORCH_HOME="${TORCH_HOME:-$EC523_PROJECT_DIR/cache/torch}"
+    export HF_HOME="${HF_HOME:-$EC523_PROJECT_DIR/cache/huggingface}"
+    export PYTHONPYCACHEPREFIX="${PYTHONPYCACHEPREFIX:-$EC523_PROJECT_DIR/cache/pycache}"
     mkdir -p "$TMPDIR" "$XDG_CACHE_HOME" "$TORCH_HOME" \
         "$HF_HOME" "$PYTHONPYCACHEPREFIX" || return 1
 }
