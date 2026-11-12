@@ -180,6 +180,157 @@ def markdown(report):
     return "\n".join(lines) + "\n"
 
 
+THRESHOLDS = tuple(round(.30 + .05 * i, 2) for i in range(9))
+
+
+def select_threshold(selection_groups, domain="Overall"):
+    """Selection accepts Val-sel scores only; ties prefer the smaller tau."""
+    return max(THRESHOLDS, key=lambda t: (selection_groups[domain][str(t)]["scores"]["A"], -t))
+
+
+def score_thresholds(domain, probabilities, labels):
+    # Keep float32 probabilities: float16 quantization could move a threshold.
+    values = {}
+    for head, probability in probabilities.items():
+        values[head] = {}
+        for tau in THRESHOLDS:
+            mask = (probability >= tau).astype(np.uint8)
+            _, counts, _, _, _ = runner.probe.metric_counts_for_image(domain, mask, labels)
+            values[head][str(tau)] = counts["0.5"]
+    return domain, values
+
+
+def threshold_evaluate(encoder, heads, datasets, device, loader_workers, metric_workers):
+    """Two frozen drafts, nine thresholds, official pooled Counts only."""
+    metrics = runner.probe.official_metrics()
+    counts = {h: {d: {str(t): metrics.Counts() for t in THRESHOLDS} for d in DOMAINS} for h in HEADS}
+    pending, files = deque(), {d: [] for d in DOMAINS}
+    started = time.perf_counter()
+
+    def consume():
+        domain, values = pending.popleft().get()
+        for h in HEADS:
+            for key, value in values[h].items():
+                counts[h][domain][key] = counts[h][domain][key] + metrics.Counts(**value)
+
+    with mp.get_context("spawn").Pool(metric_workers, initializer=runner.initialize_eval_worker,
+                                     initargs=(os.environ.get("EC523_STARTER_DIR"),)) as pool:
+        for domain in DOMAINS:
+            loader = runner.make_loader(datasets[domain], 1, loader_workers)
+            for images, _, _, ids, labels in loader:
+                _, drafts = frozen_pair(encoder, heads, runner.probe.as_device_tensor(images, device))
+                probabilities = {h: v.sigmoid().squeeze().cpu().numpy() for h, v in drafts.items()}
+                files[domain].append(ids[0] + ".png")
+                pending.append(pool.apply_async(score_thresholds, (domain, probabilities, np.asarray(labels).squeeze(0))))
+                if len(pending) >= 2 * metric_workers:
+                    consume()
+            del loader
+        while pending:
+            consume()
+    result = {}
+    for h in HEADS:
+        counts[h]["Overall"] = {str(t): counts[h]["Urban"][str(t)] + counts[h]["Rural"][str(t)] for t in THRESHOLDS}
+        result[h] = {d: {k: {"counts": asdict(c), "scores": {**metrics.summarize(c), "A": metrics.summarize(c)["quality"]}}
+                         for k, c in by_tau.items()} for d, by_tau in counts[h].items()}
+    return {"groups": result, "files": files, "wall_seconds": time.perf_counter() - started}
+
+
+def verify_report(evaluation, recorded, limited):
+    checks = []
+    for h in HEADS:
+        for d in ("Overall", *DOMAINS):
+            for k in (1, 2, 4):
+                actual = evaluation["groups"][h][d][str(k)]["scores"]["A"]
+                reference = recorded[h][d][str(k)]["scores"]["A"]
+                delta = actual - reference
+                status = "SMOKE" if limited else "PASS" if abs(delta) <= 1e-5 else "FAIL"
+                checks.append(dict(head=h, domain=d, k=k, actual=actual, reference=reference,
+                                   difference=delta, status=status))
+                print(f"{status} refiner {h} {d} K={k} A={actual:.12f} delta={delta:+.12g}", flush=True)
+    overall = [r for r in checks if r["domain"] == "Overall"]
+    return {"evaluation": evaluation, "checks": checks, "tolerance": 1e-5,
+            "G": None if limited else all(r["status"] == "PASS" for r in overall),
+            "all_domains_pass": None if limited else all(r["status"] == "PASS" for r in checks)}
+
+
+def threshold_comparison(evaluations, recorded, gate):
+    rows, selected, posthoc = [], {}, []
+    for h in HEADS:
+        tau = select_threshold(evaluations["Val-sel"]["groups"][h])
+        selected[h] = tau
+        for split, data in evaluations.items():
+            for d in ("Overall", *DOMAINS):
+                scores = data["groups"][h][d]
+                base = scores["0.5"]["scores"]["A"]
+                value = scores[str(tau)]["scores"]["A"]
+                rows.append(dict(head=h, split=split, domain=d, tau=tau, baseline_A=base, selected_A=value, gain=value-base))
+        for d in ("Overall", *DOMAINS):
+            scores = evaluations["Val-rep"]["groups"][h]
+            best = select_threshold(scores, d)
+            posthoc.append(dict(head=h, domain=d, tau=best, A=scores[d][str(best)]["scores"]["A"],
+                                note="post-hoc Val-rep selection; optimistic diagnostic only"))
+    hypotheses = {}
+    for h, name in (("linear", "P3"), ("A1-i", "P4")):
+        row = next(r for r in rows if r["head"] == h and r["split"] == "Val-rep" and r["domain"] == "Overall")
+        ref = recorded[h]["Overall"]
+        refiner_gain = ref["4"]["scores"]["A"] - ref["y0_draft"]["scores"]["A"]
+        hypotheses[name] = {"calibration_gain": row["gain"], "refiner_gain": refiner_gain,
+                            "required_gain": .7 * refiner_gain,
+                            "met": row["gain"] >= .7 * refiner_gain if gate is True else None}
+    return dict(selected_tau=selected, rows=rows, posthoc=posthoc, hypotheses=hypotheses,
+                G=gate, interpretation="not adjudicated until full gate G passes" if gate is not True else "observed calibration comparison; direction B unchanged")
+
+
+def extension_runs(args, encoder, heads, models):
+    """Write only new extension files; never overwrite the original report."""
+    split = json.loads((ROOT / "configs/val_split_seed0.json").read_text())
+    limited = args.eval_limit_per_domain is not None or next(encoder.parameters()).device.type == "cpu"
+    datasets = runner.protocol_datasets(split, "Val-rep", args.eval_limit_per_domain)
+    recorded = {h: json.loads((ROOT / "results/exp" / run / "metrics.json").read_text())["evaluation"]["groups"]
+                for h, run in RUNS.items()}
+    gate = None
+    args.out_dir.mkdir(parents=True, exist_ok=True)
+    if args.verify_val_refiners:
+        value = evaluate(encoder, heads, models, datasets, [1, 2, 4], next(encoder.parameters()).device,
+                         args.loader_workers, args.metric_workers)
+        report = verify_report(value, recorded, limited)
+        report["recorded_sources"] = {h: f"results/exp/{run}/metrics.json: evaluation.groups.<domain>.<K>.scores.A"
+                                      for h, run in RUNS.items()}
+        gate = report["G"]
+        lines = ["# Observed refiner path verification", "", f"Observed gate G: {gate}.",
+                 "G=False invalidates previous Train refiner observations pending code investigation. "
+                 "Limited CPU runs do not adjudicate G.", "",
+                 "| Head | Domain | K | Recomputed A | Recorded A | Difference | Status |",
+                 "|---|---|---|---:|---:|---:|---|"]
+        lines += [f"| {r['head']} | {r['domain']} | {r['k']} | {r['actual']:.12f} | {r['reference']:.12f} | {r['difference']:+.12g} | {r['status']} |" for r in report["checks"]]
+        (args.out_dir / "verify.json").write_text(json.dumps(report, indent=2, allow_nan=False) + "\n")
+        (args.out_dir / "verify.md").write_text("\n".join(lines) + "\n")
+    if args.threshold_sweep:
+        sets = {"Train": train_subset(args.per_domain, 0),
+                "Val-sel": runner.protocol_datasets(split, "Val-sel", min(100, args.eval_limit_per_domain or 100)),
+                "Val-rep": datasets}
+        evaluations = {name: threshold_evaluate(encoder, heads, data, next(encoder.parameters()).device,
+                                               args.loader_workers, args.metric_workers) for name, data in sets.items()}
+        report = threshold_comparison(evaluations, recorded, gate if not limited and args.per_domain == 100 else None)
+        report["recorded_sources"] = {h: f"results/exp/{run}/metrics.json: evaluation.groups.Overall.<K>.scores.A"
+                                      for h, run in RUNS.items()}
+        report["evaluations"] = evaluations
+        lines = ["# Observed draft threshold calibration", "",
+                 "Thresholds are selected only by Val-sel Overall A; ties choose the smaller tau. "
+                 "Val-rep per-domain optima are post-hoc, optimistic diagnostics. "
+                 "Train and Val-rep are never used to choose the reported global threshold.", "",
+                 "| Head | Set | Domain | Selected tau | A at 0.5 | A at selected tau | Gain |",
+                 "|---|---|---|---:|---:|---:|---:|"]
+        lines += [f"| {r['head']} | {r['split']} | {r['domain']} | {r['tau']:.2f} | {r['baseline_A']:.9f} | {r['selected_A']:.9f} | {r['gain']:+.9f} |" for r in report["rows"]]
+        lines += ["", "## Post-hoc Val-rep optima (optimistic)", "", "| Head | Domain | tau | A |", "|---|---|---:|---:|"]
+        lines += [f"| {r['head']} | {r['domain']} | {r['tau']:.2f} | {r['A']:.9f} |" for r in report["posthoc"]]
+        lines += ["", "## Registered predictions", "", f"Observed G: {gate}.", report["interpretation"]]
+        lines += [f"Observed {name}: {r['met']}; calibration gain={r['calibration_gain']:+.9f}, "
+                  f"70% of recorded refiner gain={r['required_gain']:.9f}." for name, r in report["hypotheses"].items()]
+        (args.out_dir / "threshold.json").write_text(json.dumps(report, indent=2, allow_nan=False) + "\n")
+        (args.out_dir / "threshold.md").write_text("\n".join(lines) + "\n")
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--per-domain", type=int, default=100)
@@ -188,16 +339,24 @@ def main():
     parser.add_argument("--loader-workers", type=int, default=1)
     parser.add_argument("--metric-workers", type=int, default=6)
     parser.add_argument("--verify-val-drafts", action="store_true")
+    parser.add_argument("--verify-val-refiners", action="store_true")
+    parser.add_argument("--threshold-sweep", action="store_true")
+    parser.add_argument("--eval-limit-per-domain", type=int, help="CPU smoke only: limit each Val subset")
     parser.add_argument("--out-dir", type=Path, default=ROOT / "results/draft_overfit")
     args = parser.parse_args()
     if args.per_domain < 1 or args.loader_workers < 0 or args.metric_workers < 1:
         parser.error("Expected positive sample/metric counts and nonnegative loader workers")
+    if args.eval_limit_per_domain is not None and args.eval_limit_per_domain < 1:
+        parser.error("eval-limit-per-domain must be positive")
     if "NSLOTS" in os.environ and args.loader_workers + args.metric_workers + 1 > int(os.environ["NSLOTS"]):
         parser.error("Loader workers + metric workers + main exceed NSLOTS")
     device = torch.device("cuda" if args.device == "auto" and torch.cuda.is_available() else
                           "cpu" if args.device == "auto" else args.device)
     torch.manual_seed(0)
     encoder, heads, models, epochs = load_pipeline(device)
+    if args.verify_val_refiners or args.threshold_sweep:
+        extension_runs(args, encoder, heads, models)
+        return
     datasets = train_subset(args.per_domain, seed=0)
     train = evaluate(encoder, heads, models, datasets, args.ks, device, args.loader_workers, args.metric_workers)
     val, sources = {}, {}
