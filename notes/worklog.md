@@ -675,3 +675,37 @@ Observed prior job 8596064 on NVIDIA L40S completed with SGE accounting failed=0
 - Observed PASS Counts: the acceptance score_masks function and the repository train_refiner.score_image path agree exactly for all nine fields in each of Urban, Rural and Overall. The CPU subset A comparisons reached the expected FAIL outputs: Urban actual 0.706288319969 versus full-reference 0.570407158552; Rural 0.600431554978 versus 0.483056030491; Overall 0.663610274377 versus 0.540162009156. These compare different-sized datasets and do not constitute a full regression failure. The final log explicitly identifies the run as smoke only. Outputs, including the Counts cross-check, are ignored under runs/submission_e6_acceptance/cpu_scorer_fix_20261113 and runs/submission_e6_trial/scorer_fix.
 - Verified run.json and k1_resources.json were saved before k1_scores.json, all resource fields match the preserved run, the inference feature cache was removed, and no ec523-e6-acceptance scratch directory remains in the trial scratch parent. No extra encoder/refiner forward was used for the Counts comparison.
 - Submission ZIP SHA-256 remains c7f9118b5ae0095f7b1d120c38aad71a6b6ca3c0d9913e5247d9318ef29b08d6. Only the acceptance qsub and this worklog are committed. No submission code, ZIP, checkpoint or results modification, network access, installation, push or scheduler submission occurred. Full GPU acceptance must be resubmitted manually with smoke controls unset.
+
+## 2026-11-13 - e6 independent-package full GPU acceptance
+
+- Confirmed charles/draft-head-v2 at c4c6942 with a clean working tree; no branch change occurred. The latest ec523-submission-e6 log is job 8607822, not the failed job 8607277.
+- Observed NVIDIA L40S, logged HEAD c4c6942c2138e6237739270a6c2faeb22613c368, and full 835-image acceptance with no per-domain limit (log lines 1-5). Local SGE accounting records failed=0, exit_status=0 and ru_wallclock=899 seconds (14 minutes 59 seconds). No Traceback, OOM, NaN, No space left or Killed was found. The final completion marker is log line 3370.
+- Verified each saved run.json has device=cuda, two-phase mode, steps=1/2/4/8 respectively, 835 unique image IDs, and cache_removed=true. No smoke controls took effect. All score reports contain 835 images, and resource JSON fields equal the corresponding saved run records.
+- Observed exactly 12 A comparisons PASS, zero FAIL. Maximum absolute A difference is 3.146360449957086e-08, below tolerance 1e-5. The package-identity PASS and final summary PASS are separate and are not included in the count of 12. Source log: runs/logs/ec523-submission-e6.o8607822, comparison lines 847-849, 1687-1689, 2527-2529 and 3367-3369. Saved score source: runs/submission_e6_acceptance/8607822/k<K>_scores.json, groups.<domain>.scores.quality/reference_A/difference.
+
+| K | Domain | Actual A | Reference A | Difference | Status |
+|---|---|---:|---:|---:|---|
+| 1 | Urban | 0.570407158552 | 0.570407158552 | +0 | PASS |
+| 1 | Rural | 0.483056046318 | 0.483056030491 | +1.58264037431e-08 | PASS |
+| 1 | Overall | 0.540162015175 | 0.540162009156 | +6.01904359687e-09 | PASS |
+| 2 | Urban | 0.573779457649 | 0.573779457649 | +0 | PASS |
+| 2 | Rural | 0.481907831977 | 0.481907831977 | +0 | PASS |
+| 2 | Overall | 0.541691146643 | 0.541691146643 | +0 | PASS |
+| 4 | Urban | 0.578404389915 | 0.578404387248 | +2.66794475401e-09 | PASS |
+| 4 | Rural | 0.478829515509 | 0.478829484889 | +3.06203742917e-08 | PASS |
+| 4 | Overall | 0.543100163680 | 0.543100152192 | +1.14878431212e-08 | PASS |
+| 8 | Urban | 0.579687526879 | 0.579687496084 | +3.07947097822e-08 | PASS |
+| 8 | Rural | 0.469991454383 | 0.469991422919 | +3.14636044996e-08 | PASS |
+| 8 | Overall | 0.539980941031 | 0.539980910016 | +3.10144920856e-08 | PASS |
+
+| K | Encoding seconds | Refinement seconds | Encoding peak CUDA bytes | Refinement peak CUDA bytes |
+|---|---:|---:|---:|---:|
+| 1 | 75.599850636 | 36.121040432 | 1403006976 | 1060269056 |
+| 2 | 68.885213414 | 38.874185980 | 1403006976 | 1060269056 |
+| 4 | 67.454770682 | 47.810653798 | 1403006976 | 1060269056 |
+| 8 | 66.745810872 | 67.811750454 | 1403006976 | 1060269056 |
+
+- Resource source: log lines 846/1686/2526/3366 and k<K>_run.json phases.encoding/refinement. All four encoding peaks are 1,403,006,976 bytes (1.306652 GiB); refinement peaks are 1,060,269,056 bytes (0.987453 GiB), measured as PyTorch-allocated CUDA memory. Encoder release reduced allocated bytes from 1,249,802,240 to 36,233,728 in each run.
+- Recomputed the local submission ZIP SHA-256 without modifying it: c7f9118b5ae0095f7b1d120c38aad71a6b6ca3c0d9913e5247d9318ef29b08d6, identical to the accepted candidate fingerprint.
+- cleared for leaderboard submission. This clearance applies to the unchanged e6 seed-0 small package following all 12 full-data comparisons; no leaderboard upload or scheduler submission was made.
+- Only this worklog is modified and committed. No code, checkpoint, results or package edits; no network access, installation, inference/evaluation rerun or push. Logs, reports and ZIP remain ignored under runs.
