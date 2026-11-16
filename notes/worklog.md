@@ -734,3 +734,36 @@ Experiments: e7 changes only normalized training-step weights to 0.1/0.2/0.3/0.4
 - CPU smoke settings for e7/e8/e9: limit two Train/report images per domain, one epoch, batch 4, seed 0, one selection image per domain, K1/2/4/6/8 evaluation, geometry/extras enabled, zero loader workers and one metric worker. e7 loss=0.14615589380264282, K distribution {4:1}; e8 loss=0.14615589380264282, K distribution {2:0,3:0,4:0,5:1,6:0}; e9 loss=0.09146103262901306, K distribution {4:1}. All are finite and complete training, selection and final evaluation. Best epoch is 1 in all three; selection proxies are 0.4807551769919152 / 0.4807551769919152 / 0.4807581731786162. Overall report A at every requested K is 0.27890664897041045 in each smoke; these observations verify execution, not performance.
 - Observed CPU stage times (training / selection / final evaluation): e7 226.502 / 79.478 / 161.736 s; e8 206.052 / 78.365 / 172.795 s; e9 222.609 / 80.985 / 173.363 s. Corresponding stage sums excluding startup are 467.716 / 457.212 / 476.957 s. Trials ran concurrently with single-thread Torch, so these are workflow timings, not comparative performance measurements or GPU extrapolations.
 - Deleted all ten trial last.pt/best.pt files from the two regression and three smoke checkpoint directories, after checking default model/optimizer/scheduler/RNG equality. Logs and numeric reports remain ignored under runs/b_variants_trial. Predictions above remain unadjudicated and precede any full B results; no full jobs were submitted. Protected model, submission, old job and result files are unchanged, as is the accepted e6 ZIP SHA-256 c7f9118b5ae0095f7b1d120c38aad71a6b6ca3c0d9913e5247d9318ef29b08d6. No network access, installation, push or scheduler submission occurred.
+
+## 2026-11-16 - B refiner results acceptance
+
+- Confirmed charles/draft-head-v2 at 6677be1 with no tracked changes; only the nine new B result directories were untracked. No branch change occurred.
+- Observed all nine jobs completed on NVIDIA L40S at logged source HEAD 6677be1f057aa2bb88fc7479a4a37582964f6057. Direct local SGE accounting records failed=0 and exit_status=0 for each. Logs contain no Traceback, OOM, NaN, Killed, quota or no-space error; every log ends with written results and the y0 PASS. GPU/HEAD sources are log lines 1/3; first epoch resource records are line 636; y0 regression is line 7172.
+
+| Experiment | Seed | Job | Wallclock s | Peak training CUDA bytes | Best epoch | Val-sel proxy | y0 regression |
+|---|---|---|---:|---:|---:|---:|---|
+| e7_stepw | 0 | 8668647 | 2730 | 6628442112 | 1 | 0.548388805852 | PASS |
+| e7_stepw | 1 | 8668648 | 2725 | 6628442112 | 1 | 0.545729473870 | PASS |
+| e7_stepw | 2 | 8668649 | 2717 | 6628442112 | 1 | 0.543276421121 | PASS |
+| e8_randk | 0 | 8668650 | 2724 | 9046197248 | 1 | 0.547035686114 | PASS |
+| e8_randk | 1 | 8668651 | 2709 | 9046197248 | 1 | 0.547406252641 | PASS |
+| e8_randk | 2 | 8668652 | 2562 | 9046197248 | 1 | 0.544630396967 | PASS |
+| e9_posw2 | 0 | 8668653 | 2793 | 6628442112 | 2 | 0.546474693020 | PASS |
+| e9_posw2 | 1 | 8668654 | 2751 | 6628442112 | 4 | 0.538033887271 | PASS |
+| e9_posw2 | 2 | 8668655 | 2757 | 6628442112 | 4 | 0.537018886854 | PASS |
+
+- Observed y0_draft Overall A=0.5382461209070982 in all nine reports; the logged difference from 0.538246 is +1.20907098222e-07, within 1e-5. Verified seeds, the one-variable interventions, A1-i probe path, 10 epochs, batch 4, nominal K_train=4, evaluation K1/2/4/6/8, selection weights, unchanged split SHA, identical fixed selection files and exactly the 835 Val-rep files. Evaluated epochs equal best epochs. All JSON numeric values are finite.
+- Observed e8 covers every K in 2-6 in each of its 30 seed/epoch combinations, with 631 batches per epoch. For seeds 0/1/2 respectively, K6 batch counts range 104-139 / 110-135 / 111-129 across the ten epochs. All batch step-loss lengths equal the sampled K. Sources: e8 metrics.json epochs[*].k_distribution and epochs[*].batches[*].k_train/step_losses.
+- Resource limitation: the logger records peak_cuda_bytes at epoch level, not per batch or by K. The e8 mixed-depth epoch maxima are 9,046,197,248 bytes (8.424928 GiB) for each seed, while e7/e9 maxima are 6,628,442,112 bytes (6.173218 GiB). An isolated K6 peak is not available and must not be inferred as measured from the epoch maximum; no inference/training was rerun to obtain it.
+- Regenerated the existing aggregate with analysis/aggregate_experiments.py. Observed summary.md has 35 added lines and zero removed/changed existing lines, including the new B variants vs e6 section. Existing experiment/aggregate/Table 1 objects and all earlier comparison sections remain unchanged. In summary.json, completed_runs changes from 21 to 30; B objects are added, with the required JSON array-separator changes. Existing e0-e6 numeric values and other metadata are identical.
+
+| Experiment | Overall K4 A mean | K4-K1 mean | K8-K4 mean | K4 IoU mean | Val-sel proxy mean |
+|---|---:|---:|---:|---:|---:|
+| e6_convdraft | 0.540766283669 | 0.000645309895 | -0.003381376454 | 0.628657936214 | 0.545286117908 |
+| e7_stepw | 0.541400116861 | 0.001329346144 | -0.012009266250 | 0.629047228119 | 0.545798233614 |
+| e8_randk | 0.541546008271 | 0.000553856399 | -0.000111484415 | 0.628518383086 | 0.546357445240 |
+| e9_posw2 | 0.535028670143 | -0.000855627973 | -0.001137413249 | 0.624386485642 | 0.540509155715 |
+
+- Observed P_e7=False: K4-K1=0.001329346144 is below 0.0027, although K4 A=0.541400116861 exceeds 0.539766. Observed P_e8=True: K8-K4=-0.000111484415 is at least -0.001 and K4 A=0.541546008271 exceeds 0.539766. Observed P_e9=False: K4 IoU=0.624386485642 versus e6=0.628657936214 (difference -0.004271450572, below required +0.005), and K4 A=0.535028670143 is below 0.539766. Sources: summary.md Overall rows in B variants vs e6, and summary.json b_comparison.rows.
+- Observed only e8 satisfies its registered prediction, so the registered rule selects e8_randk as the next leaderboard candidate. Its Val-sel proxy mean is 0.546357445240; seed 1 has the highest proxy 0.547406252641056 (best epoch 1; metrics.json lines 232178-232179). Candidate checkpoint is runs/exp/e8_randk_s1/best.pt. The e7/e8-both-satisfy combination condition is not met. This is the preregistered rule outcome, not a causal conclusion or a submission action.
+- Verified the new result directories contain only summary.md and metrics.json. Largest new file is 6,701,600 bytes, below 50 MB; new results and both aggregate files pass the personal-account/absolute-path scan. Raw run results were not modified. Only the 18 new numeric/text result files, two aggregate files and this appended worklog are committed. No code/model/checkpoint/old-run edits, network access, installation, training/evaluation rerun, qsub submission or push occurred.
