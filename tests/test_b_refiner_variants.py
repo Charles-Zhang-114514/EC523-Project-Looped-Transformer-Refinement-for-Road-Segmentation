@@ -87,6 +87,47 @@ class BRefinerTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, 'mutually exclusive'):
             runner.validate_step_training(args)
 
+    def test_nonzero_conv_head_step_weights_change_real_loss_and_gradients(self):
+        initial = runner.LoopRefiner(8, dimension=16, heads=4, patch=16,
+                                     image_size=32, head_type='conv_upsample')
+        torch.nn.init.normal_(initial.output_head.final.weight, std=.05)
+        features, draft = torch.randn(2, 8, 2, 2), torch.randn(2, 1, 32, 32)
+        targets = torch.randint(0, 2, (2, 32, 32)).float()
+        valid = torch.rand(2, 32, 32) > .1
+        settings = [runner.build_parser().parse_args(arguments) for arguments in
+                    ([], ['--step-weights', '0.1,0.2,0.3,0.4'])]
+        results = []
+        for args in settings:
+            runner.validate_step_training(args)
+            model = copy.deepcopy(initial).train()
+            outputs = runner.refine_steps(model, features, draft, args.k_train)
+            # This is the same objective call used by the actual BCE trainer.
+            loss, steps, _, _, _ = runner.refiner_objective(
+                outputs, targets, valid, draft, args.noadd_lambda,
+                pos_weight=args.pos_weight, step_weights=args.step_weights)
+            loss.backward()
+            gradients = {name: parameter.grad.detach().clone()
+                         for name, parameter in model.named_parameters() if parameter.grad is not None}
+            results.append(dict(total=loss.item(), steps=[step.item() for step in steps],
+                                gradients=gradients))
+        uniform, weighted = results
+        self.assertEqual(uniform['steps'], weighted['steps'])
+        self.assertEqual(len(set(weighted['steps'])), 4, 'Nonzero head must produce four distinct losses')
+        # Independent arithmetic is only an oracle, never the training loss.
+        manual = sum(weight * loss for weight, loss in zip(settings[1].step_weights, weighted['steps']))
+        self.assertAlmostEqual(weighted['total'], manual, delta=1e-6)
+        self.assertNotAlmostEqual(weighted['total'], uniform['total'], delta=1e-6)
+        different = [name for name, gradient in uniform['gradients'].items()
+                     if not torch.equal(gradient, weighted['gradients'][name])]
+        self.assertTrue(different, 'Step weights must change at least one parameter gradient')
+        name = max(different, key=lambda key: abs(uniform['gradients'][key].norm().item() -
+                                                 weighted['gradients'][key].norm().item()))
+        print('WEIGHTED_STEP_GRADIENT ' + json.dumps(dict(
+            per_step_losses=weighted['steps'], uniform_total=uniform['total'],
+            weighted_total=weighted['total'], manual_weighted_total=manual,
+            parameter=name, uniform_gradient_norm=uniform['gradients'][name].norm().item(),
+            weighted_gradient_norm=weighted['gradients'][name].norm().item())), flush=True)
+
     def test_random_k_is_reproducible_without_global_rng_or_loader_changes(self):
         class Dataset:
             def __len__(self):
