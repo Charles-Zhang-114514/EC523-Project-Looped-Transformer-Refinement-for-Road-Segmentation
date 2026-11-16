@@ -18,6 +18,7 @@ sys.path.insert(0, str(ROOT))
 sys.path.insert(0, str(ROOT/'src'))
 from submission.model import DEFAULT_CONFIG, refiner_from_config
 from looproad.models.linear_probe import LinearProbe
+from submission.baseline import probe_from_metadata
 
 
 def file_hash(path):
@@ -38,10 +39,18 @@ def export_weights(refiner_checkpoint, probe_checkpoint, output_dir):
     if config['head_type'] != 'conv_upsample' or count != 1_193_025:
         raise ValueError('Expected the selected v2 conv_upsample architecture')
     probe_saved = torch.load(probe_checkpoint, map_location='cpu', weights_only=True)
-    if (probe_saved.get('encoder'), probe_saved.get('head'), float(probe_saved.get('pos_weight', -1))) != (
-            'dinov3_vitl16_web', 'bn_linear', 4.):
-        raise ValueError('Expected the selected frozen web-encoder BN probe')
-    probe = LinearProbe(1024, head_type='bn_linear')
+    head_type = probe_saved.get('head')
+    if (probe_saved.get('encoder') != 'dinov3_vitl16_web' or head_type not in ('bn_linear', 'conv_up')
+            or float(probe_saved.get('pos_weight', -1)) != 4.):
+        raise ValueError('Expected a frozen web-encoder bn_linear or A1-i conv_up head')
+    head_metadata = {'encoder': 'dinov3_vitl16_web', 'head': head_type, 'pos_weight': '4',
+                     'source_sha256': file_hash(probe_checkpoint)}
+    if head_type == 'conv_up':
+        if probe_saved.get('draft_layers') != 'last':
+            raise ValueError('Submission supports only the A1-i last-layer conv_up head')
+        head_metadata['head_config'] = json.dumps(dict(in_channels=1024, input_layers=1, draft_layers='last'), sort_keys=True)
+        head_metadata['source_epoch'] = str(probe_saved['epoch'])
+    probe = probe_from_metadata(head_metadata)
     probe.load_state_dict(probe_saved['state_dict'], strict=True)
     states = [refiner.state_dict(), probe.state_dict()]
     if any(not torch.isfinite(tensor).all() for state in states for tensor in state.values()):
@@ -49,8 +58,7 @@ def export_weights(refiner_checkpoint, probe_checkpoint, output_dir):
     output_dir.mkdir(parents=True, exist_ok=True)
     metadata = [{'config': json.dumps(config, sort_keys=True), 'source_epoch': str(saved['epoch']),
                  'source_seed': str(saved['config']['seed']), 'source_sha256': file_hash(refiner_checkpoint)},
-                {'encoder': 'dinov3_vitl16_web', 'head': 'bn_linear', 'pos_weight': '4',
-                 'source_sha256': file_hash(probe_checkpoint)}]
+                head_metadata]
     reports = []
     for path, state, model, attributes in zip(paths, states, (refiner, probe), metadata):
         tensors = {name: value.detach().cpu().contiguous() for name, value in state.items()}

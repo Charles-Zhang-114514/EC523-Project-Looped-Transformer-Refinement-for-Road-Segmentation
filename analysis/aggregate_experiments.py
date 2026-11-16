@@ -8,6 +8,14 @@ import statistics
 ROOT = Path(__file__).resolve().parents[1]
 EXPERIMENTS = ('e0_v2', 'e1_reset', 'e2_nofb', 'e3_single', 'e4_untied', 'e5_noadd')
 EXPECTED = tuple(f'{experiment}_s{seed}' for experiment in EXPERIMENTS for seed in (0, 1, 2))
+OPTIONAL_EXPERIMENTS = ('e6_convdraft', 'e7_stepw', 'e8_randk', 'e9_posw2')
+CONV_DRAFT_MARKER = '\n\n## Conv draft head (e6) vs linear draft (e0)\n'
+B_MARKER = '\n\n## B variants vs e6\n'
+B_EXPERIMENTS = ('e6_convdraft', 'e7_stepw', 'e8_randk', 'e9_posw2')
+B_COLUMNS = ('experiment', 'domain', 'status', 'A_K1', 'A_K2', 'A_K4', 'A_K6', 'A_K8',
+             'K4_minus_K1', 'K8_minus_K4', 'IoU_K4', 'clDice_K4', 'BIoU_K4', 'Val_sel_proxy')
+CONV_DRAFT_COLUMNS = ('experiment', 'seed', 'domain', 'status', 'y0_A',
+                      'A_K1', 'gain_K1', 'A_K2', 'gain_K2', 'A_K4', 'gain_K4', 'A_K8', 'gain_K8')
 COLUMNS = ('experiment', 'seed', 'status', 'best_epoch', 'y0_A', 'A_K1', 'A_K2', 'A_K4', 'A_K6', 'A_K8', 'proxy',
            'Urban_A_K1', 'Rural_A_K1', 'Urban_A_K4', 'Rural_A_K4', 'gap_repair_K1', 'new_break_K1',
            'gap_repair_K4', 'new_break_K4', 'correct_added_K1', 'correct_deleted_K1', 'new_fragments_K1')
@@ -80,9 +88,9 @@ def completed_seeds(rows, experiment):
     return [by_seed[seed] for seed in (0, 1, 2) if seed in by_seed]
 
 
-def table1_rows(rows, aggregates):
+def table1_rows(rows, aggregates, experiments=EXPERIMENTS):
     candidates = []
-    for experiment, aggregate in zip(EXPERIMENTS, aggregates):
+    for experiment, aggregate in zip(experiments, aggregates):
         selected = completed_seeds(rows, experiment)
         candidate = {'experiment': experiment, 'status': aggregate['status'],
                      'best_epochs': [r['best_epoch'] for r in selected]}
@@ -123,14 +131,106 @@ def display(value):
 def aggregate_directory(directory):
     discovered = {p.parent.name for p in directory.glob('*/metrics.json')
                   if '_s' in p.parent.name and not p.parent.name.endswith('_rerun')}
-    names = list(EXPECTED) + sorted(discovered - set(EXPECTED))
+    optional = tuple(experiment for experiment in OPTIONAL_EXPERIMENTS
+                     if any(name.startswith(experiment+'_s') for name in discovered))
+    experiments = EXPERIMENTS + optional
+    expected = EXPECTED + tuple(f'{experiment}_s{seed}' for experiment in optional for seed in (0, 1, 2))
+    names = list(expected) + sorted(discovered - set(expected))
     rows = [read_run(name, directory/name/'metrics.json') for name in names]
-    aggregates = [mean_row(rows, experiment) for experiment in EXPERIMENTS]
-    return {'rows': rows + aggregates, 'completed_runs': sum(r['status'] == 'complete' for r in rows),
-            'table1': table1_rows(rows, aggregates),
+    aggregates = [mean_row(rows, experiment) for experiment in experiments]
+    report = {'rows': rows + aggregates, 'completed_runs': sum(r['status'] == 'complete' for r in rows),
+            'table1': table1_rows(rows, aggregates, experiments),
             'standard_deviation': 'sample standard deviation (ddof=1)',
             'proxy_definition': '0.25*A(K1)+0.25*A(K2)+0.5*A(K4)',
             'observations': 'Observed Val-rep results. Unfinished runs are missing; no conclusions are inferred.'}
+    if 'e6_convdraft' in optional:
+        report['conv_draft_comparison'] = conv_draft_comparison(directory)
+    if any(experiment in optional for experiment in B_EXPERIMENTS[1:]):
+        report['b_comparison'] = b_comparison(directory)
+    return report
+
+
+def b_comparison(directory):
+    """Three-seed comparisons; selection proxy comes from Val-sel best_score."""
+    seeds, rows = [], []
+    for experiment in B_EXPERIMENTS:
+        for domain in ('Overall', 'Urban', 'Rural'):
+            selected = []
+            for seed in (0, 1, 2):
+                path = directory/f'{experiment}_s{seed}'/'metrics.json'
+                complete = read_run(f'{experiment}_s{seed}', path)['status'] == 'complete'
+                data = json.loads(path.read_text()) if complete else None
+                complete = complete and isinstance(data.get('best_score'), (float, int))
+                row = dict(experiment=experiment, seed=seed, domain=domain,
+                           status='complete' if complete else 'missing')
+                if complete:
+                    group = data['evaluation']['groups'][domain]
+                    for k in (1, 2, 4, 6, 8):
+                        row[f'A_K{k}'] = group[str(k)]['scores']['A']
+                    row['K4_minus_K1'] = row['A_K4'] - row['A_K1']
+                    row['K8_minus_K4'] = row['A_K8'] - row['A_K4']
+                    for column, metric in (('IoU_K4', 'road_iou'), ('clDice_K4', 'cldice'), ('BIoU_K4', 'boundary_iou')):
+                        row[column] = group['4']['scores'][metric]
+                    row['Val_sel_proxy'] = data['best_score']
+                    selected.append(row)
+                seeds.append(row)
+            aggregate = dict(experiment=experiment, domain=domain,
+                             status='complete' if len(selected) == 3 else 'incomplete')
+            if len(selected) == 3:
+                for field in B_COLUMNS[3:]:
+                    values = [row[field] for row in selected]
+                    aggregate[field] = dict(mean=statistics.mean(values), std=statistics.stdev(values))
+            rows.append(aggregate)
+    return dict(rows=rows, seeds=seeds,
+                observations='Observed Val-rep scores and paired-depth differences within each run; mean and sample standard deviation require all three seeds. Val-sel proxy is the selected checkpoint best_score, not the Val-rep proxy.')
+
+
+def b_markdown(comparison):
+    lines = [comparison['observations'], '', '| ' + ' | '.join(B_COLUMNS) + ' |',
+             '|' + '---|'*len(B_COLUMNS)]
+    lines += ['| ' + ' | '.join(display(row.get(key)) for key in B_COLUMNS) + ' |'
+              for row in comparison['rows']]
+    return '\n'.join(lines) + '\n'
+
+
+def conv_draft_comparison(directory):
+    """Compare each trained refiner with its own draft, never the other head."""
+    rows, aggregates = [], []
+    for experiment in ('e0_v2', 'e6_convdraft'):
+        for seed in (0, 1, 2):
+            path = directory/f'{experiment}_s{seed}'/'metrics.json'
+            complete = read_run(f'{experiment}_s{seed}', path)['status'] == 'complete'
+            data = json.loads(path.read_text()) if complete else None
+            for domain in ('Overall', 'Urban', 'Rural'):
+                row = dict(experiment=experiment, seed=seed, domain=domain,
+                           status='complete' if complete else 'missing')
+                if complete:
+                    group = data['evaluation']['groups'][domain]
+                    row['y0_A'] = group['y0_draft']['scores']['A']
+                    for k in (1, 2, 4, 8):
+                        row[f'A_K{k}'] = group[str(k)]['scores']['A']
+                        row[f'gain_K{k}'] = row[f'A_K{k}'] - row['y0_A']
+                rows.append(row)
+        for domain in ('Overall', 'Urban', 'Rural'):
+            selected = [r for r in rows if r['experiment'] == experiment and r['domain'] == domain
+                        and r['status'] == 'complete']
+            row = dict(experiment=experiment+' mean ± std (3 seeds)', seed='0,1,2', domain=domain,
+                       status='complete' if len(selected) == 3 else 'incomplete')
+            if len(selected) == 3:
+                for field in CONV_DRAFT_COLUMNS[4:]:
+                    values = [r[field] for r in selected]
+                    row[field] = dict(mean=statistics.mean(values), std=statistics.stdev(values))
+            aggregates.append(row)
+    return dict(rows=rows+aggregates,
+                observations='Observed gains subtract each run and domain\'s own y0. Means require three seeds; sample standard deviations use ddof=1.')
+
+
+def conv_draft_markdown(comparison):
+    lines = [comparison['observations'], '',
+             '| ' + ' | '.join(CONV_DRAFT_COLUMNS) + ' |', '|'+'---|'*len(CONV_DRAFT_COLUMNS)]
+    lines += ['| ' + ' | '.join(display(row.get(key)) for key in CONV_DRAFT_COLUMNS) + ' |'
+              for row in comparison['rows']]
+    return '\n'.join(lines)+'\n'
 
 
 def read_inference_row(data, seed, mode):
@@ -206,6 +306,8 @@ def existing_comparison_appendix(directory):
         text = (directory/'summary.md').read_text(encoding='utf-8')
     except FileNotFoundError:
         return ''
+    # This suffix is generated separately; retain all older appendices verbatim.
+    text = text.split(B_MARKER, 1)[0].split(CONV_DRAFT_MARKER, 1)[0]
     marker = '\n\n## Untied vs shared\n'
     position = text.find(marker)
     return text[position:] if position >= 0 else ''
@@ -236,7 +338,12 @@ def main():
     lines += ['| ' + ' | '.join(display(row.get(key)) for key in TABLE1_COLUMNS) + ' |' for row in report['table1']]
     out_dir.mkdir(parents=True, exist_ok=True)
     (out_dir/'summary.json').write_text(json.dumps(report, indent=2, allow_nan=False)+'\n', encoding='utf-8')
-    (out_dir/'summary.md').write_text('\n'.join(lines)+'\n'+existing_comparison_appendix(args.results_dir), encoding='utf-8')
+    text = '\n'.join(lines)+'\n'+existing_comparison_appendix(args.results_dir)
+    if 'conv_draft_comparison' in report:
+        text += CONV_DRAFT_MARKER + '\n' + conv_draft_markdown(report['conv_draft_comparison'])
+    if 'b_comparison' in report:
+        text += B_MARKER + '\n' + b_markdown(report['b_comparison'])
+    (out_dir/'summary.md').write_text(text, encoding='utf-8')
     print(f"Observed {report['completed_runs']} completed runs; wrote summary.md and summary.json", flush=True)
 
 

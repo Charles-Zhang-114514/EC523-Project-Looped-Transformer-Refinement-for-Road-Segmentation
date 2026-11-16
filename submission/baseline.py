@@ -1,4 +1,4 @@
-"""Frozen local DINOv3-web + BN probe, aligned with baseline.py:1-6.
+"""Frozen local DINOv3-web + metadata-selected head, aligned with baseline.py:1-6.
 
 Reuse the project's encoder and probe forward implementations, as used by
 scripts/train_refiner.py:frozen_draft. No image processor resizes inputs, no
@@ -10,6 +10,7 @@ import sys
 
 import torch
 from torch import nn
+from safetensors import safe_open
 from safetensors.torch import load_file
 from transformers import AutoModel
 
@@ -19,6 +20,29 @@ from looproad.encoders.huggingface import DinoV3WebViTL16Encoder
 from looproad.models.linear_probe import LinearProbe
 
 ENCODER_FILES = ('config.json', 'preprocessor_config.json', 'model.safetensors')
+
+
+def probe_from_metadata(metadata):
+    """Build only known frozen heads; absent metadata preserves legacy BN math."""
+    head_type = metadata.get('head', 'bn_linear')
+    if head_type == 'bn_linear':
+        return LinearProbe(1024, head_type='bn_linear')
+    if head_type == 'conv_up':
+        config = json.loads(metadata['head_config'])
+        if config != dict(in_channels=1024, input_layers=1, draft_layers='last'):
+            raise ValueError('Submission conv_up supports only the A1-i last-layer configuration')
+        from looproad.models.draft_head import ConvUpDraftHead
+        return ConvUpDraftHead(config['in_channels'], config['input_layers'])
+    raise ValueError(f'Unsupported frozen draft head: {head_type}')
+
+
+def load_probe(checkpoint):
+    """Tensor-only head load including BN buffers; no pickle at inference."""
+    with safe_open(str(checkpoint), framework='pt', device='cpu') as reader:
+        metadata = reader.metadata() or {}
+    probe = probe_from_metadata(metadata)
+    probe.load_state_dict(load_file(str(checkpoint), device='cpu'), strict=True)
+    return probe.requires_grad_(False).eval()
 
 
 class FrozenBaseline(nn.Module):
@@ -59,6 +83,5 @@ def load_baseline(checkpoint, encoder_dir, device):
     encoder = DinoV3WebViTL16Encoder(backbone, mean, std, autocast_bf16=True)
     if encoder.out_channels != 1024 or encoder.patch_size != 16:
         raise ValueError('Expected DINOv3 ViT-L/16 features with 1024 channels')
-    probe = LinearProbe(1024, head_type='bn_linear')
-    probe.load_state_dict(load_file(str(checkpoint), device='cpu'), strict=True)
+    probe = load_probe(checkpoint)
     return FrozenBaseline(encoder, probe).to(device).eval()

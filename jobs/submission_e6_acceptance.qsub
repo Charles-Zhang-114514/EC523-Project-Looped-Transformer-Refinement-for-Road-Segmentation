@@ -1,0 +1,201 @@
+#!/bin/bash -l
+#$ -N ec523-submission-e6
+#$ -P ec523kb
+#$ -cwd
+#$ -pe omp 8
+#$ -l gpus=1
+#$ -l gpu_c=8.0
+#$ -l mem_per_core=8G
+#$ -l h_rt=01:30:00
+#$ -m ea
+#$ -j y
+#$ -o runs/logs/
+
+# A40 Midway estimate: 4*120 s encoding + (37+45+66+106) s refinement
+# + 4*835*.125 s scoring = 1151.5 s (~19.2 min). Charge the full A1
+# training head forward/backward rate .086/8 s/image as additional frozen
+# head overhead: 4*835*.086/8=35.9 s, giving ~19.8 min. Allow 25 min for
+# ~104 GiB feature-cache read/write traffic, extraction, encoder copy and
+# output, plus 10 min variation; request 90 min. No CPU extrapolation.
+# Require 32 GiB scratch; one live 13.05 GiB cache and ~3.3 GiB probabilities.
+set -euo pipefail
+E6_REPO="${SGE_O_WORKDIR:?Submit from repository root}"
+NODE_TMP="${TMPDIR:?SGE node-local TMPDIR is required}"
+source "$E6_REPO/env.sh"
+cd "$E6_REPO"
+export TMPDIR="$NODE_TMP" TMP="$NODE_TMP" TEMP="$NODE_TMP"
+export E6_REPORTS="$E6_REPO/runs/submission_e6_acceptance/${JOB_ID:?}"
+mkdir -p "$E6_REPORTS"
+export E6_TMP
+E6_TMP="$(mktemp -d "$TMPDIR/ec523-e6-acceptance-XXXXXX")"
+trap 'rm -rf -- "$E6_TMP"' EXIT
+export E6_REPO
+# Optional smoke controls; unset means the original full CUDA acceptance.
+export ACCEPTANCE_DEVICE="${ACCEPTANCE_DEVICE:-cuda}"
+export ACCEPTANCE_KS="${ACCEPTANCE_KS:-1 2 4 8}"
+export ACCEPTANCE_LIMIT_PER_DOMAIN="${ACCEPTANCE_LIMIT_PER_DOMAIN:-}"
+export ACCEPTANCE_CHECK_COUNTS="${ACCEPTANCE_CHECK_COUNTS:-0}"
+case "$ACCEPTANCE_DEVICE" in cpu|cuda) ;; *) echo 'Invalid ACCEPTANCE_DEVICE' >&2; exit 2 ;; esac
+test -n "$ACCEPTANCE_KS"
+for k in $ACCEPTANCE_KS; do
+    case "$k" in 1|2|4|8) ;; *) echo 'ACCEPTANCE_KS must contain only 1, 2, 4, 8' >&2; exit 2 ;; esac
+done
+export OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1
+export HF_HOME="$E6_TMP/empty_hf" HF_HUB_OFFLINE=1 TRANSFORMERS_OFFLINE=1 HF_HUB_DISABLE_TELEMETRY=1
+export HF_HUB_CACHE="$HF_HOME/hub" HUGGINGFACE_HUB_CACHE="$HF_HOME/hub"
+unset TRANSFORMERS_CACHE PYTHONPATH
+export PYTHONNOUSERSITE=1
+mkdir "$HF_HOME"
+: "${EC523_DATA_DIR:?Set the read-only dataset path}"
+: "${EC523_STARTER_DIR:?Set the official CLI directory}"
+export EC523_ENCODER_DIR="${EC523_ENCODER_DIR:-$E6_REPO/submission/encoder}"
+export E6_PACKAGE_ZIP="${E6_PACKAGE_ZIP:-$E6_REPO/runs/submission_packages/e6_s0.zip}"
+python - <<'PY'
+import json, os, shutil, zipfile
+from pathlib import Path
+import torch, numpy, transformers
+root, repo = Path(os.environ['E6_TMP']), Path(os.environ['E6_REPO'])
+print('GPU:', torch.cuda.get_device_name() if os.environ['ACCEPTANCE_DEVICE']=='cuda' else 'CPU smoke', flush=True)
+print('Versions:', torch.__version__, numpy.__version__, transformers.__version__, flush=True)
+print('Scratch free bytes:', shutil.disk_usage(root).free, flush=True)
+if shutil.disk_usage(root).free < 32*1024**3:
+    raise RuntimeError('Need at least 32 GiB free node-local scratch')
+with zipfile.ZipFile(os.environ['E6_PACKAGE_ZIP']) as archive:
+    for entry in archive.namelist():
+        if Path(entry).is_absolute() or '..' in Path(entry).parts:
+            raise ValueError('Unsafe ZIP member')
+    archive.extractall(root/'unpacked')
+rows = []
+limit_text = os.environ['ACCEPTANCE_LIMIT_PER_DOMAIN']
+limit = int(limit_text) if limit_text else None
+if limit is not None and limit <= 0:
+    raise ValueError('ACCEPTANCE_LIMIT_PER_DOMAIN must be positive')
+for domain, names in json.loads((repo/'configs/val_split_seed0.json').read_text())['Val-rep'].items():
+    if limit is not None:
+        names = sorted(names)[:limit]
+    for name in names:
+        image = Path(os.environ['EC523_DATA_DIR'])/'Val'/domain/'images_png'/name
+        link = root/'images'/domain.lower()/name
+        link.parent.mkdir(parents=True, exist_ok=True)
+        link.symlink_to(image.resolve(strict=True))
+        rows.append(dict(id=f'{domain.lower()}/{Path(name).stem}', domain=domain,
+                         label=str((image.parent.parent/'masks_png'/name).resolve(strict=True))))
+assert len(rows) == 835 if limit is None else len(rows) == 2*limit
+print('Acceptance images:', len(rows), 'limit per domain:', limit, flush=True)
+(root/'labels.json').write_text(json.dumps(rows))
+(root/'cache').mkdir()
+PY
+git rev-parse HEAD
+cd "$E6_TMP/unpacked"
+# Offline preparation copies from the explicit source; it never moves or
+# changes the shared encoder directory. No repository PYTHONPATH is present.
+python submission/fetch_encoder.py --from-dir "$EC523_ENCODER_DIR" --dest submission/encoder
+python - <<'PY'
+import os, hashlib
+from pathlib import Path
+from safetensors import safe_open
+repo = Path(os.environ['E6_REPO'])
+for exported, source in [('model.safetensors','runs/exp/e6_convdraft_s0/best.pt'),
+                         ('baseline.safetensors','runs/draft_head/A1-i/best.pt')]:
+    with safe_open('submission/'+exported, framework='pt') as reader:
+        metadata = reader.metadata()
+    with (repo/source).open('rb') as stream:
+        assert hashlib.file_digest(stream,'sha256').hexdigest() == metadata['source_sha256']
+    if exported == 'baseline.safetensors':
+        assert metadata['head'] == 'conv_up'
+print('PASS package identifies the paired A1-i / e6 seed-0 checkpoints', flush=True)
+PY
+for k in $ACCEPTANCE_KS; do
+    test -z "$(find "$HF_HOME" -type f -print -quit)"
+    python -u submission/predict.py --checkpoint submission/model.safetensors \
+        --baseline submission/baseline.safetensors --encoder-dir submission/encoder \
+        --input "$E6_TMP/images" --output "$E6_TMP/out_k${k}" --steps "$k" \
+        --device "$ACCEPTANCE_DEVICE" --cache-dir "$E6_TMP/cache" --seed 0
+    # Preserve inference evidence BEFORE importing or running any scorer.
+    cp "$E6_TMP/out_k${k}/run.json" "$E6_REPORTS/k${k}_run.json"
+    python - "$k" <<'PY'
+import json, os, sys
+from pathlib import Path
+k = sys.argv[1]; reports = Path(os.environ['E6_REPORTS'])
+run = json.loads((reports/f'k{k}_run.json').read_text())
+resources = dict(phases=run['phases'], encoder_release=run['encoder_release'], device=run['device'])
+(reports/f'k{k}_resources.json').write_text(json.dumps(resources, indent=2))
+assert run['mode'] == 'two-phase' and run['cache_removed']
+assert all(p['peak_cuda_allocated_bytes'] is None or p['peak_cuda_allocated_bytes'] <= 48*1024**3 for p in run['phases'].values())
+print('PHASES',k,json.dumps(run['phases']),'RELEASE',json.dumps(run['encoder_release']),flush=True)
+PY
+    python - "$k" <<'PY'
+import importlib.util, json, os, sys
+from dataclasses import asdict
+from pathlib import Path
+import numpy as np
+from PIL import Image
+k = sys.argv[1]
+root, repo, reports = map(Path, (os.environ['E6_TMP'],os.environ['E6_REPO'],os.environ['E6_REPORTS']))
+# Official metrics imports its sibling common.py. Only this scorer process
+# gets the starter path; inference still runs with PYTHONPATH unset.
+sys.path.insert(0, os.environ['EC523_STARTER_DIR'])
+spec = importlib.util.spec_from_file_location('official_metrics', Path(os.environ['EC523_STARTER_DIR'])/'metrics.py')
+metrics = importlib.util.module_from_spec(spec); spec.loader.exec_module(metrics)
+rows = json.loads((root/'labels.json').read_text())
+prediction = root/f'out_k{k}'
+assert len(list((prediction/'road_masks').rglob('*.png'))) == len(rows)
+
+def read_masks(row):
+    with Image.open(prediction/'road_masks'/(row['id']+'.png')) as source:
+        mask = np.asarray(source)
+    with Image.open(row['label']) as source:
+        labels = np.asarray(source)
+    assert mask.dtype == np.uint8 and mask.shape == labels.shape == (1024,1024)
+    assert set(np.unique(mask)) <= {0,1}
+    return mask, labels
+
+def score_masks():
+    counts = {d: metrics.Counts() for d in ('Urban','Rural')}
+    for row in rows:
+        mask, labels = read_masks(row)
+        counts[row['domain']] = counts[row['domain']] + metrics.image_counts(mask.astype(np.float32), labels)
+    counts['Overall'] = counts['Urban'] + counts['Rural']
+    return counts
+
+counts = score_masks()
+repository_counts = None
+if os.environ['ACCEPTANCE_CHECK_COUNTS'] == '1':
+    # Smoke-only cross-check uses the repository's existing scoring wrapper;
+    # no additional encoder/refiner forward, and no inference path change.
+    sys.path[:0] = [str(repo/'src'), str(repo)]
+    from scripts import train_refiner as runner
+    runner.initialize_eval_worker(os.environ['EC523_STARTER_DIR'])
+    other = {d: metrics.Counts() for d in ('Urban','Rural')}
+    for row in rows:
+        mask, labels = read_masks(row)
+        _, _, values, _ = runner.score_image(row['domain'],row['id'],{'y0_draft':mask},labels,False)
+        other[row['domain']] = other[row['domain']] + metrics.Counts(**values['y0_draft']['counts'])
+    other['Overall'] = other['Urban'] + other['Rural']
+    repository_counts = {d: asdict(v) for d,v in other.items()}
+    assert repository_counts == {d: asdict(v) for d,v in counts.items()}
+    print('PASS Counts: acceptance score_masks equals repository score_image for every field/domain', flush=True)
+reference = json.loads((repo/'results/exp/e6_convdraft_s0/metrics.json').read_text())['evaluation']['groups']
+scores = {}; passed = True
+for domain, value in counts.items():
+    result = metrics.summarize(value)
+    expected = reference[domain][k]['scores']['A']; delta = result['quality']-expected
+    ok = abs(delta) <= 1e-5; passed = passed and ok
+    print(f'{"PASS" if ok else "FAIL"} K={k} {domain} A={result["quality"]:.12f} reference={expected:.12f} delta={delta:+.12g}', flush=True)
+    scores[domain] = dict(scores=result, counts=asdict(value), reference_A=expected, difference=delta, passed=ok)
+(reports/f'k{k}_scores.json').write_text(json.dumps(dict(groups=scores, passed=passed, number_of_images=len(rows),
+                                                      repository_counts=repository_counts), indent=2))
+PY
+    rm -rf -- "$E6_TMP/out_k${k}"
+    test -z "$(find "$HF_HOME" -type f -print -quit)"
+done
+python - <<'PY'
+import json, os
+from pathlib import Path
+reports = Path(os.environ['E6_REPORTS'])
+ks = os.environ['ACCEPTANCE_KS'].split()
+passed = all(json.loads((reports/f'k{k}_scores.json').read_text())['passed'] for k in ks)
+print('PASS' if passed else 'FAIL', f'e6 independent-package regression ({3*len(ks)} A comparisons); completed', flush=True)
+if os.environ['ACCEPTANCE_LIMIT_PER_DOMAIN']:
+    print('SMOKE ONLY: subset scores are compared with full Val-rep references; FAIL is expected and does not invalidate the smoke workflow.', flush=True)
+PY

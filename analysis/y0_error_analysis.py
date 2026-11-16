@@ -325,6 +325,10 @@ def save_visualizations(worst, datasets, vis_dir):
 def load_frozen_probe(checkpoint_path, device):
     """Load the selected checkpoint exactly as in the original analysis runner."""
     checkpoint = torch.load(checkpoint_path, map_location="cpu", weights_only=True)
+    if checkpoint.get("head") == "conv_up":
+        from looproad.models.draft_head import load_frozen_conv_draft
+        encoder, head = load_frozen_conv_draft(checkpoint, device)
+        return encoder, head, checkpoint
     if checkpoint.get("encoder") != ENCODER or checkpoint.get("head") != "bn_linear":
         raise ValueError("Expected the selected dinov3_vitl16_web + bn_linear checkpoint")
     if float(checkpoint.get("pos_weight", -1)) != 4:

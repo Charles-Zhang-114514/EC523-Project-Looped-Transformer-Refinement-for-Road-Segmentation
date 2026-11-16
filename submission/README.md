@@ -112,7 +112,7 @@ occupy 16 MiB per image plus a 128-byte NPY header: 14,009,082,240 bytes
 
 This package performs image-only, offline inference. It never opens annotation
 files. Submit one checkpoint for every loop count; do not ensemble the seeds.
-The selected model is v2 seed 0, best epoch 7, trained with four supervised
+The default Midway model is v2 seed 0, best epoch 7, trained with four supervised
 updates. Input images must be RGB-compatible 1024 x 1024 tiles. They are not
 resized, cropped or augmented.
 
@@ -156,7 +156,7 @@ submission/
   encoder_sha256.json         # pinned model identity, revision and three hashes
   README.md
   model.safetensors          # exported refiner parameters and model buffers
-  baseline.safetensors       # exported BN probe parameters and running stats
+  baseline.safetensors       # frozen head parameters, BN buffers and head metadata
   encoder/
     LICENSE.md               # included in the small package
     config.json              # acquired by fetch_encoder.py
@@ -308,7 +308,7 @@ The course `evaluate.py` requires both a probability directory and run.json.
 The new full check runs each requested K separately without traces, calls the
 unchanged evaluator immediately and deletes probabilities before the next run.
 
-## Model and training provenance
+## Default Midway model and training provenance
 
 The baseline uses frozen DINOv3 ViT-L/16 web features [B,1024,64,64], then a
 frozen BatchNorm2d and 1x1 probe with bilinear upsampling. The float32 refiner
@@ -369,6 +369,34 @@ Only report JSONs, run.json files and job.log persist under
 All scratch work is removed even if the job fails.
 
 ## Build the small submission and separate encoder ZIP
+
+Without checkpoint options, packaging uses the existing Midway safetensors
+and the same 23-file small-package layout. It does not overwrite those weights.
+The loader selects `bn_linear` or `conv_up` from baseline.safetensors metadata;
+legacy exports without head metadata retain the `bn_linear` interpretation.
+
+For the e6 seed-0 candidate, use the A1-i **conv_up** draft head (only the final
+DINOv3 layer, draft epoch 6) and its paired refiner (seed 0, selected epoch 1):
+
+```bash
+python scripts/package_submission.py --no-encoder \
+  --probe-checkpoint runs/draft_head/A1-i/best.pt \
+  --refiner-checkpoint runs/exp/e6_convdraft_s0/best.pt \
+  --out runs/submission_packages/e6_s0 \
+  --scc-encoder-dir "<SCC_ENCODER_DIR>" --encoder-url "<ENCODER_ZIP_URL>"
+```
+
+This exports weights privately into the new package, adds the required
+`src/looproad/models/draft_head.py`, and writes the actual head/epoch identity
+near the top of the packaged README. No existing checkpoint or export changes.
+The conv_up head is per-input BN, 1x1 projection, four bilinear x2 / 3x3
+convolution / BN / GELU stages, and a final 1x1 logit projection. Its frozen
+parameters are loaded strictly from safetensors; it runs in phase 2 on the
+same cached float32 features. The two-phase loop and ablations are unchanged.
+
+Use the Quick start loop for either package: `out_k1/road_masks/`,
+`out_k2/road_masks/`, and `out_k4/road_masks/` are after exactly 1, 2, and 4
+refinement rounds. Encoder acquisition and placeholders are unchanged.
 
 ```bash
 python scripts/package_submission.py --no-encoder --out runs/submission_packages/gradescope

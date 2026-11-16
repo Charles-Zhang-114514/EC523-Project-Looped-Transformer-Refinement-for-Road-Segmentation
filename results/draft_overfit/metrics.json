@@ -1,0 +1,4893 @@
+{
+  "config": {
+    "seed": 0,
+    "per_domain": 100,
+    "ks": [
+      1,
+      2,
+      4
+    ],
+    "device": "cuda",
+    "probe_checkpoints": {
+      "linear": "runs/linear_probe/checkpoints/dinov3_vitl16_web_bn_posw4.pt",
+      "A1-i": "runs/draft_head/A1-i/best.pt"
+    },
+    "refiner_runs": {
+      "linear": "e0_v2_s0",
+      "A1-i": "e6_convdraft_s0"
+    }
+  },
+  "loaded_refiner_epochs": {
+    "linear": 7,
+    "A1-i": 1
+  },
+  "train": {
+    "groups": {
+      "linear": {
+        "Urban": {
+          "y0_draft": {
+            "counts": {
+              "valid": 101425881,
+              "intersection": 8921520,
+              "union": 13203574,
+              "predicted_skeleton": 226808,
+              "true_skeleton": 157371,
+              "skeleton_precision_hits": 147899,
+              "skeleton_recall_hits": 128851,
+              "boundary_intersection": 152015,
+              "boundary_union": 2315954
+            },
+            "scores": {
+              "road_iou": 0.6756897791461615,
+              "cldice": 0.725986029807053,
+              "boundary_iou": 0.06563817761492673,
+              "skeleton_precision": 0.6520889915699623,
+              "skeleton_recall": 0.818772200723132,
+              "quality": 0.5687683340381819,
+              "counts": {
+                "valid": 101425881,
+                "intersection": 8921520,
+                "union": 13203574,
+                "predicted_skeleton": 226808,
+                "true_skeleton": 157371,
+                "skeleton_precision_hits": 147899,
+                "skeleton_recall_hits": 128851,
+                "boundary_intersection": 152015,
+                "boundary_union": 2315954
+              },
+              "A": 0.5687683340381819
+            }
+          },
+          "1": {
+            "counts": {
+              "valid": 101425881,
+              "intersection": 9106607,
+              "union": 13822007,
+              "predicted_skeleton": 266704,
+              "true_skeleton": 157371,
+              "skeleton_precision_hits": 158928,
+              "skeleton_recall_hits": 134253,
+              "boundary_intersection": 154014,
+              "boundary_union": 2547439
+            },
+            "scores": {
+              "road_iou": 0.6588483857662639,
+              "cldice": 0.7016704732670576,
+              "boundary_iou": 0.060458366225844856,
+              "skeleton_precision": 0.5958965744795729,
+              "skeleton_recall": 0.853098728482376,
+              "quality": 0.5520170081084183,
+              "counts": {
+                "valid": 101425881,
+                "intersection": 9106607,
+                "union": 13822007,
+                "predicted_skeleton": 266704,
+                "true_skeleton": 157371,
+                "skeleton_precision_hits": 158928,
+                "skeleton_recall_hits": 134253,
+                "boundary_intersection": 154014,
+                "boundary_union": 2547439
+              },
+              "A": 0.5520170081084183
+            }
+          },
+          "2": {
+            "counts": {
+              "valid": 101425881,
+              "intersection": 9096943,
+              "union": 13789320,
+              "predicted_skeleton": 269579,
+              "true_skeleton": 157371,
+              "skeleton_precision_hits": 160454,
+              "skeleton_recall_hits": 134116,
+              "boundary_intersection": 155792,
+              "boundary_union": 2553407
+            },
+            "scores": {
+              "road_iou": 0.6597093257680582,
+              "cldice": 0.7008945886451065,
+              "boundary_iou": 0.06101338329533835,
+              "skeleton_precision": 0.5952021485353087,
+              "skeleton_recall": 0.8522281741871119,
+              "quality": 0.5523257161366287,
+              "counts": {
+                "valid": 101425881,
+                "intersection": 9096943,
+                "union": 13789320,
+                "predicted_skeleton": 269579,
+                "true_skeleton": 157371,
+                "skeleton_precision_hits": 160454,
+                "skeleton_recall_hits": 134116,
+                "boundary_intersection": 155792,
+                "boundary_union": 2553407
+              },
+              "A": 0.5523257161366287
+            }
+          },
+          "4": {
+            "counts": {
+              "valid": 101425881,
+              "intersection": 9036815,
+              "union": 13589997,
+              "predicted_skeleton": 269899,
+              "true_skeleton": 157371,
+              "skeleton_precision_hits": 163751,
+              "skeleton_recall_hits": 133023,
+              "boundary_intersection": 160117,
+              "boundary_union": 2527357
+            },
+            "scores": {
+              "road_iou": 0.6649607796087078,
+              "cldice": 0.7063982433690158,
+              "boundary_iou": 0.06335353493788175,
+              "skeleton_precision": 0.60671214046736,
+              "skeleton_recall": 0.8452828030577425,
+              "quality": 0.5570705698026349,
+              "counts": {
+                "valid": 101425881,
+                "intersection": 9036815,
+                "union": 13589997,
+                "predicted_skeleton": 269899,
+                "true_skeleton": 157371,
+                "skeleton_precision_hits": 163751,
+                "skeleton_recall_hits": 133023,
+                "boundary_intersection": 160117,
+                "boundary_union": 2527357
+              },
+              "A": 0.5570705698026349
+            }
+          }
+        },
+        "Rural": {
+          "y0_draft": {
+            "counts": {
+              "valid": 101900838,
+              "intersection": 1968516,
+              "union": 3239125,
+              "predicted_skeleton": 101717,
+              "true_skeleton": 89218,
+              "skeleton_precision_hits": 69500,
+              "skeleton_recall_hits": 70279,
+              "boundary_intersection": 152184,
+              "boundary_union": 1184947
+            },
+            "scores": {
+              "road_iou": 0.6077307914946166,
+              "cldice": 0.7317866488478859,
+              "boundary_iou": 0.12843106062971593,
+              "skeleton_precision": 0.6832682835710845,
+              "skeleton_recall": 0.7877222085229438,
+              "quality": 0.5490876025276172,
+              "counts": {
+                "valid": 101900838,
+                "intersection": 1968516,
+                "union": 3239125,
+                "predicted_skeleton": 101717,
+                "true_skeleton": 89218,
+                "skeleton_precision_hits": 69500,
+                "skeleton_recall_hits": 70279,
+                "boundary_intersection": 152184,
+                "boundary_union": 1184947
+              },
+              "A": 0.5490876025276172
+            }
+          },
+          "1": {
+            "counts": {
+              "valid": 101900838,
+              "intersection": 2058364,
+              "union": 3519603,
+              "predicted_skeleton": 120315,
+              "true_skeleton": 89218,
+              "skeleton_precision_hits": 73665,
+              "skeleton_recall_hits": 75179,
+              "boundary_intersection": 151492,
+              "boundary_union": 1319533
+            },
+            "scores": {
+              "road_iou": 0.5848284593461252,
+              "cldice": 0.7092165323386396,
+              "boundary_iou": 0.11480728409217504,
+              "skeleton_precision": 0.6122677970327889,
+              "skeleton_recall": 0.8426438611042615,
+              "quality": 0.5281406461930894,
+              "counts": {
+                "valid": 101900838,
+                "intersection": 2058364,
+                "union": 3519603,
+                "predicted_skeleton": 120315,
+                "true_skeleton": 89218,
+                "skeleton_precision_hits": 73665,
+                "skeleton_recall_hits": 75179,
+                "boundary_intersection": 151492,
+                "boundary_union": 1319533
+              },
+              "A": 0.5281406461930894
+            }
+          },
+          "2": {
+            "counts": {
+              "valid": 101900838,
+              "intersection": 2061908,
+              "union": 3541926,
+              "predicted_skeleton": 122336,
+              "true_skeleton": 89218,
+              "skeleton_precision_hits": 74699,
+              "skeleton_recall_hits": 75406,
+              "boundary_intersection": 151092,
+              "boundary_union": 1328525
+            },
+            "scores": {
+              "road_iou": 0.5821431616583745,
+              "cldice": 0.7089966427364445,
+              "boundary_iou": 0.11372913569560227,
+              "skeleton_precision": 0.6106052184148575,
+              "skeleton_recall": 0.845188190723845,
+              "quality": 0.526516400789241,
+              "counts": {
+                "valid": 101900838,
+                "intersection": 2061908,
+                "union": 3541926,
+                "predicted_skeleton": 122336,
+                "true_skeleton": 89218,
+                "skeleton_precision_hits": 74699,
+                "skeleton_recall_hits": 75406,
+                "boundary_intersection": 151092,
+                "boundary_union": 1328525
+              },
+              "A": 0.526516400789241
+            }
+          },
+          "4": {
+            "counts": {
+              "valid": 101900838,
+              "intersection": 2053858,
+              "union": 3511578,
+              "predicted_skeleton": 122810,
+              "true_skeleton": 89218,
+              "skeleton_precision_hits": 75416,
+              "skeleton_recall_hits": 75121,
+              "boundary_intersection": 153431,
+              "boundary_union": 1324263
+            },
+            "scores": {
+              "road_iou": 0.5848817824920876,
+              "cldice": 0.710204188364519,
+              "boundary_iou": 0.11586142631788399,
+              "skeleton_precision": 0.6140868007491247,
+              "skeleton_recall": 0.8419937680737071,
+              "quality": 0.5286744330189763,
+              "counts": {
+                "valid": 101900838,
+                "intersection": 2053858,
+                "union": 3511578,
+                "predicted_skeleton": 122810,
+                "true_skeleton": 89218,
+                "skeleton_precision_hits": 75416,
+                "skeleton_recall_hits": 75121,
+                "boundary_intersection": 153431,
+                "boundary_union": 1324263
+              },
+              "A": 0.5286744330189763
+            }
+          }
+        },
+        "Overall": {
+          "y0_draft": {
+            "counts": {
+              "valid": 203326719,
+              "intersection": 10890036,
+              "union": 16442699,
+              "predicted_skeleton": 328525,
+              "true_skeleton": 246589,
+              "skeleton_precision_hits": 217399,
+              "skeleton_recall_hits": 199130,
+              "boundary_intersection": 304199,
+              "boundary_union": 3500901
+            },
+            "scores": {
+              "road_iou": 0.662302216929228,
+              "cldice": 0.7274067690401401,
+              "boundary_iou": 0.08689163161140517,
+              "skeleton_precision": 0.6617426375466099,
+              "skeleton_recall": 0.8075380491425003,
+              "quality": 0.566751465498937,
+              "counts": {
+                "valid": 203326719,
+                "intersection": 10890036,
+                "union": 16442699,
+                "predicted_skeleton": 328525,
+                "true_skeleton": 246589,
+                "skeleton_precision_hits": 217399,
+                "skeleton_recall_hits": 199130,
+                "boundary_intersection": 304199,
+                "boundary_union": 3500901
+              },
+              "A": 0.566751465498937
+            }
+          },
+          "1": {
+            "counts": {
+              "valid": 203326719,
+              "intersection": 11164971,
+              "union": 17341610,
+              "predicted_skeleton": 387019,
+              "true_skeleton": 246589,
+              "skeleton_precision_hits": 232593,
+              "skeleton_recall_hits": 209432,
+              "boundary_intersection": 305506,
+              "boundary_union": 3866972
+            },
+            "scores": {
+              "road_iou": 0.6438255156239818,
+              "cldice": 0.7038906954227442,
+              "boundary_iou": 0.07900393382729433,
+              "skeleton_precision": 0.6009859981034523,
+              "skeleton_recall": 0.8493160684377649,
+              "quality": 0.548880753204273,
+              "counts": {
+                "valid": 203326719,
+                "intersection": 11164971,
+                "union": 17341610,
+                "predicted_skeleton": 387019,
+                "true_skeleton": 246589,
+                "skeleton_precision_hits": 232593,
+                "skeleton_recall_hits": 209432,
+                "boundary_intersection": 305506,
+                "boundary_union": 3866972
+              },
+              "A": 0.548880753204273
+            }
+          },
+          "2": {
+            "counts": {
+              "valid": 203326719,
+              "intersection": 11158851,
+              "union": 17331246,
+              "predicted_skeleton": 391915,
+              "true_skeleton": 246589,
+              "skeleton_precision_hits": 235153,
+              "skeleton_recall_hits": 209522,
+              "boundary_intersection": 306884,
+              "boundary_union": 3881932
+            },
+            "scores": {
+              "road_iou": 0.6438574006739042,
+              "cldice": 0.7033460392893712,
+              "boundary_iou": 0.07905445020675272,
+              "skeleton_precision": 0.6000102062947322,
+              "skeleton_recall": 0.8496810482219401,
+              "quality": 0.548743402165114,
+              "counts": {
+                "valid": 203326719,
+                "intersection": 11158851,
+                "union": 17331246,
+                "predicted_skeleton": 391915,
+                "true_skeleton": 246589,
+                "skeleton_precision_hits": 235153,
+                "skeleton_recall_hits": 209522,
+                "boundary_intersection": 306884,
+                "boundary_union": 3881932
+              },
+              "A": 0.548743402165114
+            }
+          },
+          "4": {
+            "counts": {
+              "valid": 203326719,
+              "intersection": 11090673,
+              "union": 17101575,
+              "predicted_skeleton": 392709,
+              "true_skeleton": 246589,
+              "skeleton_precision_hits": 239167,
+              "skeleton_recall_hits": 208144,
+              "boundary_intersection": 313548,
+              "boundary_union": 3851620
+            },
+            "scores": {
+              "road_iou": 0.6485176365334772,
+              "cldice": 0.7075412239891101,
+              "boundary_iou": 0.08140678467761617,
+              "skeleton_precision": 0.609018382568263,
+              "skeleton_recall": 0.844092802193123,
+              "quality": 0.5528025423989948,
+              "counts": {
+                "valid": 203326719,
+                "intersection": 11090673,
+                "union": 17101575,
+                "predicted_skeleton": 392709,
+                "true_skeleton": 246589,
+                "skeleton_precision_hits": 239167,
+                "skeleton_recall_hits": 208144,
+                "boundary_intersection": 313548,
+                "boundary_union": 3851620
+              },
+              "A": 0.5528025423989948
+            }
+          }
+        }
+      },
+      "A1-i": {
+        "Urban": {
+          "y0_draft": {
+            "counts": {
+              "valid": 101425881,
+              "intersection": 9337018,
+              "union": 14750506,
+              "predicted_skeleton": 220494,
+              "true_skeleton": 157371,
+              "skeleton_precision_hits": 130698,
+              "skeleton_recall_hits": 137478,
+              "boundary_intersection": 114501,
+              "boundary_union": 2477425
+            },
+            "scores": {
+              "road_iou": 0.6329964544945103,
+              "cldice": 0.7062772742108291,
+              "boundary_iou": 0.04621774624862508,
+              "skeleton_precision": 0.5927508231516504,
+              "skeleton_recall": 0.8735917036811103,
+              "quality": 0.5376249587602289,
+              "counts": {
+                "valid": 101425881,
+                "intersection": 9337018,
+                "union": 14750506,
+                "predicted_skeleton": 220494,
+                "true_skeleton": 157371,
+                "skeleton_precision_hits": 130698,
+                "skeleton_recall_hits": 137478,
+                "boundary_intersection": 114501,
+                "boundary_union": 2477425
+              },
+              "A": 0.5376249587602289
+            }
+          },
+          "1": {
+            "counts": {
+              "valid": 101425881,
+              "intersection": 9277222,
+              "union": 14389199,
+              "predicted_skeleton": 213466,
+              "true_skeleton": 157371,
+              "skeleton_precision_hits": 129970,
+              "skeleton_recall_hits": 136284,
+              "boundary_intersection": 120984,
+              "boundary_union": 2423055
+            },
+            "scores": {
+              "road_iou": 0.6447351238939707,
+              "cldice": 0.7150125918978308,
+              "boundary_iou": 0.0499303565127494,
+              "skeleton_precision": 0.6088557428349245,
+              "skeleton_recall": 0.8660045370493928,
+              "quality": 0.5468574108188845,
+              "counts": {
+                "valid": 101425881,
+                "intersection": 9277222,
+                "union": 14389199,
+                "predicted_skeleton": 213466,
+                "true_skeleton": 157371,
+                "skeleton_precision_hits": 129970,
+                "skeleton_recall_hits": 136284,
+                "boundary_intersection": 120984,
+                "boundary_union": 2423055
+              },
+              "A": 0.5468574108188845
+            }
+          },
+          "2": {
+            "counts": {
+              "valid": 101425881,
+              "intersection": 9212951,
+              "union": 14042187,
+              "predicted_skeleton": 206226,
+              "true_skeleton": 157371,
+              "skeleton_precision_hits": 129761,
+              "skeleton_recall_hits": 135114,
+              "boundary_intersection": 127070,
+              "boundary_union": 2370291
+            },
+            "scores": {
+              "road_iou": 0.6560908923944682,
+              "cldice": 0.7262155602991064,
+              "boundary_iou": 0.053609451328971845,
+              "skeleton_precision": 0.6292174604560046,
+              "skeleton_recall": 0.8585698762796194,
+              "quality": 0.5566320045527604,
+              "counts": {
+                "valid": 101425881,
+                "intersection": 9212951,
+                "union": 14042187,
+                "predicted_skeleton": 206226,
+                "true_skeleton": 157371,
+                "skeleton_precision_hits": 129761,
+                "skeleton_recall_hits": 135114,
+                "boundary_intersection": 127070,
+                "boundary_union": 2370291
+              },
+              "A": 0.5566320045527604
+            }
+          },
+          "4": {
+            "counts": {
+              "valid": 101425881,
+              "intersection": 9074614,
+              "union": 13450746,
+              "predicted_skeleton": 196521,
+              "true_skeleton": 157371,
+              "skeleton_precision_hits": 129484,
+              "skeleton_recall_hits": 132321,
+              "boundary_intersection": 136650,
+              "boundary_union": 2291907
+            },
+            "scores": {
+              "road_iou": 0.6746550711759779,
+              "cldice": 0.7388152918710985,
+              "boundary_iou": 0.05962283809945168,
+              "skeleton_precision": 0.658881239155103,
+              "skeleton_recall": 0.8408220065958786,
+              "quality": 0.5708966907692089,
+              "counts": {
+                "valid": 101425881,
+                "intersection": 9074614,
+                "union": 13450746,
+                "predicted_skeleton": 196521,
+                "true_skeleton": 157371,
+                "skeleton_precision_hits": 129484,
+                "skeleton_recall_hits": 132321,
+                "boundary_intersection": 136650,
+                "boundary_union": 2291907
+              },
+              "A": 0.5708966907692089
+            }
+          }
+        },
+        "Rural": {
+          "y0_draft": {
+            "counts": {
+              "valid": 101900838,
+              "intersection": 2097446,
+              "union": 3429515,
+              "predicted_skeleton": 99692,
+              "true_skeleton": 89218,
+              "skeleton_precision_hits": 67916,
+              "skeleton_recall_hits": 77073,
+              "boundary_intersection": 157764,
+              "boundary_union": 1253219
+            },
+            "scores": {
+              "road_iou": 0.6115867695577946,
+              "cldice": 0.7617741842380957,
+              "boundary_iou": 0.12588701575702252,
+              "skeleton_precision": 0.6812582754885046,
+              "skeleton_recall": 0.8638727611020198,
+              "quality": 0.5595030432017305,
+              "counts": {
+                "valid": 101900838,
+                "intersection": 2097446,
+                "union": 3429515,
+                "predicted_skeleton": 99692,
+                "true_skeleton": 89218,
+                "skeleton_precision_hits": 67916,
+                "skeleton_recall_hits": 77073,
+                "boundary_intersection": 157764,
+                "boundary_union": 1253219
+              },
+              "A": 0.5595030432017305
+            }
+          },
+          "1": {
+            "counts": {
+              "valid": 101900838,
+              "intersection": 2088810,
+              "union": 3376012,
+              "predicted_skeleton": 99257,
+              "true_skeleton": 89218,
+              "skeleton_precision_hits": 68330,
+              "skeleton_recall_hits": 76773,
+              "boundary_intersection": 161685,
+              "boundary_union": 1242322
+            },
+            "scores": {
+              "road_iou": 0.6187211419864621,
+              "cldice": 0.7649021344763406,
+              "boundary_iou": 0.13014741749723502,
+              "skeleton_precision": 0.6884149228769759,
+              "skeleton_recall": 0.86051021094398,
+              "quality": 0.5648606948355802,
+              "counts": {
+                "valid": 101900838,
+                "intersection": 2088810,
+                "union": 3376012,
+                "predicted_skeleton": 99257,
+                "true_skeleton": 89218,
+                "skeleton_precision_hits": 68330,
+                "skeleton_recall_hits": 76773,
+                "boundary_intersection": 161685,
+                "boundary_union": 1242322
+              },
+              "A": 0.5648606948355802
+            }
+          },
+          "2": {
+            "counts": {
+              "valid": 101900838,
+              "intersection": 2078205,
+              "union": 3318891,
+              "predicted_skeleton": 98683,
+              "true_skeleton": 89218,
+              "skeleton_precision_hits": 68985,
+              "skeleton_recall_hits": 76444,
+              "boundary_intersection": 165640,
+              "boundary_union": 1232171
+            },
+            "scores": {
+              "road_iou": 0.626174526370405,
+              "cldice": 0.7699408621047463,
+              "boundary_iou": 0.13442939332284237,
+              "skeleton_precision": 0.6990565750939878,
+              "skeleton_recall": 0.8568226142706629,
+              "quality": 0.5709554004811949,
+              "counts": {
+                "valid": 101900838,
+                "intersection": 2078205,
+                "union": 3318891,
+                "predicted_skeleton": 98683,
+                "true_skeleton": 89218,
+                "skeleton_precision_hits": 68985,
+                "skeleton_recall_hits": 76444,
+                "boundary_intersection": 165640,
+                "boundary_union": 1232171
+              },
+              "A": 0.5709554004811949
+            }
+          },
+          "4": {
+            "counts": {
+              "valid": 101900838,
+              "intersection": 2052610,
+              "union": 3210056,
+              "predicted_skeleton": 95366,
+              "true_skeleton": 89218,
+              "skeleton_precision_hits": 68540,
+              "skeleton_recall_hits": 75566,
+              "boundary_intersection": 173843,
+              "boundary_union": 1208810
+            },
+            "scores": {
+              "road_iou": 0.6394312124149859,
+              "cldice": 0.7775883035086514,
+              "boundary_iou": 0.14381333708357807,
+              "skeleton_precision": 0.7187047794811569,
+              "skeleton_recall": 0.8469815508081329,
+              "quality": 0.581754764676804,
+              "counts": {
+                "valid": 101900838,
+                "intersection": 2052610,
+                "union": 3210056,
+                "predicted_skeleton": 95366,
+                "true_skeleton": 89218,
+                "skeleton_precision_hits": 68540,
+                "skeleton_recall_hits": 75566,
+                "boundary_intersection": 173843,
+                "boundary_union": 1208810
+              },
+              "A": 0.581754764676804
+            }
+          }
+        },
+        "Overall": {
+          "y0_draft": {
+            "counts": {
+              "valid": 203326719,
+              "intersection": 11434464,
+              "union": 18180021,
+              "predicted_skeleton": 320186,
+              "true_skeleton": 246589,
+              "skeleton_precision_hits": 198614,
+              "skeleton_recall_hits": 214551,
+              "boundary_intersection": 272265,
+              "boundary_union": 3730644
+            },
+            "scores": {
+              "road_iou": 0.6289576893228012,
+              "cldice": 0.7242630410767629,
+              "boundary_iou": 0.07298069716649458,
+              "skeleton_precision": 0.6203081958611557,
+              "skeleton_recall": 0.8700753074954681,
+              "quality": 0.5463538964177284,
+              "counts": {
+                "valid": 203326719,
+                "intersection": 11434464,
+                "union": 18180021,
+                "predicted_skeleton": 320186,
+                "true_skeleton": 246589,
+                "skeleton_precision_hits": 198614,
+                "skeleton_recall_hits": 214551,
+                "boundary_intersection": 272265,
+                "boundary_union": 3730644
+              },
+              "A": 0.5463538964177284
+            }
+          },
+          "1": {
+            "counts": {
+              "valid": 203326719,
+              "intersection": 11366032,
+              "union": 17765211,
+              "predicted_skeleton": 312723,
+              "true_skeleton": 246589,
+              "skeleton_precision_hits": 198300,
+              "skeleton_recall_hits": 213057,
+              "boundary_intersection": 282669,
+              "boundary_union": 3665377
+            },
+            "scores": {
+              "road_iou": 0.639791556655308,
+              "cldice": 0.7314206055275895,
+              "boundary_iou": 0.07711867019408918,
+              "skeleton_precision": 0.6341075008873668,
+              "skeleton_recall": 0.8640166430781584,
+              "quality": 0.5547456940247486,
+              "counts": {
+                "valid": 203326719,
+                "intersection": 11366032,
+                "union": 17765211,
+                "predicted_skeleton": 312723,
+                "true_skeleton": 246589,
+                "skeleton_precision_hits": 198300,
+                "skeleton_recall_hits": 213057,
+                "boundary_intersection": 282669,
+                "boundary_union": 3665377
+              },
+              "A": 0.5547456940247486
+            }
+          },
+          "2": {
+            "counts": {
+              "valid": 203326719,
+              "intersection": 11291156,
+              "union": 17361078,
+              "predicted_skeleton": 304909,
+              "true_skeleton": 246589,
+              "skeleton_precision_hits": 198746,
+              "skeleton_recall_hits": 211558,
+              "boundary_intersection": 292710,
+              "boundary_union": 3602462
+            },
+            "scores": {
+              "road_iou": 0.6503718259891466,
+              "cldice": 0.7408093324423,
+              "boundary_iou": 0.08125276546983702,
+              "skeleton_precision": 0.651820707161809,
+              "skeleton_recall": 0.8579377020061723,
+              "quality": 0.5636792658212306,
+              "counts": {
+                "valid": 203326719,
+                "intersection": 11291156,
+                "union": 17361078,
+                "predicted_skeleton": 304909,
+                "true_skeleton": 246589,
+                "skeleton_precision_hits": 198746,
+                "skeleton_recall_hits": 211558,
+                "boundary_intersection": 292710,
+                "boundary_union": 3602462
+              },
+              "A": 0.5636792658212306
+            }
+          },
+          "4": {
+            "counts": {
+              "valid": 203326719,
+              "intersection": 11127224,
+              "union": 16660802,
+              "predicted_skeleton": 291887,
+              "true_skeleton": 246589,
+              "skeleton_precision_hits": 198024,
+              "skeleton_recall_hits": 207887,
+              "boundary_intersection": 310493,
+              "boundary_union": 3500717
+            },
+            "scores": {
+              "road_iou": 0.6678684495500277,
+              "cldice": 0.7518326253337134,
+              "boundary_iou": 0.08869411609107505,
+              "skeleton_precision": 0.6784269254882883,
+              "skeleton_recall": 0.8430505821427557,
+              "quality": 0.5772228355933429,
+              "counts": {
+                "valid": 203326719,
+                "intersection": 11127224,
+                "union": 16660802,
+                "predicted_skeleton": 291887,
+                "true_skeleton": 246589,
+                "skeleton_precision_hits": 198024,
+                "skeleton_recall_hits": 207887,
+                "boundary_intersection": 310493,
+                "boundary_union": 3500717
+              },
+              "A": 0.5772228355933429
+            }
+          }
+        }
+      }
+    },
+    "files": {
+      "Urban": [
+        "1368.png",
+        "1371.png",
+        "1375.png",
+        "1383.png",
+        "1390.png",
+        "1397.png",
+        "1402.png",
+        "1409.png",
+        "1421.png",
+        "1445.png",
+        "1448.png",
+        "1453.png",
+        "1462.png",
+        "1463.png",
+        "1502.png",
+        "1517.png",
+        "1552.png",
+        "1557.png",
+        "1627.png",
+        "1650.png",
+        "1651.png",
+        "1655.png",
+        "1664.png",
+        "1669.png",
+        "1692.png",
+        "1693.png",
+        "1715.png",
+        "1732.png",
+        "1742.png",
+        "1752.png",
+        "1772.png",
+        "1788.png",
+        "1789.png",
+        "1791.png",
+        "1792.png",
+        "1801.png",
+        "1808.png",
+        "1814.png",
+        "1829.png",
+        "1843.png",
+        "1877.png",
+        "1892.png",
+        "1904.png",
+        "1907.png",
+        "1914.png",
+        "1942.png",
+        "1945.png",
+        "1949.png",
+        "1957.png",
+        "1966.png",
+        "1967.png",
+        "1969.png",
+        "2015.png",
+        "2016.png",
+        "2039.png",
+        "2044.png",
+        "2046.png",
+        "2058.png",
+        "2080.png",
+        "2083.png",
+        "2089.png",
+        "2091.png",
+        "2105.png",
+        "2129.png",
+        "2130.png",
+        "2135.png",
+        "2148.png",
+        "2153.png",
+        "2158.png",
+        "2176.png",
+        "2178.png",
+        "2186.png",
+        "2188.png",
+        "2195.png",
+        "2211.png",
+        "2232.png",
+        "2236.png",
+        "2245.png",
+        "2260.png",
+        "2265.png",
+        "2286.png",
+        "2293.png",
+        "2304.png",
+        "2306.png",
+        "2317.png",
+        "2328.png",
+        "2340.png",
+        "2347.png",
+        "2372.png",
+        "2388.png",
+        "2405.png",
+        "2425.png",
+        "2456.png",
+        "2472.png",
+        "2491.png",
+        "2497.png",
+        "2499.png",
+        "2503.png",
+        "2507.png",
+        "2520.png"
+      ],
+      "Rural": [
+        "100.png",
+        "1003.png",
+        "1006.png",
+        "1016.png",
+        "1022.png",
+        "1030.png",
+        "1036.png",
+        "1044.png",
+        "1057.png",
+        "1083.png",
+        "1085.png",
+        "1091.png",
+        "110.png",
+        "1100.png",
+        "1143.png",
+        "1159.png",
+        "1199.png",
+        "1202.png",
+        "1275.png",
+        "1301.png",
+        "1305.png",
+        "1306.png",
+        "1318.png",
+        "132.png",
+        "1349.png",
+        "135.png",
+        "142.png",
+        "16.png",
+        "17.png",
+        "180.png",
+        "201.png",
+        "22.png",
+        "220.png",
+        "223.png",
+        "226.png",
+        "231.png",
+        "234.png",
+        "243.png",
+        "247.png",
+        "266.png",
+        "279.png",
+        "315.png",
+        "333.png",
+        "349.png",
+        "352.png",
+        "355.png",
+        "383.png",
+        "390.png",
+        "398.png",
+        "40.png",
+        "402.png",
+        "411.png",
+        "413.png",
+        "416.png",
+        "462.png",
+        "463.png",
+        "468.png",
+        "492.png",
+        "496.png",
+        "498.png",
+        "5.png",
+        "515.png",
+        "532.png",
+        "534.png",
+        "545.png",
+        "547.png",
+        "560.png",
+        "585.png",
+        "586.png",
+        "592.png",
+        "610.png",
+        "62.png",
+        "635.png",
+        "636.png",
+        "643.png",
+        "644.png",
+        "660.png",
+        "675.png",
+        "697.png",
+        "702.png",
+        "714.png",
+        "726.png",
+        "739.png",
+        "758.png",
+        "766.png",
+        "773.png",
+        "78.png",
+        "785.png",
+        "793.png",
+        "817.png",
+        "819.png",
+        "843.png",
+        "851.png",
+        "857.png",
+        "889.png",
+        "9.png",
+        "901.png",
+        "936.png",
+        "954.png",
+        "965.png"
+      ]
+    },
+    "forward_seconds": 16.841848616488278,
+    "wall_seconds": 41.62403135804925
+  },
+  "val_recorded": {
+    "linear": {
+      "Urban": {
+        "y0_draft": {
+          "scores": {
+            "road_iou": 0.6714175904593531,
+            "cldice": 0.714745204896131,
+            "boundary_iou": 0.08237518897402679,
+            "skeleton_precision": 0.7328158138640045,
+            "skeleton_recall": 0.6975443597128744,
+            "quality": 0.5666073944933212,
+            "counts": {
+              "valid": 340787183,
+              "intersection": 22327949,
+              "union": 33254936,
+              "predicted_skeleton": 654919,
+              "true_skeleton": 536072,
+              "skeleton_precision_hits": 479935,
+              "skeleton_recall_hits": 373934,
+              "boundary_intersection": 560577,
+              "boundary_union": 6805168
+            },
+            "A": 0.5666073944933212
+          },
+          "structure": {
+            "gap_skeleton_pixels": 83221,
+            "terminal_missing_skeleton_pixels": 59925,
+            "whole_missed_skeleton_pixels": 18992,
+            "fp_fragments": 2569,
+            "predicted_components": 4409
+          },
+          "added_road_pixels": 0,
+          "deleted_road_pixels": 0,
+          "added_road_fraction": 0.0,
+          "deleted_road_fraction": 0.0,
+          "refiner_seconds": 0.0,
+          "refiner_seconds_per_image": 0.0,
+          "peak_cuda_bytes": 1480559616,
+          "extra": {
+            "changes": {
+              "added_correct": 0,
+              "added_wrong": 0,
+              "deleted_correct": 0,
+              "deleted_wrong": 0,
+              "fractions": {
+                "added_correct": 0.0,
+                "added_wrong": 0.0,
+                "deleted_correct": 0.0,
+                "deleted_wrong": 0.0
+              },
+              "correct_fraction": null,
+              "added_correct_fraction": null,
+              "deleted_correct_fraction": null
+            },
+            "tracking": {
+              "gap_total": 83221,
+              "gap_covered": 0,
+              "terminal_total": 59925,
+              "terminal_covered": 0,
+              "covered_total": 373934,
+              "covered_lost": 0,
+              "gap_repair_fraction": 0.0,
+              "terminal_coverage_fraction": 0.0,
+              "new_break_fraction": 0.0
+            },
+            "new_fragments": {
+              "count": 0,
+              "aligned_edges": 0,
+              "aligned_edge_fraction": null
+            }
+          }
+        },
+        "1": {
+          "scores": {
+            "road_iou": 0.6615019682835572,
+            "cldice": 0.7077984837000993,
+            "boundary_iou": 0.08375000961119641,
+            "skeleton_precision": 0.6724984070870561,
+            "skeleton_recall": 0.7470097300362638,
+            "quality": 0.5598405311740478,
+            "counts": {
+              "valid": 340787183,
+              "intersection": 23097309,
+              "union": 34916463,
+              "predicted_skeleton": 764323,
+              "true_skeleton": 536072,
+              "skeleton_precision_hits": 514006,
+              "skeleton_recall_hits": 400451,
+              "boundary_intersection": 620858,
+              "boundary_union": 7413229
+            },
+            "A": 0.5598405311740478
+          },
+          "structure": {
+            "gap_skeleton_pixels": 70972,
+            "terminal_missing_skeleton_pixels": 50428,
+            "whole_missed_skeleton_pixels": 14221,
+            "fp_fragments": 3478,
+            "predicted_components": 5342
+          },
+          "added_road_pixels": 2494461,
+          "deleted_road_pixels": 63574,
+          "added_road_fraction": 0.0073197031004537515,
+          "deleted_road_fraction": 0.00018655044312508665,
+          "refiner_seconds": 0.8942149602808058,
+          "refiner_seconds_per_image": 0.0026378022427162415,
+          "peak_cuda_bytes": 1541264384,
+          "extra": {
+            "changes": {
+              "added_correct": 787269,
+              "added_wrong": 1707192,
+              "deleted_correct": 45665,
+              "deleted_wrong": 17909,
+              "fractions": {
+                "added_correct": 0.002310148501095477,
+                "added_wrong": 0.005009554599358274,
+                "deleted_correct": 0.00013399858409581092,
+                "deleted_wrong": 5.255185902927576e-05
+              },
+              "correct_fraction": 0.32561477853117726,
+              "added_correct_fraction": 0.31560685855581627,
+              "deleted_correct_fraction": 0.7182967879950923
+            },
+            "tracking": {
+              "gap_total": 83221,
+              "gap_covered": 20709,
+              "terminal_total": 59925,
+              "terminal_covered": 5752,
+              "covered_total": 373934,
+              "covered_lost": 286,
+              "gap_repair_fraction": 0.24884344095841193,
+              "terminal_coverage_fraction": 0.0959866499791406,
+              "new_break_fraction": 0.0007648408542684003
+            },
+            "new_fragments": {
+              "count": 1730,
+              "aligned_edges": 419,
+              "aligned_edge_fraction": 0.060549132947976876
+            }
+          }
+        },
+        "2": {
+          "scores": {
+            "road_iou": 0.6604785053024758,
+            "cldice": 0.7065020999153448,
+            "boundary_iou": 0.08399754948429267,
+            "skeleton_precision": 0.6669957218552046,
+            "skeleton_recall": 0.7509830769001179,
+            "quality": 0.5589893925226999,
+            "counts": {
+              "valid": 340787183,
+              "intersection": 23154284,
+              "union": 35056832,
+              "predicted_skeleton": 780011,
+              "true_skeleton": 536072,
+              "skeleton_precision_hits": 520264,
+              "skeleton_recall_hits": 402581,
+              "boundary_intersection": 628238,
+              "boundary_union": 7479242
+            },
+            "A": 0.5589893925226999
+          },
+          "structure": {
+            "gap_skeleton_pixels": 69251,
+            "terminal_missing_skeleton_pixels": 50271,
+            "whole_missed_skeleton_pixels": 13969,
+            "fp_fragments": 3543,
+            "predicted_components": 5384
+          },
+          "added_road_pixels": 2793117,
+          "deleted_road_pixels": 164886,
+          "added_road_fraction": 0.008196074087680697,
+          "deleted_road_fraction": 0.00048383861901285177,
+          "refiner_seconds": 1.697393395123072,
+          "refiner_seconds_per_image": 0.005007060162604932,
+          "peak_cuda_bytes": 1549652992,
+          "extra": {
+            "changes": {
+              "added_correct": 877312,
+              "added_wrong": 1915805,
+              "deleted_correct": 113909,
+              "deleted_wrong": 50977,
+              "fractions": {
+                "added_correct": 0.0025743691188057386,
+                "added_wrong": 0.005621704968874959,
+                "deleted_correct": 0.000334252594235623,
+                "deleted_wrong": 0.00014958602477722877
+              },
+              "correct_fraction": 0.33509803742592553,
+              "added_correct_fraction": 0.3140978340685335,
+              "deleted_correct_fraction": 0.6908348798563856
+            },
+            "tracking": {
+              "gap_total": 83221,
+              "gap_covered": 22235,
+              "terminal_total": 59925,
+              "terminal_covered": 6583,
+              "covered_total": 373934,
+              "covered_lost": 735,
+              "gap_repair_fraction": 0.2671801588541354,
+              "terminal_coverage_fraction": 0.10985398414685023,
+              "new_break_fraction": 0.0019655875100953644
+            },
+            "new_fragments": {
+              "count": 1857,
+              "aligned_edges": 445,
+              "aligned_edge_fraction": 0.05990845449649973
+            }
+          }
+        },
+        "4": {
+          "scores": {
+            "road_iou": 0.6625328843005138,
+            "cldice": 0.7093097448911783,
+            "boundary_iou": 0.08468188633653125,
+            "skeleton_precision": 0.6750707378383128,
+            "skeleton_recall": 0.7472074646689251,
+            "quality": 0.5609957428849166,
+            "counts": {
+              "valid": 340787183,
+              "intersection": 23016884,
+              "union": 34740742,
+              "predicted_skeleton": 785294,
+              "true_skeleton": 536072,
+              "skeleton_precision_hits": 530129,
+              "skeleton_recall_hits": 400557,
+              "boundary_intersection": 631018,
+              "boundary_union": 7451629
+            },
+            "A": 0.5609957428849166
+          },
+          "structure": {
+            "gap_skeleton_pixels": 70211,
+            "terminal_missing_skeleton_pixels": 50315,
+            "whole_missed_skeleton_pixels": 14989,
+            "fp_fragments": 3525,
+            "predicted_components": 5394
+          },
+          "added_road_pixels": 2603794,
+          "deleted_road_pixels": 429053,
+          "added_road_fraction": 0.007640527959644539,
+          "deleted_road_fraction": 0.0012590056827342594,
+          "refiner_seconds": 3.304553900845349,
+          "refiner_seconds_per_image": 0.009747946610163271,
+          "peak_cuda_bytes": 1549652992,
+          "extra": {
+            "changes": {
+              "added_correct": 836907,
+              "added_wrong": 1766887,
+              "deleted_correct": 281081,
+              "deleted_wrong": 147972,
+              "fractions": {
+                "added_correct": 0.002455805387493109,
+                "added_wrong": 0.00518472257215143,
+                "deleted_correct": 0.0008247992120055759,
+                "deleted_wrong": 0.0004342064707286835
+              },
+              "correct_fraction": 0.36862657430460555,
+              "added_correct_fraction": 0.3214182842421482,
+              "deleted_correct_fraction": 0.655119530687351
+            },
+            "tracking": {
+              "gap_total": 83221,
+              "gap_covered": 21565,
+              "terminal_total": 59925,
+              "terminal_covered": 6444,
+              "covered_total": 373934,
+              "covered_lost": 1986,
+              "gap_repair_fraction": 0.259129306304899,
+              "terminal_coverage_fraction": 0.10753441802252817,
+              "new_break_fraction": 0.005311097680339311
+            },
+            "new_fragments": {
+              "count": 1784,
+              "aligned_edges": 400,
+              "aligned_edge_fraction": 0.05605381165919283
+            }
+          }
+        },
+        "6": {
+          "scores": {
+            "road_iou": 0.6633729806232722,
+            "cldice": 0.7105820720405476,
+            "boundary_iou": 0.08494976618547731,
+            "skeleton_precision": 0.6806939013817873,
+            "skeleton_recall": 0.7432154635944426,
+            "quality": 0.5618510651608959,
+            "counts": {
+              "valid": 340787183,
+              "intersection": 22867603,
+              "union": 34471713,
+              "predicted_skeleton": 791294,
+              "true_skeleton": 536072,
+              "skeleton_precision_hits": 538629,
+              "skeleton_recall_hits": 398417,
+              "boundary_intersection": 632306,
+              "boundary_union": 7443293
+            },
+            "A": 0.5618510651608959
+          },
+          "structure": {
+            "gap_skeleton_pixels": 70722,
+            "terminal_missing_skeleton_pixels": 51624,
+            "whole_missed_skeleton_pixels": 15309,
+            "fp_fragments": 3526,
+            "predicted_components": 5445
+          },
+          "added_road_pixels": 2464885,
+          "deleted_road_pixels": 708454,
+          "added_road_fraction": 0.007232915798948929,
+          "deleted_road_fraction": 0.002078875131873724,
+          "refiner_seconds": 5.030977885588072,
+          "refiner_seconds_per_image": 0.014840642730348295,
+          "peak_cuda_bytes": 1549652992,
+          "extra": {
+            "changes": {
+              "added_correct": 802563,
+              "added_wrong": 1662322,
+              "deleted_correct": 445545,
+              "deleted_wrong": 262909,
+              "fractions": {
+                "added_correct": 0.002355026949473038,
+                "added_wrong": 0.004877888849475891,
+                "deleted_correct": 0.0013073995215365831,
+                "deleted_wrong": 0.0007714756103371412
+              },
+              "correct_fraction": 0.39331064219738265,
+              "added_correct_fraction": 0.3255985573363463,
+              "deleted_correct_fraction": 0.6288975713313779
+            },
+            "tracking": {
+              "gap_total": 83221,
+              "gap_covered": 21023,
+              "terminal_total": 59925,
+              "terminal_covered": 6292,
+              "covered_total": 373934,
+              "covered_lost": 3442,
+              "gap_repair_fraction": 0.2526165270785018,
+              "terminal_coverage_fraction": 0.10499791405924072,
+              "new_break_fraction": 0.009204832938432985
+            },
+            "new_fragments": {
+              "count": 1757,
+              "aligned_edges": 373,
+              "aligned_edge_fraction": 0.05307342060330108
+            }
+          }
+        },
+        "8": {
+          "scores": {
+            "road_iou": 0.6635114914389694,
+            "cldice": 0.7120694257839834,
+            "boundary_iou": 0.08491270895875659,
+            "skeleton_precision": 0.687441390031779,
+            "skeleton_recall": 0.7385276604635198,
+            "quality": 0.562359115246431,
+            "counts": {
+              "valid": 340787183,
+              "intersection": 22698894,
+              "union": 34210250,
+              "predicted_skeleton": 800845,
+              "true_skeleton": 536072,
+              "skeleton_precision_hits": 550534,
+              "skeleton_recall_hits": 395904,
+              "boundary_intersection": 632115,
+              "boundary_union": 7444292
+            },
+            "A": 0.562359115246431
+          },
+          "structure": {
+            "gap_skeleton_pixels": 71827,
+            "terminal_missing_skeleton_pixels": 53032,
+            "whole_missed_skeleton_pixels": 15309,
+            "fp_fragments": 3586,
+            "predicted_components": 5548
+          },
+          "added_road_pixels": 2345006,
+          "deleted_road_pixels": 1018747,
+          "added_road_fraction": 0.006881144940242662,
+          "deleted_road_fraction": 0.002989393530096465,
+          "refiner_seconds": 7.252720020362176,
+          "refiner_seconds_per_image": 0.021394454337351553,
+          "peak_cuda_bytes": 1549652992,
+          "extra": {
+            "changes": {
+              "added_correct": 771579,
+              "added_wrong": 1573427,
+              "deleted_correct": 618113,
+              "deleted_wrong": 400634,
+              "fractions": {
+                "added_correct": 0.0022641080371851897,
+                "added_wrong": 0.004617036903057472,
+                "deleted_correct": 0.0018137800681312594,
+                "deleted_wrong": 0.0011756134619652055
+              },
+              "correct_fraction": 0.4131373498589225,
+              "added_correct_fraction": 0.329030714633566,
+              "deleted_correct_fraction": 0.6067384738310886
+            },
+            "tracking": {
+              "gap_total": 83221,
+              "gap_covered": 20516,
+              "terminal_total": 59925,
+              "terminal_covered": 6144,
+              "covered_total": 373934,
+              "covered_lost": 5311,
+              "gap_repair_fraction": 0.24652431477631848,
+              "terminal_coverage_fraction": 0.10252816020025031,
+              "new_break_fraction": 0.01420304117838977
+            },
+            "new_fragments": {
+              "count": 1752,
+              "aligned_edges": 365,
+              "aligned_edge_fraction": 0.052083333333333336
+            }
+          }
+        }
+      },
+      "Rural": {
+        "y0_draft": {
+          "scores": {
+            "road_iou": 0.5060604286306124,
+            "cldice": 0.6106998998330398,
+            "boundary_iou": 0.09181465271446032,
+            "skeleton_precision": 0.7839013658598215,
+            "skeleton_recall": 0.5001850058952656,
+            "quality": 0.4546031148081102,
+            "counts": {
+              "valid": 512411151,
+              "intersection": 8236720,
+              "union": 16276159,
+              "predicted_skeleton": 364093,
+              "true_skeleton": 521605,
+              "skeleton_precision_hits": 285413,
+              "skeleton_recall_hits": 260899,
+              "boundary_intersection": 532296,
+              "boundary_union": 5797506
+            },
+            "A": 0.4546031148081102
+          },
+          "structure": {
+            "gap_skeleton_pixels": 145959,
+            "terminal_missing_skeleton_pixels": 75785,
+            "whole_missed_skeleton_pixels": 38962,
+            "fp_fragments": 1903,
+            "predicted_components": 5160
+          },
+          "added_road_pixels": 0,
+          "deleted_road_pixels": 0,
+          "added_road_fraction": 0.0,
+          "deleted_road_fraction": 0.0,
+          "refiner_seconds": 0.0,
+          "refiner_seconds_per_image": 0.0,
+          "peak_cuda_bytes": 1480559616,
+          "extra": {
+            "changes": {
+              "added_correct": 0,
+              "added_wrong": 0,
+              "deleted_correct": 0,
+              "deleted_wrong": 0,
+              "fractions": {
+                "added_correct": 0.0,
+                "added_wrong": 0.0,
+                "deleted_correct": 0.0,
+                "deleted_wrong": 0.0
+              },
+              "correct_fraction": null,
+              "added_correct_fraction": null,
+              "deleted_correct_fraction": null
+            },
+            "tracking": {
+              "gap_total": 145959,
+              "gap_covered": 0,
+              "terminal_total": 75785,
+              "terminal_covered": 0,
+              "covered_total": 260899,
+              "covered_lost": 0,
+              "gap_repair_fraction": 0.0,
+              "terminal_coverage_fraction": 0.0,
+              "new_break_fraction": 0.0
+            },
+            "new_fragments": {
+              "count": 0,
+              "aligned_edges": 0,
+              "aligned_edge_fraction": null
+            }
+          }
+        },
+        "1": {
+          "scores": {
+            "road_iou": 0.5260905979872273,
+            "cldice": 0.6552312570478565,
+            "boundary_iou": 0.10462941423379049,
+            "skeleton_precision": 0.7340129421934519,
+            "skeleton_recall": 0.5917217051216918,
+            "quality": 0.4805405589547287,
+            "counts": {
+              "valid": 512411151,
+              "intersection": 9017579,
+              "union": 17140734,
+              "predicted_skeleton": 452319,
+              "true_skeleton": 521605,
+              "skeleton_precision_hits": 332008,
+              "skeleton_recall_hits": 308645,
+              "boundary_intersection": 659816,
+              "boundary_union": 6306219
+            },
+            "A": 0.4805405589547287
+          },
+          "structure": {
+            "gap_skeleton_pixels": 117311,
+            "terminal_missing_skeleton_pixels": 69922,
+            "whole_missed_skeleton_pixels": 25727,
+            "fp_fragments": 2751,
+            "predicted_components": 5982
+          },
+          "added_road_pixels": 1673947,
+          "deleted_road_pixels": 28513,
+          "added_road_fraction": 0.0032668043947388647,
+          "deleted_road_fraction": 5.5644768745479543e-05,
+          "refiner_seconds": 1.322319902246818,
+          "refiner_seconds_per_image": 0.0026659675448524557,
+          "peak_cuda_bytes": 1541264384,
+          "extra": {
+            "changes": {
+              "added_correct": 787432,
+              "added_wrong": 886515,
+              "deleted_correct": 21940,
+              "deleted_wrong": 6573,
+              "fractions": {
+                "added_correct": 0.0015367190945460123,
+                "added_wrong": 0.0017300853001928523,
+                "deleted_correct": 4.2817179050812656e-05,
+                "deleted_wrong": 1.2827589694666891e-05
+              },
+              "correct_fraction": 0.47541322556770793,
+              "added_correct_fraction": 0.470404379589079,
+              "deleted_correct_fraction": 0.769473573457721
+            },
+            "tracking": {
+              "gap_total": 145959,
+              "gap_covered": 39976,
+              "terminal_total": 75785,
+              "terminal_covered": 7543,
+              "covered_total": 260899,
+              "covered_lost": 206,
+              "gap_repair_fraction": 0.273885132126145,
+              "terminal_coverage_fraction": 0.099531569571815,
+              "new_break_fraction": 0.0007895775759968417
+            },
+            "new_fragments": {
+              "count": 1303,
+              "aligned_edges": 224,
+              "aligned_edge_fraction": 0.042977743668457406
+            }
+          }
+        },
+        "2": {
+          "scores": {
+            "road_iou": 0.5267881419688812,
+            "cldice": 0.6568468508066074,
+            "boundary_iou": 0.10499786671312104,
+            "skeleton_precision": 0.7326440822297674,
+            "skeleton_recall": 0.5952626987854794,
+            "quality": 0.48144769956904704,
+            "counts": {
+              "valid": 512411151,
+              "intersection": 9043922,
+              "union": 17168044,
+              "predicted_skeleton": 457985,
+              "true_skeleton": 521605,
+              "skeleton_precision_hits": 335540,
+              "skeleton_recall_hits": 310492,
+              "boundary_intersection": 664208,
+              "boundary_union": 6325919
+            },
+            "A": 0.48144769956904704
+          },
+          "structure": {
+            "gap_skeleton_pixels": 115984,
+            "terminal_missing_skeleton_pixels": 69402,
+            "whole_missed_skeleton_pixels": 25727,
+            "fp_fragments": 2766,
+            "predicted_components": 5962
+          },
+          "added_road_pixels": 1770010,
+          "deleted_road_pixels": 70923,
+          "added_road_fraction": 0.0034542768957032317,
+          "deleted_road_fraction": 0.00013841033681954358,
+          "refiner_seconds": 2.493882954469882,
+          "refiner_seconds_per_image": 0.005027989827560246,
+          "peak_cuda_bytes": 1549652992,
+          "extra": {
+            "changes": {
+              "added_correct": 827352,
+              "added_wrong": 942658,
+              "deleted_correct": 50773,
+              "deleted_wrong": 20150,
+              "fractions": {
+                "added_correct": 0.001614625283593799,
+                "added_wrong": 0.001839651612109433,
+                "deleted_correct": 9.90864463056933e-05,
+                "deleted_wrong": 3.932389051385027e-05
+              },
+              "correct_fraction": 0.4769999777286843,
+              "added_correct_fraction": 0.4674278676391659,
+              "deleted_correct_fraction": 0.7158890627864022
+            },
+            "tracking": {
+              "gap_total": 145959,
+              "gap_covered": 41755,
+              "terminal_total": 75785,
+              "terminal_covered": 7886,
+              "covered_total": 260899,
+              "covered_lost": 545,
+              "gap_repair_fraction": 0.2860734863900136,
+              "terminal_coverage_fraction": 0.10405753117371512,
+              "new_break_fraction": 0.002088930965622712
+            },
+            "new_fragments": {
+              "count": 1330,
+              "aligned_edges": 217,
+              "aligned_edge_fraction": 0.04078947368421053
+            }
+          }
+        },
+        "4": {
+          "scores": {
+            "road_iou": 0.5267606137443251,
+            "cldice": 0.6555496014828242,
+            "boundary_iou": 0.10560863861686749,
+            "skeleton_precision": 0.7354401638791108,
+            "skeleton_recall": 0.5913152672999684,
+            "quality": 0.48116691504038334,
+            "counts": {
+              "valid": 512411151,
+              "intersection": 8985954,
+              "union": 17058895,
+              "predicted_skeleton": 459363,
+              "true_skeleton": 521605,
+              "skeleton_precision_hits": 337834,
+              "skeleton_recall_hits": 308433,
+              "boundary_intersection": 666106,
+              "boundary_union": 6307306
+            },
+            "A": 0.48116691504038334
+          },
+          "structure": {
+            "gap_skeleton_pixels": 116257,
+            "terminal_missing_skeleton_pixels": 70917,
+            "whole_missed_skeleton_pixels": 25998,
+            "fp_fragments": 2729,
+            "predicted_components": 5954
+          },
+          "added_road_pixels": 1698722,
+          "deleted_road_pixels": 166752,
+          "added_road_fraction": 0.003315154240271403,
+          "deleted_road_fraction": 0.00032542617324891123,
+          "refiner_seconds": 5.175334104686044,
+          "refiner_seconds_per_image": 0.010434141340092832,
+          "peak_cuda_bytes": 1549652992,
+          "extra": {
+            "changes": {
+              "added_correct": 801458,
+              "added_wrong": 897264,
+              "deleted_correct": 114528,
+              "deleted_wrong": 52224,
+              "fractions": {
+                "added_correct": 0.001564091644836199,
+                "added_wrong": 0.0017510625954352036,
+                "deleted_correct": 0.0002235080165146523,
+                "deleted_wrong": 0.0001019181567342589
+              },
+              "correct_fraction": 0.4910205127490386,
+              "added_correct_fraction": 0.4718005653661988,
+              "deleted_correct_fraction": 0.6868163500287853
+            },
+            "tracking": {
+              "gap_total": 145959,
+              "gap_covered": 40681,
+              "terminal_total": 75785,
+              "terminal_covered": 7655,
+              "covered_total": 260899,
+              "covered_lost": 1299,
+              "gap_repair_fraction": 0.27871525565398503,
+              "terminal_coverage_fraction": 0.10100943458468034,
+              "new_break_fraction": 0.004978938209805327
+            },
+            "new_fragments": {
+              "count": 1286,
+              "aligned_edges": 231,
+              "aligned_edge_fraction": 0.04490668740279938
+            }
+          }
+        },
+        "6": {
+          "scores": {
+            "road_iou": 0.5262543182220126,
+            "cldice": 0.6540028573633891,
+            "boundary_iou": 0.10607677599777851,
+            "skeleton_precision": 0.7376765187942993,
+            "skeleton_recall": 0.5873774216121395,
+            "quality": 0.48054337151957877,
+            "counts": {
+              "valid": 512411151,
+              "intersection": 8926852,
+              "union": 16963000,
+              "predicted_skeleton": 460645,
+              "true_skeleton": 521605,
+              "skeleton_precision_hits": 339807,
+              "skeleton_recall_hits": 306379,
+              "boundary_intersection": 667741,
+              "boundary_union": 6294884
+            },
+            "A": 0.48054337151957877
+          },
+          "structure": {
+            "gap_skeleton_pixels": 117023,
+            "terminal_missing_skeleton_pixels": 72205,
+            "whole_missed_skeleton_pixels": 25998,
+            "fp_fragments": 2707,
+            "predicted_components": 5964
+          },
+          "added_road_pixels": 1642901,
+          "deleted_road_pixels": 265928,
+          "added_road_fraction": 0.003206216329979907,
+          "deleted_road_fraction": 0.000518973873775046,
+          "refiner_seconds": 8.106999858398922,
+          "refiner_seconds_per_image": 0.016344757779030085,
+          "peak_cuda_bytes": 1549652992,
+          "extra": {
+            "changes": {
+              "added_correct": 779633,
+              "added_wrong": 863268,
+              "deleted_correct": 176427,
+              "deleted_wrong": 89501,
+              "fractions": {
+                "added_correct": 0.0015214988949372025,
+                "added_wrong": 0.0016847174350427046,
+                "deleted_correct": 0.00034430749536908497,
+                "deleted_wrong": 0.00017466637840596097
+              },
+              "correct_fraction": 0.5008620468360445,
+              "added_correct_fraction": 0.47454654906169025,
+              "deleted_correct_fraction": 0.6634389759634187
+            },
+            "tracking": {
+              "gap_total": 145959,
+              "gap_covered": 39879,
+              "terminal_total": 75785,
+              "terminal_covered": 7445,
+              "covered_total": 260899,
+              "covered_lost": 2355,
+              "gap_repair_fraction": 0.2732205619386266,
+              "terminal_coverage_fraction": 0.09823843768555783,
+              "new_break_fraction": 0.00902648151200273
+            },
+            "new_fragments": {
+              "count": 1262,
+              "aligned_edges": 243,
+              "aligned_edge_fraction": 0.048137876386687796
+            }
+          }
+        },
+        "8": {
+          "scores": {
+            "road_iou": 0.5254113865361474,
+            "cldice": 0.6520785677109496,
+            "boundary_iou": 0.10655016122942629,
+            "skeleton_precision": 0.7397327713528127,
+            "skeleton_recall": 0.582996712071395,
+            "quality": 0.47963929582724385,
+            "counts": {
+              "valid": 512411151,
+              "intersection": 8861786,
+              "union": 16866376,
+              "predicted_skeleton": 463124,
+              "true_skeleton": 521605,
+              "skeleton_precision_hits": 342588,
+              "skeleton_recall_hits": 304094,
+              "boundary_intersection": 669683,
+              "boundary_union": 6285143
+            },
+            "A": 0.47963929582724385
+          },
+          "structure": {
+            "gap_skeleton_pixels": 119112,
+            "terminal_missing_skeleton_pixels": 72361,
+            "whole_missed_skeleton_pixels": 26038,
+            "fp_fragments": 2705,
+            "predicted_components": 5992
+          },
+          "added_road_pixels": 1591979,
+          "deleted_road_pixels": 376696,
+          "added_road_fraction": 0.003106839101555774,
+          "deleted_road_fraction": 0.0007351440328042353,
+          "refiner_seconds": 10.761421511298977,
+          "refiner_seconds_per_image": 0.021696414337296323,
+          "peak_cuda_bytes": 1549652992,
+          "extra": {
+            "changes": {
+              "added_correct": 758799,
+              "added_wrong": 833180,
+              "deleted_correct": 242963,
+              "deleted_wrong": 133733,
+              "fractions": {
+                "added_correct": 0.0014808401388595074,
+                "added_wrong": 0.0016259989626962665,
+                "deleted_correct": 0.0004741563479363079,
+                "deleted_wrong": 0.00026098768486792747
+              },
+              "correct_fraction": 0.5088508768588009,
+              "added_correct_fraction": 0.4766388250096264,
+              "deleted_correct_fraction": 0.6449842844097097
+            },
+            "tracking": {
+              "gap_total": 145959,
+              "gap_covered": 39043,
+              "terminal_total": 75785,
+              "terminal_covered": 7229,
+              "covered_total": 260899,
+              "covered_lost": 3593,
+              "gap_repair_fraction": 0.2674929260956844,
+              "terminal_coverage_fraction": 0.09538826944646038,
+              "new_break_fraction": 0.013771612769692486
+            },
+            "new_fragments": {
+              "count": 1257,
+              "aligned_edges": 241,
+              "aligned_edge_fraction": 0.0479315831344471
+            }
+          }
+        }
+      },
+      "Overall": {
+        "y0_draft": {
+          "scores": {
+            "road_iou": 0.6170804219046642,
+            "cldice": 0.6672210402500885,
+            "boundary_iou": 0.08671754899000006,
+            "skeleton_precision": 0.7510686822137521,
+            "skeleton_recall": 0.6002144321943278,
+            "quality": 0.5260500328253587,
+            "counts": {
+              "valid": 853198334,
+              "intersection": 30564669,
+              "union": 49531095,
+              "predicted_skeleton": 1019012,
+              "true_skeleton": 1057677,
+              "skeleton_precision_hits": 765348,
+              "skeleton_recall_hits": 634833,
+              "boundary_intersection": 1092873,
+              "boundary_union": 12602674
+            },
+            "A": 0.5260500328253587
+          },
+          "structure": {
+            "gap_skeleton_pixels": 229180,
+            "terminal_missing_skeleton_pixels": 135710,
+            "whole_missed_skeleton_pixels": 57954,
+            "fp_fragments": 4472,
+            "predicted_components": 9569
+          },
+          "added_road_pixels": 0,
+          "deleted_road_pixels": 0,
+          "added_road_fraction": 0.0,
+          "deleted_road_fraction": 0.0,
+          "refiner_seconds": 0.0,
+          "refiner_seconds_per_image": 0.0,
+          "peak_cuda_bytes": 1480559616,
+          "extra": {
+            "changes": {
+              "added_correct": 0,
+              "added_wrong": 0,
+              "deleted_correct": 0,
+              "deleted_wrong": 0,
+              "fractions": {
+                "added_correct": 0.0,
+                "added_wrong": 0.0,
+                "deleted_correct": 0.0,
+                "deleted_wrong": 0.0
+              },
+              "correct_fraction": null,
+              "added_correct_fraction": null,
+              "deleted_correct_fraction": null
+            },
+            "tracking": {
+              "gap_total": 229180,
+              "gap_covered": 0,
+              "terminal_total": 135710,
+              "terminal_covered": 0,
+              "covered_total": 634833,
+              "covered_lost": 0,
+              "gap_repair_fraction": 0.0,
+              "terminal_coverage_fraction": 0.0,
+              "new_break_fraction": 0.0
+            },
+            "new_fragments": {
+              "count": 0,
+              "aligned_edges": 0,
+              "aligned_edge_fraction": null
+            }
+          }
+        },
+        "1": {
+          "scores": {
+            "road_iou": 0.616915428619793,
+            "cldice": 0.6826701914402672,
+            "boundary_iou": 0.0933473416714725,
+            "skeleton_precision": 0.6953680704759494,
+            "skeleton_recall": 0.670427739281463,
+            "quality": 0.5319282400762712,
+            "counts": {
+              "valid": 853198334,
+              "intersection": 32114888,
+              "union": 52057197,
+              "predicted_skeleton": 1216642,
+              "true_skeleton": 1057677,
+              "skeleton_precision_hits": 846014,
+              "skeleton_recall_hits": 709096,
+              "boundary_intersection": 1280674,
+              "boundary_union": 13719448
+            },
+            "A": 0.5319282400762712
+          },
+          "structure": {
+            "gap_skeleton_pixels": 188283,
+            "terminal_missing_skeleton_pixels": 120350,
+            "whole_missed_skeleton_pixels": 39948,
+            "fp_fragments": 6229,
+            "predicted_components": 11324
+          },
+          "added_road_pixels": 4168408,
+          "deleted_road_pixels": 92087,
+          "added_road_fraction": 0.004885626042490608,
+          "deleted_road_fraction": 0.00010793152814571718,
+          "refiner_seconds": 2.2165348625276238,
+          "refiner_seconds_per_image": 0.00265453276949416,
+          "peak_cuda_bytes": 1541264384,
+          "extra": {
+            "changes": {
+              "added_correct": 1574701,
+              "added_wrong": 2593707,
+              "deleted_correct": 67605,
+              "deleted_wrong": 24482,
+              "fractions": {
+                "added_correct": 0.0018456447196953856,
+                "added_wrong": 0.0030399813227952226,
+                "deleted_correct": 7.923714487703161e-05,
+                "deleted_wrong": 2.8694383268685567e-05
+              },
+              "correct_fraction": 0.3854730494930753,
+              "added_correct_fraction": 0.3777703622102251,
+              "deleted_correct_fraction": 0.7341427128693518
+            },
+            "tracking": {
+              "gap_total": 229180,
+              "gap_covered": 60685,
+              "terminal_total": 135710,
+              "terminal_covered": 13295,
+              "covered_total": 634833,
+              "covered_lost": 492,
+              "gap_repair_fraction": 0.26479186665503096,
+              "terminal_coverage_fraction": 0.09796625156583892,
+              "new_break_fraction": 0.0007750069703370808
+            },
+            "new_fragments": {
+              "count": 3033,
+              "aligned_edges": 643,
+              "aligned_edge_fraction": 0.05300032970656116
+            }
+          }
+        },
+        "2": {
+          "scores": {
+            "road_iou": 0.6165300612681206,
+            "cldice": 0.6826277954508753,
+            "boundary_iou": 0.09362049453823827,
+            "skeleton_precision": 0.6912817165806675,
+            "skeleton_recall": 0.6741878664280305,
+            "quality": 0.5317774681769706,
+            "counts": {
+              "valid": 853198334,
+              "intersection": 32198206,
+              "union": 52224876,
+              "predicted_skeleton": 1237996,
+              "true_skeleton": 1057677,
+              "skeleton_precision_hits": 855804,
+              "skeleton_recall_hits": 713073,
+              "boundary_intersection": 1292446,
+              "boundary_union": 13805161
+            },
+            "A": 0.5317774681769706
+          },
+          "structure": {
+            "gap_skeleton_pixels": 185235,
+            "terminal_missing_skeleton_pixels": 119673,
+            "whole_missed_skeleton_pixels": 39696,
+            "fp_fragments": 6309,
+            "predicted_components": 11346
+          },
+          "added_road_pixels": 4563127,
+          "deleted_road_pixels": 235809,
+          "added_road_fraction": 0.005348260560480654,
+          "deleted_road_fraction": 0.0002763823962178529,
+          "refiner_seconds": 4.191276349592954,
+          "refiner_seconds_per_image": 0.005019492634243059,
+          "peak_cuda_bytes": 1549652992,
+          "extra": {
+            "changes": {
+              "added_correct": 1704664,
+              "added_wrong": 2858463,
+              "deleted_correct": 164682,
+              "deleted_wrong": 71127,
+              "fractions": {
+                "added_correct": 0.001997969208411511,
+                "added_wrong": 0.0033502913520691425,
+                "deleted_correct": 0.00019301725453205117,
+                "deleted_wrong": 8.336514168580175e-05
+              },
+              "correct_fraction": 0.38953342991029677,
+              "added_correct_fraction": 0.3735736480707199,
+              "deleted_correct_fraction": 0.6983702912102592
+            },
+            "tracking": {
+              "gap_total": 229180,
+              "gap_covered": 63990,
+              "terminal_total": 135710,
+              "terminal_covered": 14469,
+              "covered_total": 634833,
+              "covered_lost": 1280,
+              "gap_repair_fraction": 0.27921284579806266,
+              "terminal_coverage_fraction": 0.10661705106477047,
+              "new_break_fraction": 0.0020162782968119173
+            },
+            "new_fragments": {
+              "count": 3187,
+              "aligned_edges": 662,
+              "aligned_edge_fraction": 0.05192971446501412
+            }
+          }
+        },
+        "4": {
+          "scores": {
+            "road_iou": 0.6178197349143586,
+            "cldice": 0.6835723618953179,
+            "boundary_iou": 0.09427502928097269,
+            "skeleton_precision": 0.6973511577888527,
+            "skeleton_recall": 0.6703275196491935,
+            "quality": 0.5328365818819691,
+            "counts": {
+              "valid": 853198334,
+              "intersection": 32002838,
+              "union": 51799637,
+              "predicted_skeleton": 1244657,
+              "true_skeleton": 1057677,
+              "skeleton_precision_hits": 867963,
+              "skeleton_recall_hits": 708990,
+              "boundary_intersection": 1297124,
+              "boundary_union": 13758935
+            },
+            "A": 0.5328365818819691
+          },
+          "structure": {
+            "gap_skeleton_pixels": 186468,
+            "terminal_missing_skeleton_pixels": 121232,
+            "whole_missed_skeleton_pixels": 40987,
+            "fp_fragments": 6254,
+            "predicted_components": 11348
+          },
+          "added_road_pixels": 4302516,
+          "deleted_road_pixels": 595805,
+          "added_road_fraction": 0.005042808721658849,
+          "deleted_road_fraction": 0.000698319460150282,
+          "refiner_seconds": 8.479888005531393,
+          "refiner_seconds_per_image": 0.010155554497642386,
+          "peak_cuda_bytes": 1549652992,
+          "extra": {
+            "changes": {
+              "added_correct": 1638365,
+              "added_wrong": 2664151,
+              "deleted_correct": 395609,
+              "deleted_wrong": 200196,
+              "fractions": {
+                "added_correct": 0.0019202627744465332,
+                "added_wrong": 0.003122545947212316,
+                "deleted_correct": 0.00046367765176625394,
+                "deleted_wrong": 0.0002346418083840281
+              },
+              "correct_fraction": 0.41523901761440296,
+              "added_correct_fraction": 0.3807923085004216,
+              "deleted_correct_fraction": 0.6639907352237728
+            },
+            "tracking": {
+              "gap_total": 229180,
+              "gap_covered": 62246,
+              "terminal_total": 135710,
+              "terminal_covered": 14099,
+              "covered_total": 634833,
+              "covered_lost": 3285,
+              "gap_repair_fraction": 0.2716031067283358,
+              "terminal_coverage_fraction": 0.1038906491783951,
+              "new_break_fraction": 0.00517458922267746
+            },
+            "new_fragments": {
+              "count": 3070,
+              "aligned_edges": 631,
+              "aligned_edge_fraction": 0.051384364820846906
+            }
+          }
+        },
+        "6": {
+          "scores": {
+            "road_iou": 0.6181516945569425,
+            "cldice": 0.6835559179461187,
+            "boundary_iou": 0.09463024097010833,
+            "skeleton_precision": 0.7016603844117005,
+            "skeleton_recall": 0.666362225896942,
+            "quality": 0.5330686708563286,
+            "counts": {
+              "valid": 853198334,
+              "intersection": 31794455,
+              "union": 51434713,
+              "predicted_skeleton": 1251939,
+              "true_skeleton": 1057677,
+              "skeleton_precision_hits": 878436,
+              "skeleton_recall_hits": 704796,
+              "boundary_intersection": 1300047,
+              "boundary_union": 13738177
+            },
+            "A": 0.5330686708563286
+          },
+          "structure": {
+            "gap_skeleton_pixels": 187745,
+            "terminal_missing_skeleton_pixels": 123829,
+            "whole_missed_skeleton_pixels": 41307,
+            "fp_fragments": 6233,
+            "predicted_components": 11409
+          },
+          "added_road_pixels": 4107786,
+          "deleted_road_pixels": 974382,
+          "added_road_fraction": 0.004814573395545332,
+          "deleted_road_fraction": 0.0011420345787970091,
+          "refiner_seconds": 13.137977743986994,
+          "refiner_seconds_per_image": 0.015734105082619153,
+          "peak_cuda_bytes": 1549652992,
+          "extra": {
+            "changes": {
+              "added_correct": 1582196,
+              "added_wrong": 2525590,
+              "deleted_correct": 621972,
+              "deleted_wrong": 352410,
+              "fractions": {
+                "added_correct": 0.0018544293125635663,
+                "added_wrong": 0.0029601440829817656,
+                "deleted_correct": 0.000728988765231227,
+                "deleted_wrong": 0.00041304581356578225
+              },
+              "correct_fraction": 0.43370624505132455,
+              "added_correct_fraction": 0.3851700161595565,
+              "deleted_correct_fraction": 0.638324599592357
+            },
+            "tracking": {
+              "gap_total": 229180,
+              "gap_covered": 60902,
+              "terminal_total": 135710,
+              "terminal_covered": 13737,
+              "covered_total": 634833,
+              "covered_lost": 5797,
+              "gap_repair_fraction": 0.2657387206562527,
+              "terminal_coverage_fraction": 0.10122319652199543,
+              "new_break_fraction": 0.009131535380170848
+            },
+            "new_fragments": {
+              "count": 3019,
+              "aligned_edges": 616,
+              "aligned_edge_fraction": 0.051010268300761843
+            }
+          }
+        },
+        "8": {
+          "scores": {
+            "road_iou": 0.6179084734375367,
+            "cldice": 0.6834809992615913,
+            "boundary_iou": 0.09481803147762453,
+            "skeleton_precision": 0.7066011903772956,
+            "skeleton_recall": 0.6618258693343998,
+            "quality": 0.5329621427927708,
+            "counts": {
+              "valid": 853198334,
+              "intersection": 31560680,
+              "union": 51076626,
+              "predicted_skeleton": 1263969,
+              "true_skeleton": 1057677,
+              "skeleton_precision_hits": 893122,
+              "skeleton_recall_hits": 699998,
+              "boundary_intersection": 1301798,
+              "boundary_union": 13729435
+            },
+            "A": 0.5329621427927708
+          },
+          "structure": {
+            "gap_skeleton_pixels": 190939,
+            "terminal_missing_skeleton_pixels": 125393,
+            "whole_missed_skeleton_pixels": 41347,
+            "fp_fragments": 6291,
+            "predicted_components": 11540
+          },
+          "added_road_pixels": 3936985,
+          "deleted_road_pixels": 1395443,
+          "added_road_fraction": 0.004614384303286743,
+          "deleted_road_fraction": 0.0016355435124419733,
+          "refiner_seconds": 18.014141531661153,
+          "refiner_seconds_per_image": 0.021573822193606172,
+          "peak_cuda_bytes": 1549652992,
+          "extra": {
+            "changes": {
+              "added_correct": 1530378,
+              "added_wrong": 2406607,
+              "deleted_correct": 861076,
+              "deleted_wrong": 534367,
+              "fractions": {
+                "added_correct": 0.0017936954855797926,
+                "added_wrong": 0.0028206888177069508,
+                "deleted_correct": 0.0010092331005418958,
+                "deleted_wrong": 0.0006263104119000777
+              },
+              "correct_fraction": 0.44847375341964296,
+              "added_correct_fraction": 0.3887182704531513,
+              "deleted_correct_fraction": 0.6170628252103454
+            },
+            "tracking": {
+              "gap_total": 229180,
+              "gap_covered": 59559,
+              "terminal_total": 135710,
+              "terminal_covered": 13373,
+              "covered_total": 634833,
+              "covered_lost": 8904,
+              "gap_repair_fraction": 0.25987869796666374,
+              "terminal_coverage_fraction": 0.09854100655810183,
+              "new_break_fraction": 0.0140257359021979
+            },
+            "new_fragments": {
+              "count": 3009,
+              "aligned_edges": 606,
+              "aligned_edge_fraction": 0.050348953140578266
+            }
+          }
+        }
+      }
+    },
+    "A1-i": {
+      "Urban": {
+        "y0_draft": {
+          "scores": {
+            "road_iou": 0.6658632643020084,
+            "cldice": 0.7217568194230823,
+            "boundary_iou": 0.08645552192726548,
+            "skeleton_precision": 0.6774033632504941,
+            "skeleton_recall": 0.7723253592800967,
+            "quality": 0.566749782363382,
+            "counts": {
+              "valid": 340787183,
+              "intersection": 23818728,
+              "union": 35771200,
+              "predicted_skeleton": 617260,
+              "true_skeleton": 536072,
+              "skeleton_precision_hits": 418134,
+              "skeleton_recall_hits": 414022,
+              "boundary_intersection": 615963,
+              "boundary_union": 7124623
+            },
+            "A": 0.566749782363382
+          },
+          "structure": {
+            "gap_skeleton_pixels": 54969,
+            "terminal_missing_skeleton_pixels": 49339,
+            "whole_missed_skeleton_pixels": 17742,
+            "fp_fragments": 1695,
+            "predicted_components": 2856
+          },
+          "added_road_pixels": 0,
+          "deleted_road_pixels": 0,
+          "added_road_fraction": 0.0,
+          "deleted_road_fraction": 0.0,
+          "refiner_seconds": 0.0,
+          "refiner_seconds_per_image": 0.0,
+          "peak_cuda_bytes": 1616235520,
+          "extra": {
+            "changes": {
+              "added_correct": 0,
+              "added_wrong": 0,
+              "deleted_correct": 0,
+              "deleted_wrong": 0,
+              "fractions": {
+                "added_correct": 0.0,
+                "added_wrong": 0.0,
+                "deleted_correct": 0.0,
+                "deleted_wrong": 0.0
+              },
+              "correct_fraction": null,
+              "added_correct_fraction": null,
+              "deleted_correct_fraction": null
+            },
+            "tracking": {
+              "gap_total": 54969,
+              "gap_covered": 0,
+              "terminal_total": 49339,
+              "terminal_covered": 0,
+              "covered_total": 414022,
+              "covered_lost": 0,
+              "gap_repair_fraction": 0.0,
+              "terminal_coverage_fraction": 0.0,
+              "new_break_fraction": 0.0
+            },
+            "new_fragments": {
+              "count": 0,
+              "aligned_edges": 0,
+              "aligned_edge_fraction": null
+            }
+          }
+        },
+        "1": {
+          "scores": {
+            "road_iou": 0.6711395595614817,
+            "cldice": 0.7238426475847152,
+            "boundary_iou": 0.08842292247988019,
+            "skeleton_precision": 0.6862170232637679,
+            "skeleton_recall": 0.7658336939814054,
+            "quality": 0.5704071585521314,
+            "counts": {
+              "valid": 340787183,
+              "intersection": 23640393,
+              "union": 35224258,
+              "predicted_skeleton": 608156,
+              "true_skeleton": 536072,
+              "skeleton_precision_hits": 417327,
+              "skeleton_recall_hits": 410542,
+              "boundary_intersection": 623416,
+              "boundary_union": 7050389
+            },
+            "A": 0.5704071585521314
+          },
+          "structure": {
+            "gap_skeleton_pixels": 57322,
+            "terminal_missing_skeleton_pixels": 50465,
+            "whole_missed_skeleton_pixels": 17743,
+            "fp_fragments": 1630,
+            "predicted_components": 2807
+          },
+          "added_road_pixels": 0,
+          "deleted_road_pixels": 725277,
+          "added_road_fraction": 0.0,
+          "deleted_road_fraction": 0.002128240251335978,
+          "refiner_seconds": 0.907615119125694,
+          "refiner_seconds_per_image": 0.0026773307348840533,
+          "peak_cuda_bytes": 1544806912,
+          "extra": {
+            "changes": {
+              "added_correct": 0,
+              "added_wrong": 0,
+              "deleted_correct": 546942,
+              "deleted_wrong": 178335,
+              "fractions": {
+                "added_correct": 0.0,
+                "added_wrong": 0.0,
+                "deleted_correct": 0.0016049371199503121,
+                "deleted_wrong": 0.0005233031313856659
+              },
+              "correct_fraction": 0.7541146348222817,
+              "added_correct_fraction": null,
+              "deleted_correct_fraction": 0.7541146348222817
+            },
+            "tracking": {
+              "gap_total": 54969,
+              "gap_covered": 0,
+              "terminal_total": 49339,
+              "terminal_covered": 0,
+              "covered_total": 414022,
+              "covered_lost": 3480,
+              "gap_repair_fraction": 0.0,
+              "terminal_coverage_fraction": 0.0,
+              "new_break_fraction": 0.008405350440314766
+            },
+            "new_fragments": {
+              "count": 0,
+              "aligned_edges": 0,
+              "aligned_edge_fraction": null
+            }
+          }
+        },
+        "2": {
+          "scores": {
+            "road_iou": 0.675746471620008,
+            "cldice": 0.7261821336021332,
+            "boundary_iou": 0.0902579087914351,
+            "skeleton_precision": 0.6958755257245395,
+            "skeleton_recall": 0.7592487576295721,
+            "quality": 0.573779457648931,
+            "counts": {
+              "valid": 340787183,
+              "intersection": 23448683,
+              "union": 34700415,
+              "predicted_skeleton": 601313,
+              "true_skeleton": 536072,
+              "skeleton_precision_hits": 418439,
+              "skeleton_recall_hits": 407012,
+              "boundary_intersection": 630230,
+              "boundary_union": 6982546
+            },
+            "A": 0.573779457648931
+          },
+          "structure": {
+            "gap_skeleton_pixels": 59039,
+            "terminal_missing_skeleton_pixels": 52245,
+            "whole_missed_skeleton_pixels": 17776,
+            "fp_fragments": 1593,
+            "predicted_components": 2794
+          },
+          "added_road_pixels": 0,
+          "deleted_road_pixels": 1440830,
+          "added_road_fraction": 0.0,
+          "deleted_road_fraction": 0.00422794656570168,
+          "refiner_seconds": 1.7086384769063443,
+          "refiner_seconds_per_image": 0.00504023149529895,
+          "peak_cuda_bytes": 1553195520,
+          "extra": {
+            "changes": {
+              "added_correct": 0,
+              "added_wrong": 0,
+              "deleted_correct": 1070785,
+              "deleted_wrong": 370045,
+              "fractions": {
+                "added_correct": 0.0,
+                "added_wrong": 0.0,
+                "deleted_correct": 0.0031420929348742557,
+                "deleted_wrong": 0.0010858536308274247
+              },
+              "correct_fraction": 0.7431723381661959,
+              "added_correct_fraction": null,
+              "deleted_correct_fraction": 0.7431723381661959
+            },
+            "tracking": {
+              "gap_total": 54969,
+              "gap_covered": 0,
+              "terminal_total": 49339,
+              "terminal_covered": 0,
+              "covered_total": 414022,
+              "covered_lost": 7010,
+              "gap_repair_fraction": 0.0,
+              "terminal_coverage_fraction": 0.0,
+              "new_break_fraction": 0.0169314674099444
+            },
+            "new_fragments": {
+              "count": 0,
+              "aligned_edges": 0,
+              "aligned_edge_fraction": null
+            }
+          }
+        },
+        "4": {
+          "scores": {
+            "road_iou": 0.6815300507118441,
+            "cldice": 0.730885803016403,
+            "boundary_iou": 0.09186810493337406,
+            "skeleton_precision": 0.7149323558858737,
+            "skeleton_recall": 0.7475674909340536,
+            "quality": 0.5784043872475179,
+            "counts": {
+              "valid": 340787183,
+              "intersection": 23029126,
+              "union": 33790331,
+              "predicted_skeleton": 592291,
+              "true_skeleton": 536072,
+              "skeleton_precision_hits": 423448,
+              "skeleton_recall_hits": 400750,
+              "boundary_intersection": 632678,
+              "boundary_union": 6886808
+            },
+            "A": 0.5784043872475179
+          },
+          "structure": {
+            "gap_skeleton_pixels": 59025,
+            "terminal_missing_skeleton_pixels": 57289,
+            "whole_missed_skeleton_pixels": 19008,
+            "fp_fragments": 1537,
+            "predicted_components": 2762
+          },
+          "added_road_pixels": 0,
+          "deleted_road_pixels": 2770471,
+          "added_road_fraction": 0.0,
+          "deleted_road_fraction": 0.008129622057998585,
+          "refiner_seconds": 3.2864019848639145,
+          "refiner_seconds_per_image": 0.009694401135291783,
+          "peak_cuda_bytes": 1553195520,
+          "extra": {
+            "changes": {
+              "added_correct": 0,
+              "added_wrong": 0,
+              "deleted_correct": 1980869,
+              "deleted_wrong": 789602,
+              "fractions": {
+                "added_correct": 0.0,
+                "added_wrong": 0.0,
+                "deleted_correct": 0.005812627642161061,
+                "deleted_wrong": 0.002316994415837523
+              },
+              "correct_fraction": 0.7149935877329162,
+              "added_correct_fraction": null,
+              "deleted_correct_fraction": 0.7149935877329162
+            },
+            "tracking": {
+              "gap_total": 54969,
+              "gap_covered": 0,
+              "terminal_total": 49339,
+              "terminal_covered": 0,
+              "covered_total": 414022,
+              "covered_lost": 13272,
+              "gap_repair_fraction": 0.0,
+              "terminal_coverage_fraction": 0.0,
+              "new_break_fraction": 0.03205626754133838
+            },
+            "new_fragments": {
+              "count": 0,
+              "aligned_edges": 0,
+              "aligned_edge_fraction": null
+            }
+          }
+        },
+        "6": {
+          "scores": {
+            "road_iou": 0.6826699476455056,
+            "cldice": 0.7339114556046512,
+            "boundary_iou": 0.09165672289318547,
+            "skeleton_precision": 0.7319878629003127,
+            "skeleton_recall": 0.7358451849751526,
+            "quality": 0.5798397550827852,
+            "counts": {
+              "valid": 340787183,
+              "intersection": 22570769,
+              "union": 33062491,
+              "predicted_skeleton": 581358,
+              "true_skeleton": 536072,
+              "skeleton_precision_hits": 425547,
+              "skeleton_recall_hits": 394466,
+              "boundary_intersection": 624716,
+              "boundary_union": 6815823
+            },
+            "A": 0.5798397550827852
+          },
+          "structure": {
+            "gap_skeleton_pixels": 62471,
+            "terminal_missing_skeleton_pixels": 59245,
+            "whole_missed_skeleton_pixels": 19890,
+            "fp_fragments": 1471,
+            "predicted_components": 2726
+          },
+          "added_road_pixels": 0,
+          "deleted_road_pixels": 3956668,
+          "added_road_fraction": 0.0,
+          "deleted_road_fraction": 0.011610377964244037,
+          "refiner_seconds": 4.909820005646907,
+          "refiner_seconds_per_image": 0.014483244854415654,
+          "peak_cuda_bytes": 1553195520,
+          "extra": {
+            "changes": {
+              "added_correct": 0,
+              "added_wrong": 0,
+              "deleted_correct": 2708709,
+              "deleted_wrong": 1247959,
+              "fractions": {
+                "added_correct": 0.0,
+                "added_wrong": 0.0,
+                "deleted_correct": 0.007948388716250516,
+                "deleted_wrong": 0.00366198924799352
+              },
+              "correct_fraction": 0.6845934508530915,
+              "added_correct_fraction": null,
+              "deleted_correct_fraction": 0.6845934508530915
+            },
+            "tracking": {
+              "gap_total": 54969,
+              "gap_covered": 0,
+              "terminal_total": 49339,
+              "terminal_covered": 0,
+              "covered_total": 414022,
+              "covered_lost": 19556,
+              "gap_repair_fraction": 0.0,
+              "terminal_coverage_fraction": 0.0,
+              "new_break_fraction": 0.04723420494563091
+            },
+            "new_fragments": {
+              "count": 0,
+              "aligned_edges": 0,
+              "aligned_edge_fraction": null
+            }
+          }
+        },
+        "8": {
+          "scores": {
+            "road_iou": 0.6806687748725022,
+            "cldice": 0.7371084254021067,
+            "boundary_iou": 0.09110290513459252,
+            "skeleton_precision": 0.749283867325532,
+            "skeleton_recall": 0.7253223447596592,
+            "quality": 0.5796874960838017,
+            "counts": {
+              "valid": 340787183,
+              "intersection": 22103432,
+              "union": 32473110,
+              "predicted_skeleton": 573916,
+              "true_skeleton": 536072,
+              "skeleton_precision_hits": 430026,
+              "skeleton_recall_hits": 388825,
+              "boundary_intersection": 615940,
+              "boundary_union": 6760926
+            },
+            "A": 0.5796874960838017
+          },
+          "structure": {
+            "gap_skeleton_pixels": 63237,
+            "terminal_missing_skeleton_pixels": 61484,
+            "whole_missed_skeleton_pixels": 22526,
+            "fp_fragments": 1402,
+            "predicted_components": 2664
+          },
+          "added_road_pixels": 0,
+          "deleted_road_pixels": 5013386,
+          "added_road_fraction": 0.0,
+          "deleted_road_fraction": 0.014711192938262587,
+          "refiner_seconds": 6.556347437086515,
+          "refiner_seconds_per_image": 0.019340257926508893,
+          "peak_cuda_bytes": 1553195520,
+          "extra": {
+            "changes": {
+              "added_correct": 0,
+              "added_wrong": 0,
+              "deleted_correct": 3298090,
+              "deleted_wrong": 1715296,
+              "fractions": {
+                "added_correct": 0.0,
+                "added_wrong": 0.0,
+                "deleted_correct": 0.009677858101840643,
+                "deleted_wrong": 0.005033334836421943
+              },
+              "correct_fraction": 0.6578567858130214,
+              "added_correct_fraction": null,
+              "deleted_correct_fraction": 0.6578567858130214
+            },
+            "tracking": {
+              "gap_total": 54969,
+              "gap_covered": 0,
+              "terminal_total": 49339,
+              "terminal_covered": 0,
+              "covered_total": 414022,
+              "covered_lost": 25197,
+              "gap_repair_fraction": 0.0,
+              "terminal_coverage_fraction": 0.0,
+              "new_break_fraction": 0.06085908478293424
+            },
+            "new_fragments": {
+              "count": 0,
+              "aligned_edges": 0,
+              "aligned_edge_fraction": null
+            }
+          }
+        }
+      },
+      "Rural": {
+        "y0_draft": {
+          "scores": {
+            "road_iou": 0.5301918167635796,
+            "cldice": 0.6621049014323799,
+            "boundary_iou": 0.10013416559771868,
+            "skeleton_precision": 0.8043472736359709,
+            "skeleton_recall": 0.562611554720526,
+            "quality": 0.4837542119310475,
+            "counts": {
+              "valid": 512411151,
+              "intersection": 8972118,
+              "union": 16922400,
+              "predicted_skeleton": 354153,
+              "true_skeleton": 521605,
+              "skeleton_precision_hits": 284862,
+              "skeleton_recall_hits": 293461,
+              "boundary_intersection": 594839,
+              "boundary_union": 5940420
+            },
+            "A": 0.4837542119310475
+          },
+          "structure": {
+            "gap_skeleton_pixels": 115696,
+            "terminal_missing_skeleton_pixels": 76029,
+            "whole_missed_skeleton_pixels": 36419,
+            "fp_fragments": 1145,
+            "predicted_components": 3186
+          },
+          "added_road_pixels": 0,
+          "deleted_road_pixels": 0,
+          "added_road_fraction": 0.0,
+          "deleted_road_fraction": 0.0,
+          "refiner_seconds": 0.0,
+          "refiner_seconds_per_image": 0.0,
+          "peak_cuda_bytes": 1616235520,
+          "extra": {
+            "changes": {
+              "added_correct": 0,
+              "added_wrong": 0,
+              "deleted_correct": 0,
+              "deleted_wrong": 0,
+              "fractions": {
+                "added_correct": 0.0,
+                "added_wrong": 0.0,
+                "deleted_correct": 0.0,
+                "deleted_wrong": 0.0
+              },
+              "correct_fraction": null,
+              "added_correct_fraction": null,
+              "deleted_correct_fraction": null
+            },
+            "tracking": {
+              "gap_total": 115696,
+              "gap_covered": 0,
+              "terminal_total": 76029,
+              "terminal_covered": 0,
+              "covered_total": 293461,
+              "covered_lost": 0,
+              "gap_repair_fraction": 0.0,
+              "terminal_coverage_fraction": 0.0,
+              "new_break_fraction": 0.0
+            },
+            "new_fragments": {
+              "count": 0,
+              "aligned_edges": 0,
+              "aligned_edge_fraction": null
+            }
+          }
+        },
+        "1": {
+          "scores": {
+            "road_iou": 0.5305522974509623,
+            "cldice": 0.6588425345180947,
+            "boundary_iou": 0.10063560705196045,
+            "skeleton_precision": 0.8089219715179241,
+            "skeleton_recall": 0.5557366206228851,
+            "quality": 0.48305603049130164,
+            "counts": {
+              "valid": 512411151,
+              "intersection": 8892916,
+              "union": 16761620,
+              "predicted_skeleton": 348219,
+              "true_skeleton": 521605,
+              "skeleton_precision_hits": 281682,
+              "skeleton_recall_hits": 289875,
+              "boundary_intersection": 593468,
+              "boundary_union": 5897197
+            },
+            "A": 0.48305603049130164
+          },
+          "structure": {
+            "gap_skeleton_pixels": 111091,
+            "terminal_missing_skeleton_pixels": 83185,
+            "whole_missed_skeleton_pixels": 37454,
+            "fp_fragments": 1118,
+            "predicted_components": 3170
+          },
+          "added_road_pixels": 0,
+          "deleted_road_pixels": 239982,
+          "added_road_fraction": 0.0,
+          "deleted_road_fraction": 0.0004683387540096683,
+          "refiner_seconds": 1.3130547379842028,
+          "refiner_seconds_per_image": 0.002647287778193957,
+          "peak_cuda_bytes": 1544806912,
+          "extra": {
+            "changes": {
+              "added_correct": 0,
+              "added_wrong": 0,
+              "deleted_correct": 160780,
+              "deleted_wrong": 79202,
+              "fractions": {
+                "added_correct": 0.0,
+                "added_wrong": 0.0,
+                "deleted_correct": 0.00031377146981721325,
+                "deleted_wrong": 0.00015456728419245506
+              },
+              "correct_fraction": 0.6699669141852306,
+              "added_correct_fraction": null,
+              "deleted_correct_fraction": 0.6699669141852306
+            },
+            "tracking": {
+              "gap_total": 115696,
+              "gap_covered": 0,
+              "terminal_total": 76029,
+              "terminal_covered": 0,
+              "covered_total": 293461,
+              "covered_lost": 3586,
+              "gap_repair_fraction": 0.0,
+              "terminal_coverage_fraction": 0.0,
+              "new_break_fraction": 0.012219681661276967
+            },
+            "new_fragments": {
+              "count": 0,
+              "aligned_edges": 0,
+              "aligned_edge_fraction": null
+            }
+          }
+        },
+        "2": {
+          "scores": {
+            "road_iou": 0.5304124121386252,
+            "cldice": 0.6551280938008155,
+            "boundary_iou": 0.10081598883895981,
+            "skeleton_precision": 0.8133744513461184,
+            "skeleton_recall": 0.5484284084700108,
+            "quality": 0.4819078319773492,
+            "counts": {
+              "valid": 512411151,
+              "intersection": 8808098,
+              "union": 16606131,
+              "predicted_skeleton": 342429,
+              "true_skeleton": 521605,
+              "skeleton_precision_hits": 278523,
+              "skeleton_recall_hits": 286063,
+              "boundary_intersection": 590387,
+              "boundary_union": 5856085
+            },
+            "A": 0.4819078319773492
+          },
+          "structure": {
+            "gap_skeleton_pixels": 111243,
+            "terminal_missing_skeleton_pixels": 84537,
+            "whole_missed_skeleton_pixels": 39762,
+            "fp_fragments": 1102,
+            "predicted_components": 3134
+          },
+          "added_road_pixels": 0,
+          "deleted_road_pixels": 480289,
+          "added_road_fraction": 0.0,
+          "deleted_road_fraction": 0.0009373117643179471,
+          "refiner_seconds": 2.471867325133644,
+          "refiner_seconds_per_image": 0.004983603478092024,
+          "peak_cuda_bytes": 1553195520,
+          "extra": {
+            "changes": {
+              "added_correct": 0,
+              "added_wrong": 0,
+              "deleted_correct": 316269,
+              "deleted_wrong": 164020,
+              "fractions": {
+                "added_correct": 0.0,
+                "added_wrong": 0.0,
+                "deleted_correct": 0.0006172172470930477,
+                "deleted_wrong": 0.00032009451722489935
+              },
+              "correct_fraction": 0.6584972797628095,
+              "added_correct_fraction": null,
+              "deleted_correct_fraction": 0.6584972797628095
+            },
+            "tracking": {
+              "gap_total": 115696,
+              "gap_covered": 0,
+              "terminal_total": 76029,
+              "terminal_covered": 0,
+              "covered_total": 293461,
+              "covered_lost": 7398,
+              "gap_repair_fraction": 0.0,
+              "terminal_coverage_fraction": 0.0,
+              "new_break_fraction": 0.02520948269105605
+            },
+            "new_fragments": {
+              "count": 0,
+              "aligned_edges": 0,
+              "aligned_edge_fraction": null
+            }
+          }
+        },
+        "4": {
+          "scores": {
+            "road_iou": 0.528799166292945,
+            "cldice": 0.6478178753132879,
+            "boundary_iou": 0.10042269574118179,
+            "skeleton_precision": 0.8214948261115729,
+            "skeleton_recall": 0.5347609781347955,
+            "quality": 0.47882948488869526,
+            "counts": {
+              "valid": 512411151,
+              "intersection": 8634760,
+              "union": 16328997,
+              "predicted_skeleton": 332052,
+              "true_skeleton": 521605,
+              "skeleton_precision_hits": 272779,
+              "skeleton_recall_hits": 278934,
+              "boundary_intersection": 580899,
+              "boundary_union": 5784539
+            },
+            "A": 0.47882948488869526
+          },
+          "structure": {
+            "gap_skeleton_pixels": 111741,
+            "terminal_missing_skeleton_pixels": 89163,
+            "whole_missed_skeleton_pixels": 41767,
+            "fp_fragments": 1025,
+            "predicted_components": 3031
+          },
+          "added_road_pixels": 0,
+          "deleted_road_pixels": 930761,
+          "added_road_fraction": 0.0,
+          "deleted_road_fraction": 0.0018164339284646052,
+          "refiner_seconds": 4.84899974509608,
+          "refiner_seconds_per_image": 0.00977620916350016,
+          "peak_cuda_bytes": 1553195520,
+          "extra": {
+            "changes": {
+              "added_correct": 0,
+              "added_wrong": 0,
+              "deleted_correct": 593403,
+              "deleted_wrong": 337358,
+              "fractions": {
+                "added_correct": 0.0,
+                "added_wrong": 0.0,
+                "deleted_correct": 0.0011580602780441834,
+                "deleted_wrong": 0.0006583736504204219
+              },
+              "correct_fraction": 0.6375460510270629,
+              "added_correct_fraction": null,
+              "deleted_correct_fraction": 0.6375460510270629
+            },
+            "tracking": {
+              "gap_total": 115696,
+              "gap_covered": 0,
+              "terminal_total": 76029,
+              "terminal_covered": 0,
+              "covered_total": 293461,
+              "covered_lost": 14527,
+              "gap_repair_fraction": 0.0,
+              "terminal_coverage_fraction": 0.0,
+              "new_break_fraction": 0.04950231887712507
+            },
+            "new_fragments": {
+              "count": 0,
+              "aligned_edges": 0,
+              "aligned_edge_fraction": null
+            }
+          }
+        },
+        "6": {
+          "scores": {
+            "road_iou": 0.525588448729247,
+            "cldice": 0.640303433805308,
+            "boundary_iou": 0.09990590758461065,
+            "skeleton_precision": 0.8279436846838466,
+            "skeleton_recall": 0.5220003642603119,
+            "quality": 0.474866436023138,
+            "counts": {
+              "valid": 512411151,
+              "intersection": 8458759,
+              "union": 16093883,
+              "predicted_skeleton": 322470,
+              "true_skeleton": 521605,
+              "skeleton_precision_hits": 266987,
+              "skeleton_recall_hits": 272278,
+              "boundary_intersection": 571665,
+              "boundary_union": 5722034
+            },
+            "A": 0.474866436023138
+          },
+          "structure": {
+            "gap_skeleton_pixels": 112110,
+            "terminal_missing_skeleton_pixels": 88778,
+            "whole_missed_skeleton_pixels": 48439,
+            "fp_fragments": 936,
+            "predicted_components": 2934
+          },
+          "added_road_pixels": 0,
+          "deleted_road_pixels": 1341876,
+          "added_road_fraction": 0.0,
+          "deleted_road_fraction": 0.002618748630628454,
+          "refiner_seconds": 7.265249869087711,
+          "refiner_seconds_per_image": 0.014647681187676837,
+          "peak_cuda_bytes": 1553195520,
+          "extra": {
+            "changes": {
+              "added_correct": 0,
+              "added_wrong": 0,
+              "deleted_correct": 828517,
+              "deleted_wrong": 513359,
+              "fractions": {
+                "added_correct": 0.0,
+                "added_wrong": 0.0,
+                "deleted_correct": 0.0016168988484795874,
+                "deleted_wrong": 0.0010018497821488667
+              },
+              "correct_fraction": 0.6174318640470505,
+              "added_correct_fraction": null,
+              "deleted_correct_fraction": 0.6174318640470505
+            },
+            "tracking": {
+              "gap_total": 115696,
+              "gap_covered": 0,
+              "terminal_total": 76029,
+              "terminal_covered": 0,
+              "covered_total": 293461,
+              "covered_lost": 21183,
+              "gap_repair_fraction": 0.0,
+              "terminal_coverage_fraction": 0.0,
+              "new_break_fraction": 0.07218335656186001
+            },
+            "new_fragments": {
+              "count": 0,
+              "aligned_edges": 0,
+              "aligned_edge_fraction": null
+            }
+          }
+        },
+        "8": {
+          "scores": {
+            "road_iou": 0.5208864530745196,
+            "cldice": 0.6323321248489534,
+            "boundary_iou": 0.0992427946349617,
+            "skeleton_precision": 0.8343949247640908,
+            "skeleton_recall": 0.509055703070331,
+            "quality": 0.46999142291893814,
+            "counts": {
+              "valid": 512411151,
+              "intersection": 8277603,
+              "union": 15891377,
+              "predicted_skeleton": 313680,
+              "true_skeleton": 521605,
+              "skeleton_precision_hits": 261733,
+              "skeleton_recall_hits": 265526,
+              "boundary_intersection": 562267,
+              "boundary_union": 5665570
+            },
+            "A": 0.46999142291893814
+          },
+          "structure": {
+            "gap_skeleton_pixels": 109660,
+            "terminal_missing_skeleton_pixels": 94350,
+            "whole_missed_skeleton_pixels": 52069,
+            "fp_fragments": 875,
+            "predicted_components": 2873
+          },
+          "added_road_pixels": 0,
+          "deleted_road_pixels": 1725538,
+          "added_road_fraction": 0.0,
+          "deleted_road_fraction": 0.0033674872153592146,
+          "refiner_seconds": 9.657352647627704,
+          "refiner_seconds_per_image": 0.0194704690476365,
+          "peak_cuda_bytes": 1553195520,
+          "extra": {
+            "changes": {
+              "added_correct": 0,
+              "added_wrong": 0,
+              "deleted_correct": 1031023,
+              "deleted_wrong": 694515,
+              "fractions": {
+                "added_correct": 0.0,
+                "added_wrong": 0.0,
+                "deleted_correct": 0.00201210102080702,
+                "deleted_wrong": 0.0013553861945521948
+              },
+              "correct_fraction": 0.5975081394904083,
+              "added_correct_fraction": null,
+              "deleted_correct_fraction": 0.5975081394904083
+            },
+            "tracking": {
+              "gap_total": 115696,
+              "gap_covered": 0,
+              "terminal_total": 76029,
+              "terminal_covered": 0,
+              "covered_total": 293461,
+              "covered_lost": 27935,
+              "gap_repair_fraction": 0.0,
+              "terminal_coverage_fraction": 0.0,
+              "new_break_fraction": 0.09519152459781709
+            },
+            "new_fragments": {
+              "count": 0,
+              "aligned_edges": 0,
+              "aligned_edge_fraction": null
+            }
+          }
+        }
+      },
+      "Overall": {
+        "y0_draft": {
+          "scores": {
+            "road_iou": 0.6222927642066589,
+            "cldice": 0.6952158398968423,
+            "boundary_iou": 0.0926749341735806,
+            "skeleton_precision": 0.7236839531692494,
+            "skeleton_recall": 0.6689026990281532,
+            "quality": 0.5382461209070982,
+            "counts": {
+              "valid": 853198334,
+              "intersection": 32790846,
+              "union": 52693600,
+              "predicted_skeleton": 971413,
+              "true_skeleton": 1057677,
+              "skeleton_precision_hits": 702996,
+              "skeleton_recall_hits": 707483,
+              "boundary_intersection": 1210802,
+              "boundary_union": 13065043
+            },
+            "A": 0.5382461209070982
+          },
+          "structure": {
+            "gap_skeleton_pixels": 170665,
+            "terminal_missing_skeleton_pixels": 125368,
+            "whole_missed_skeleton_pixels": 54161,
+            "fp_fragments": 2840,
+            "predicted_components": 6042
+          },
+          "added_road_pixels": 0,
+          "deleted_road_pixels": 0,
+          "added_road_fraction": 0.0,
+          "deleted_road_fraction": 0.0,
+          "refiner_seconds": 0.0,
+          "refiner_seconds_per_image": 0.0,
+          "peak_cuda_bytes": 1616235520,
+          "extra": {
+            "changes": {
+              "added_correct": 0,
+              "added_wrong": 0,
+              "deleted_correct": 0,
+              "deleted_wrong": 0,
+              "fractions": {
+                "added_correct": 0.0,
+                "added_wrong": 0.0,
+                "deleted_correct": 0.0,
+                "deleted_wrong": 0.0
+              },
+              "correct_fraction": null,
+              "added_correct_fraction": null,
+              "deleted_correct_fraction": null
+            },
+            "tracking": {
+              "gap_total": 170665,
+              "gap_covered": 0,
+              "terminal_total": 125368,
+              "terminal_covered": 0,
+              "covered_total": 707483,
+              "covered_lost": 0,
+              "gap_repair_fraction": 0.0,
+              "terminal_coverage_fraction": 0.0,
+              "new_break_fraction": 0.0
+            },
+            "new_fragments": {
+              "count": 0,
+              "aligned_edges": 0,
+              "aligned_edge_fraction": null
+            }
+          }
+        },
+        "1": {
+          "scores": {
+            "road_iou": 0.6258105133859623,
+            "cldice": 0.6948655774127379,
+            "boundary_iou": 0.09398539619663465,
+            "skeleton_precision": 0.7308942621879493,
+            "skeleton_recall": 0.6622220205223334,
+            "quality": 0.5401620091561294,
+            "counts": {
+              "valid": 853198334,
+              "intersection": 32533309,
+              "union": 51985878,
+              "predicted_skeleton": 956375,
+              "true_skeleton": 1057677,
+              "skeleton_precision_hits": 699009,
+              "skeleton_recall_hits": 700417,
+              "boundary_intersection": 1216884,
+              "boundary_union": 12947586
+            },
+            "A": 0.5401620091561294
+          },
+          "structure": {
+            "gap_skeleton_pixels": 168413,
+            "terminal_missing_skeleton_pixels": 133650,
+            "whole_missed_skeleton_pixels": 55197,
+            "fp_fragments": 2748,
+            "predicted_components": 5977
+          },
+          "added_road_pixels": 0,
+          "deleted_road_pixels": 965259,
+          "added_road_fraction": 0.0,
+          "deleted_road_fraction": 0.0011313418715606634,
+          "refiner_seconds": 2.220669857109897,
+          "refiner_seconds_per_image": 0.0026594848588142477,
+          "peak_cuda_bytes": 1544806912,
+          "extra": {
+            "changes": {
+              "added_correct": 0,
+              "added_wrong": 0,
+              "deleted_correct": 707722,
+              "deleted_wrong": 257537,
+              "fractions": {
+                "added_correct": 0.0,
+                "added_wrong": 0.0,
+                "deleted_correct": 0.0008294929464782569,
+                "deleted_wrong": 0.00030184892508240647
+              },
+              "correct_fraction": 0.7331938888940689,
+              "added_correct_fraction": null,
+              "deleted_correct_fraction": 0.7331938888940689
+            },
+            "tracking": {
+              "gap_total": 170665,
+              "gap_covered": 0,
+              "terminal_total": 125368,
+              "terminal_covered": 0,
+              "covered_total": 707483,
+              "covered_lost": 7066,
+              "gap_repair_fraction": 0.0,
+              "terminal_coverage_fraction": 0.0,
+              "new_break_fraction": 0.009987519134735393
+            },
+            "new_fragments": {
+              "count": 0,
+              "aligned_edges": 0,
+              "aligned_edge_fraction": null
+            }
+          }
+        },
+        "2": {
+          "scores": {
+            "road_iou": 0.628706929521235,
+            "cldice": 0.6944097622449356,
+            "boundary_iou": 0.09507376604250095,
+            "skeleton_precision": 0.7385090416660486,
+            "skeleton_recall": 0.655280392785321,
+            "quality": 0.5416911466425983,
+            "counts": {
+              "valid": 853198334,
+              "intersection": 32256781,
+              "union": 51306546,
+              "predicted_skeleton": 943742,
+              "true_skeleton": 1057677,
+              "skeleton_precision_hits": 696962,
+              "skeleton_recall_hits": 693075,
+              "boundary_intersection": 1220617,
+              "boundary_union": 12838631
+            },
+            "A": 0.5416911466425983
+          },
+          "structure": {
+            "gap_skeleton_pixels": 170282,
+            "terminal_missing_skeleton_pixels": 136782,
+            "whole_missed_skeleton_pixels": 57538,
+            "fp_fragments": 2695,
+            "predicted_components": 5928
+          },
+          "added_road_pixels": 0,
+          "deleted_road_pixels": 1921119,
+          "added_road_fraction": 0.0,
+          "deleted_road_fraction": 0.002251667547208314,
+          "refiner_seconds": 4.180505802039988,
+          "refiner_seconds_per_image": 0.00500659377489819,
+          "peak_cuda_bytes": 1553195520,
+          "extra": {
+            "changes": {
+              "added_correct": 0,
+              "added_wrong": 0,
+              "deleted_correct": 1387054,
+              "deleted_wrong": 534065,
+              "fractions": {
+                "added_correct": 0.0,
+                "added_wrong": 0.0,
+                "deleted_correct": 0.0016257110975558937,
+                "deleted_wrong": 0.0006259564496524204
+              },
+              "correct_fraction": 0.7220031658632287,
+              "added_correct_fraction": null,
+              "deleted_correct_fraction": 0.7220031658632287
+            },
+            "tracking": {
+              "gap_total": 170665,
+              "gap_covered": 0,
+              "terminal_total": 125368,
+              "terminal_covered": 0,
+              "covered_total": 707483,
+              "covered_lost": 14408,
+              "gap_repair_fraction": 0.0,
+              "terminal_coverage_fraction": 0.0,
+              "new_break_fraction": 0.02036515365033506
+            },
+            "new_fragments": {
+              "count": 0,
+              "aligned_edges": 0,
+              "aligned_edge_fraction": null
+            }
+          }
+        },
+        "4": {
+          "scores": {
+            "road_iou": 0.6317699630769191,
+            "cldice": 0.6935350206552422,
+            "boundary_iou": 0.09577332228373195,
+            "skeleton_precision": 0.753212822512855,
+            "skeleton_recall": 0.6426196277313395,
+            "quality": 0.5431001521917787,
+            "counts": {
+              "valid": 853198334,
+              "intersection": 31663886,
+              "union": 50119328,
+              "predicted_skeleton": 924343,
+              "true_skeleton": 1057677,
+              "skeleton_precision_hits": 696227,
+              "skeleton_recall_hits": 679684,
+              "boundary_intersection": 1213577,
+              "boundary_union": 12671347
+            },
+            "A": 0.5431001521917787
+          },
+          "structure": {
+            "gap_skeleton_pixels": 170766,
+            "terminal_missing_skeleton_pixels": 146452,
+            "whole_missed_skeleton_pixels": 60775,
+            "fp_fragments": 2562,
+            "predicted_components": 5793
+          },
+          "added_road_pixels": 0,
+          "deleted_road_pixels": 3701232,
+          "added_road_fraction": 0.0,
+          "deleted_road_fraction": 0.004338067542452562,
+          "refiner_seconds": 8.135401729959995,
+          "refiner_seconds_per_image": 0.009742996083784424,
+          "peak_cuda_bytes": 1553195520,
+          "extra": {
+            "changes": {
+              "added_correct": 0,
+              "added_wrong": 0,
+              "deleted_correct": 2574272,
+              "deleted_wrong": 1126960,
+              "fractions": {
+                "added_correct": 0.0,
+                "added_wrong": 0.0,
+                "deleted_correct": 0.0030172023284799334,
+                "deleted_wrong": 0.0013208652139726283
+              },
+              "correct_fraction": 0.6955176006259537,
+              "added_correct_fraction": null,
+              "deleted_correct_fraction": 0.6955176006259537
+            },
+            "tracking": {
+              "gap_total": 170665,
+              "gap_covered": 0,
+              "terminal_total": 125368,
+              "terminal_covered": 0,
+              "covered_total": 707483,
+              "covered_lost": 27799,
+              "gap_repair_fraction": 0.0,
+              "terminal_coverage_fraction": 0.0,
+              "new_break_fraction": 0.03929281692987676
+            },
+            "new_fragments": {
+              "count": 0,
+              "aligned_edges": 0,
+              "aligned_edge_fraction": null
+            }
+          }
+        },
+        "6": {
+          "scores": {
+            "road_iou": 0.6312411895962872,
+            "cldice": 0.6916982593782015,
+            "boundary_iou": 0.0954214902913632,
+            "skeleton_precision": 0.76622321946211,
+            "skeleton_recall": 0.6303852688486182,
+            "quality": 0.5422143706698767,
+            "counts": {
+              "valid": 853198334,
+              "intersection": 31029528,
+              "union": 49156374,
+              "predicted_skeleton": 903828,
+              "true_skeleton": 1057677,
+              "skeleton_precision_hits": 692534,
+              "skeleton_recall_hits": 666744,
+              "boundary_intersection": 1196381,
+              "boundary_union": 12537857
+            },
+            "A": 0.5422143706698767
+          },
+          "structure": {
+            "gap_skeleton_pixels": 174581,
+            "terminal_missing_skeleton_pixels": 148023,
+            "whole_missed_skeleton_pixels": 68329,
+            "fp_fragments": 2407,
+            "predicted_components": 5660
+          },
+          "added_road_pixels": 0,
+          "deleted_road_pixels": 5298544,
+          "added_road_fraction": 0.0,
+          "deleted_road_fraction": 0.006210213720365751,
+          "refiner_seconds": 12.175069874734618,
+          "refiner_seconds_per_image": 0.014580922005670202,
+          "peak_cuda_bytes": 1553195520,
+          "extra": {
+            "changes": {
+              "added_correct": 0,
+              "added_wrong": 0,
+              "deleted_correct": 3537226,
+              "deleted_wrong": 1761318,
+              "fractions": {
+                "added_correct": 0.0,
+                "added_wrong": 0.0,
+                "deleted_correct": 0.00414584260076626,
+                "deleted_wrong": 0.0020643711195994906
+              },
+              "correct_fraction": 0.6675845288818966,
+              "added_correct_fraction": null,
+              "deleted_correct_fraction": 0.6675845288818966
+            },
+            "tracking": {
+              "gap_total": 170665,
+              "gap_covered": 0,
+              "terminal_total": 125368,
+              "terminal_covered": 0,
+              "covered_total": 707483,
+              "covered_lost": 40739,
+              "gap_repair_fraction": 0.0,
+              "terminal_coverage_fraction": 0.0,
+              "new_break_fraction": 0.057583009061701836
+            },
+            "new_fragments": {
+              "count": 0,
+              "aligned_edges": 0,
+              "aligned_edge_fraction": null
+            }
+          }
+        },
+        "8": {
+          "scores": {
+            "road_iou": 0.6281682466723982,
+            "cldice": 0.6897798907790269,
+            "boundary_iou": 0.09481409723223666,
+            "skeleton_precision": 0.779362457694717,
+            "skeleton_recall": 0.6186680810871372,
+            "quality": 0.5399809100163545,
+            "counts": {
+              "valid": 853198334,
+              "intersection": 30381035,
+              "union": 48364487,
+              "predicted_skeleton": 887596,
+              "true_skeleton": 1057677,
+              "skeleton_precision_hits": 691759,
+              "skeleton_recall_hits": 654351,
+              "boundary_intersection": 1178207,
+              "boundary_union": 12426496
+            },
+            "A": 0.5399809100163545
+          },
+          "structure": {
+            "gap_skeleton_pixels": 172897,
+            "terminal_missing_skeleton_pixels": 155834,
+            "whole_missed_skeleton_pixels": 74595,
+            "fp_fragments": 2277,
+            "predicted_components": 5537
+          },
+          "added_road_pixels": 0,
+          "deleted_road_pixels": 6738924,
+          "added_road_fraction": 0.0,
+          "deleted_road_fraction": 0.007898426112022858,
+          "refiner_seconds": 16.21370008471422,
+          "refiner_seconds_per_image": 0.019417604891873316,
+          "peak_cuda_bytes": 1553195520,
+          "extra": {
+            "changes": {
+              "added_correct": 0,
+              "added_wrong": 0,
+              "deleted_correct": 4329113,
+              "deleted_wrong": 2409811,
+              "fractions": {
+                "added_correct": 0.0,
+                "added_wrong": 0.0,
+                "deleted_correct": 0.005073982012721558,
+                "deleted_wrong": 0.0028244440993013004
+              },
+              "correct_fraction": 0.6424041879682869,
+              "added_correct_fraction": null,
+              "deleted_correct_fraction": 0.6424041879682869
+            },
+            "tracking": {
+              "gap_total": 170665,
+              "gap_covered": 0,
+              "terminal_total": 125368,
+              "terminal_covered": 0,
+              "covered_total": 707483,
+              "covered_lost": 53132,
+              "gap_repair_fraction": 0.0,
+              "terminal_coverage_fraction": 0.0,
+              "new_break_fraction": 0.07510003773942271
+            },
+            "new_fragments": {
+              "count": 0,
+              "aligned_edges": 0,
+              "aligned_edge_fraction": null
+            }
+          }
+        }
+      }
+    }
+  },
+  "val_sources": {
+    "linear": "results/exp/e0_v2_s0/metrics.json",
+    "A1-i": "results/exp/e6_convdraft_s0/metrics.json"
+  },
+  "comparison": {
+    "gap": {
+      "linear": 0.040701432673578286,
+      "A1-i": 0.008107775510630133
+    },
+    "gap_difference": -0.03259365716294815
+  },
+  "refiner_gains": [
+    {
+      "head": "linear",
+      "set": "Train subset",
+      "domain": "Overall",
+      "k": 1,
+      "gain": -0.01787071229466397
+    },
+    {
+      "head": "linear",
+      "set": "Train subset",
+      "domain": "Overall",
+      "k": 2,
+      "gain": -0.018008063333822988
+    },
+    {
+      "head": "linear",
+      "set": "Train subset",
+      "domain": "Overall",
+      "k": 4,
+      "gain": -0.013948923099942112
+    },
+    {
+      "head": "linear",
+      "set": "Train subset",
+      "domain": "Urban",
+      "k": 1,
+      "gain": -0.016751325929763694
+    },
+    {
+      "head": "linear",
+      "set": "Train subset",
+      "domain": "Urban",
+      "k": 2,
+      "gain": -0.016442617901553214
+    },
+    {
+      "head": "linear",
+      "set": "Train subset",
+      "domain": "Urban",
+      "k": 4,
+      "gain": -0.011697764235547026
+    },
+    {
+      "head": "linear",
+      "set": "Train subset",
+      "domain": "Rural",
+      "k": 1,
+      "gain": -0.02094695633452781
+    },
+    {
+      "head": "linear",
+      "set": "Train subset",
+      "domain": "Rural",
+      "k": 2,
+      "gain": -0.022571201738376234
+    },
+    {
+      "head": "linear",
+      "set": "Train subset",
+      "domain": "Rural",
+      "k": 4,
+      "gain": -0.020413169508640916
+    },
+    {
+      "head": "linear",
+      "set": "Val-rep",
+      "domain": "Overall",
+      "k": 1,
+      "gain": 0.005878207250912482
+    },
+    {
+      "head": "linear",
+      "set": "Val-rep",
+      "domain": "Overall",
+      "k": 2,
+      "gain": 0.005727435351611909
+    },
+    {
+      "head": "linear",
+      "set": "Val-rep",
+      "domain": "Overall",
+      "k": 4,
+      "gain": 0.006786549056610469
+    },
+    {
+      "head": "linear",
+      "set": "Val-rep",
+      "domain": "Urban",
+      "k": 1,
+      "gain": -0.006766863319273453
+    },
+    {
+      "head": "linear",
+      "set": "Val-rep",
+      "domain": "Urban",
+      "k": 2,
+      "gain": -0.007618001970621346
+    },
+    {
+      "head": "linear",
+      "set": "Val-rep",
+      "domain": "Urban",
+      "k": 4,
+      "gain": -0.0056116516084046
+    },
+    {
+      "head": "linear",
+      "set": "Val-rep",
+      "domain": "Rural",
+      "k": 1,
+      "gain": 0.02593744414661847
+    },
+    {
+      "head": "linear",
+      "set": "Val-rep",
+      "domain": "Rural",
+      "k": 2,
+      "gain": 0.026844584760936818
+    },
+    {
+      "head": "linear",
+      "set": "Val-rep",
+      "domain": "Rural",
+      "k": 4,
+      "gain": 0.026563800232273116
+    },
+    {
+      "head": "A1-i",
+      "set": "Train subset",
+      "domain": "Overall",
+      "k": 1,
+      "gain": 0.008391797607020246
+    },
+    {
+      "head": "A1-i",
+      "set": "Train subset",
+      "domain": "Overall",
+      "k": 2,
+      "gain": 0.017325369403502267
+    },
+    {
+      "head": "A1-i",
+      "set": "Train subset",
+      "domain": "Overall",
+      "k": 4,
+      "gain": 0.030868939175614507
+    },
+    {
+      "head": "A1-i",
+      "set": "Train subset",
+      "domain": "Urban",
+      "k": 1,
+      "gain": 0.009232452058655638
+    },
+    {
+      "head": "A1-i",
+      "set": "Train subset",
+      "domain": "Urban",
+      "k": 2,
+      "gain": 0.01900704579253154
+    },
+    {
+      "head": "A1-i",
+      "set": "Train subset",
+      "domain": "Urban",
+      "k": 4,
+      "gain": 0.03327173200898004
+    },
+    {
+      "head": "A1-i",
+      "set": "Train subset",
+      "domain": "Rural",
+      "k": 1,
+      "gain": 0.005357651633849714
+    },
+    {
+      "head": "A1-i",
+      "set": "Train subset",
+      "domain": "Rural",
+      "k": 2,
+      "gain": 0.011452357279464365
+    },
+    {
+      "head": "A1-i",
+      "set": "Train subset",
+      "domain": "Rural",
+      "k": 4,
+      "gain": 0.022251721475073483
+    },
+    {
+      "head": "A1-i",
+      "set": "Val-rep",
+      "domain": "Overall",
+      "k": 1,
+      "gain": 0.0019158882490312168
+    },
+    {
+      "head": "A1-i",
+      "set": "Val-rep",
+      "domain": "Overall",
+      "k": 2,
+      "gain": 0.0034450257355000957
+    },
+    {
+      "head": "A1-i",
+      "set": "Val-rep",
+      "domain": "Overall",
+      "k": 4,
+      "gain": 0.004854031284680427
+    },
+    {
+      "head": "A1-i",
+      "set": "Val-rep",
+      "domain": "Urban",
+      "k": 1,
+      "gain": 0.003657376188749395
+    },
+    {
+      "head": "A1-i",
+      "set": "Val-rep",
+      "domain": "Urban",
+      "k": 2,
+      "gain": 0.007029675285548986
+    },
+    {
+      "head": "A1-i",
+      "set": "Val-rep",
+      "domain": "Urban",
+      "k": 4,
+      "gain": 0.011654604884135833
+    },
+    {
+      "head": "A1-i",
+      "set": "Val-rep",
+      "domain": "Rural",
+      "k": 1,
+      "gain": -0.0006981814397458708
+    },
+    {
+      "head": "A1-i",
+      "set": "Val-rep",
+      "domain": "Rural",
+      "k": 2,
+      "gain": -0.001846379953698296
+    },
+    {
+      "head": "A1-i",
+      "set": "Val-rep",
+      "domain": "Rural",
+      "k": 4,
+      "gain": -0.0049247270423522505
+    }
+  ],
+  "predictions": {
+    "P1": false,
+    "P2": true,
+    "decision": "abandon overfitting explanation; random K and loss weights"
+  },
+  "val_regression": {
+    "checks": {
+      "linear": {
+        "actual": 0.5260500328253587,
+        "reference": 0.52605,
+        "difference": 3.282535865345437e-08,
+        "status": "PASS"
+      },
+      "A1-i": {
+        "actual": 0.5382461209070982,
+        "reference": 0.538246,
+        "difference": 1.2090709822221157e-07,
+        "status": "PASS"
+      }
+    },
+    "evaluation": {
+      "groups": {
+        "linear": {
+          "Urban": {
+            "y0_draft": {
+              "counts": {
+                "valid": 340787183,
+                "intersection": 22327949,
+                "union": 33254936,
+                "predicted_skeleton": 654919,
+                "true_skeleton": 536072,
+                "skeleton_precision_hits": 479935,
+                "skeleton_recall_hits": 373934,
+                "boundary_intersection": 560577,
+                "boundary_union": 6805168
+              },
+              "scores": {
+                "road_iou": 0.6714175904593531,
+                "cldice": 0.714745204896131,
+                "boundary_iou": 0.08237518897402679,
+                "skeleton_precision": 0.7328158138640045,
+                "skeleton_recall": 0.6975443597128744,
+                "quality": 0.5666073944933212,
+                "counts": {
+                  "valid": 340787183,
+                  "intersection": 22327949,
+                  "union": 33254936,
+                  "predicted_skeleton": 654919,
+                  "true_skeleton": 536072,
+                  "skeleton_precision_hits": 479935,
+                  "skeleton_recall_hits": 373934,
+                  "boundary_intersection": 560577,
+                  "boundary_union": 6805168
+                },
+                "A": 0.5666073944933212
+              }
+            }
+          },
+          "Rural": {
+            "y0_draft": {
+              "counts": {
+                "valid": 512411151,
+                "intersection": 8236720,
+                "union": 16276159,
+                "predicted_skeleton": 364093,
+                "true_skeleton": 521605,
+                "skeleton_precision_hits": 285413,
+                "skeleton_recall_hits": 260899,
+                "boundary_intersection": 532296,
+                "boundary_union": 5797506
+              },
+              "scores": {
+                "road_iou": 0.5060604286306124,
+                "cldice": 0.6106998998330398,
+                "boundary_iou": 0.09181465271446032,
+                "skeleton_precision": 0.7839013658598215,
+                "skeleton_recall": 0.5001850058952656,
+                "quality": 0.4546031148081102,
+                "counts": {
+                  "valid": 512411151,
+                  "intersection": 8236720,
+                  "union": 16276159,
+                  "predicted_skeleton": 364093,
+                  "true_skeleton": 521605,
+                  "skeleton_precision_hits": 285413,
+                  "skeleton_recall_hits": 260899,
+                  "boundary_intersection": 532296,
+                  "boundary_union": 5797506
+                },
+                "A": 0.4546031148081102
+              }
+            }
+          },
+          "Overall": {
+            "y0_draft": {
+              "counts": {
+                "valid": 853198334,
+                "intersection": 30564669,
+                "union": 49531095,
+                "predicted_skeleton": 1019012,
+                "true_skeleton": 1057677,
+                "skeleton_precision_hits": 765348,
+                "skeleton_recall_hits": 634833,
+                "boundary_intersection": 1092873,
+                "boundary_union": 12602674
+              },
+              "scores": {
+                "road_iou": 0.6170804219046642,
+                "cldice": 0.6672210402500885,
+                "boundary_iou": 0.08671754899000006,
+                "skeleton_precision": 0.7510686822137521,
+                "skeleton_recall": 0.6002144321943278,
+                "quality": 0.5260500328253587,
+                "counts": {
+                  "valid": 853198334,
+                  "intersection": 30564669,
+                  "union": 49531095,
+                  "predicted_skeleton": 1019012,
+                  "true_skeleton": 1057677,
+                  "skeleton_precision_hits": 765348,
+                  "skeleton_recall_hits": 634833,
+                  "boundary_intersection": 1092873,
+                  "boundary_union": 12602674
+                },
+                "A": 0.5260500328253587
+              }
+            }
+          }
+        },
+        "A1-i": {
+          "Urban": {
+            "y0_draft": {
+              "counts": {
+                "valid": 340787183,
+                "intersection": 23818728,
+                "union": 35771200,
+                "predicted_skeleton": 617260,
+                "true_skeleton": 536072,
+                "skeleton_precision_hits": 418134,
+                "skeleton_recall_hits": 414022,
+                "boundary_intersection": 615963,
+                "boundary_union": 7124623
+              },
+              "scores": {
+                "road_iou": 0.6658632643020084,
+                "cldice": 0.7217568194230823,
+                "boundary_iou": 0.08645552192726548,
+                "skeleton_precision": 0.6774033632504941,
+                "skeleton_recall": 0.7723253592800967,
+                "quality": 0.566749782363382,
+                "counts": {
+                  "valid": 340787183,
+                  "intersection": 23818728,
+                  "union": 35771200,
+                  "predicted_skeleton": 617260,
+                  "true_skeleton": 536072,
+                  "skeleton_precision_hits": 418134,
+                  "skeleton_recall_hits": 414022,
+                  "boundary_intersection": 615963,
+                  "boundary_union": 7124623
+                },
+                "A": 0.566749782363382
+              }
+            }
+          },
+          "Rural": {
+            "y0_draft": {
+              "counts": {
+                "valid": 512411151,
+                "intersection": 8972118,
+                "union": 16922400,
+                "predicted_skeleton": 354153,
+                "true_skeleton": 521605,
+                "skeleton_precision_hits": 284862,
+                "skeleton_recall_hits": 293461,
+                "boundary_intersection": 594839,
+                "boundary_union": 5940420
+              },
+              "scores": {
+                "road_iou": 0.5301918167635796,
+                "cldice": 0.6621049014323799,
+                "boundary_iou": 0.10013416559771868,
+                "skeleton_precision": 0.8043472736359709,
+                "skeleton_recall": 0.562611554720526,
+                "quality": 0.4837542119310475,
+                "counts": {
+                  "valid": 512411151,
+                  "intersection": 8972118,
+                  "union": 16922400,
+                  "predicted_skeleton": 354153,
+                  "true_skeleton": 521605,
+                  "skeleton_precision_hits": 284862,
+                  "skeleton_recall_hits": 293461,
+                  "boundary_intersection": 594839,
+                  "boundary_union": 5940420
+                },
+                "A": 0.4837542119310475
+              }
+            }
+          },
+          "Overall": {
+            "y0_draft": {
+              "counts": {
+                "valid": 853198334,
+                "intersection": 32790846,
+                "union": 52693600,
+                "predicted_skeleton": 971413,
+                "true_skeleton": 1057677,
+                "skeleton_precision_hits": 702996,
+                "skeleton_recall_hits": 707483,
+                "boundary_intersection": 1210802,
+                "boundary_union": 13065043
+              },
+              "scores": {
+                "road_iou": 0.6222927642066589,
+                "cldice": 0.6952158398968423,
+                "boundary_iou": 0.0926749341735806,
+                "skeleton_precision": 0.7236839531692494,
+                "skeleton_recall": 0.6689026990281532,
+                "quality": 0.5382461209070982,
+                "counts": {
+                  "valid": 853198334,
+                  "intersection": 32790846,
+                  "union": 52693600,
+                  "predicted_skeleton": 971413,
+                  "true_skeleton": 1057677,
+                  "skeleton_precision_hits": 702996,
+                  "skeleton_recall_hits": 707483,
+                  "boundary_intersection": 1210802,
+                  "boundary_union": 13065043
+                },
+                "A": 0.5382461209070982
+              }
+            }
+          }
+        }
+      },
+      "files": {
+        "Urban": [
+          "3515.png",
+          "3517.png",
+          "3518.png",
+          "3520.png",
+          "3521.png",
+          "3522.png",
+          "3523.png",
+          "3524.png",
+          "3525.png",
+          "3527.png",
+          "3528.png",
+          "3530.png",
+          "3535.png",
+          "3536.png",
+          "3539.png",
+          "3543.png",
+          "3544.png",
+          "3545.png",
+          "3546.png",
+          "3548.png",
+          "3554.png",
+          "3556.png",
+          "3557.png",
+          "3562.png",
+          "3564.png",
+          "3565.png",
+          "3567.png",
+          "3571.png",
+          "3573.png",
+          "3574.png",
+          "3575.png",
+          "3576.png",
+          "3579.png",
+          "3580.png",
+          "3581.png",
+          "3586.png",
+          "3587.png",
+          "3588.png",
+          "3590.png",
+          "3592.png",
+          "3596.png",
+          "3601.png",
+          "3609.png",
+          "3611.png",
+          "3616.png",
+          "3618.png",
+          "3621.png",
+          "3622.png",
+          "3624.png",
+          "3626.png",
+          "3627.png",
+          "3628.png",
+          "3629.png",
+          "3632.png",
+          "3639.png",
+          "3643.png",
+          "3644.png",
+          "3645.png",
+          "3646.png",
+          "3648.png",
+          "3649.png",
+          "3652.png",
+          "3653.png",
+          "3655.png",
+          "3657.png",
+          "3658.png",
+          "3660.png",
+          "3663.png",
+          "3664.png",
+          "3668.png",
+          "3670.png",
+          "3671.png",
+          "3672.png",
+          "3673.png",
+          "3682.png",
+          "3683.png",
+          "3684.png",
+          "3685.png",
+          "3686.png",
+          "3687.png",
+          "3688.png",
+          "3690.png",
+          "3692.png",
+          "3693.png",
+          "3694.png",
+          "3695.png",
+          "3698.png",
+          "3699.png",
+          "3701.png",
+          "3702.png",
+          "3704.png",
+          "3705.png",
+          "3706.png",
+          "3707.png",
+          "3708.png",
+          "3710.png",
+          "3711.png",
+          "3716.png",
+          "3717.png",
+          "3718.png",
+          "3724.png",
+          "3725.png",
+          "3727.png",
+          "3729.png",
+          "3731.png",
+          "3732.png",
+          "3734.png",
+          "3738.png",
+          "3740.png",
+          "3742.png",
+          "3744.png",
+          "3745.png",
+          "3747.png",
+          "3748.png",
+          "3749.png",
+          "3750.png",
+          "3751.png",
+          "3752.png",
+          "3754.png",
+          "3755.png",
+          "3757.png",
+          "3761.png",
+          "3762.png",
+          "3763.png",
+          "3766.png",
+          "3770.png",
+          "3771.png",
+          "3772.png",
+          "3773.png",
+          "3774.png",
+          "3779.png",
+          "3781.png",
+          "3782.png",
+          "3783.png",
+          "3785.png",
+          "3786.png",
+          "3787.png",
+          "3789.png",
+          "3790.png",
+          "3793.png",
+          "3794.png",
+          "3796.png",
+          "3797.png",
+          "3799.png",
+          "3800.png",
+          "3801.png",
+          "3802.png",
+          "3803.png",
+          "3807.png",
+          "3812.png",
+          "3813.png",
+          "3815.png",
+          "3816.png",
+          "3817.png",
+          "3820.png",
+          "3821.png",
+          "3822.png",
+          "3823.png",
+          "3826.png",
+          "3828.png",
+          "3829.png",
+          "3830.png",
+          "3831.png",
+          "3833.png",
+          "3834.png",
+          "3836.png",
+          "3838.png",
+          "3840.png",
+          "3842.png",
+          "3844.png",
+          "3846.png",
+          "3847.png",
+          "3848.png",
+          "3850.png",
+          "3851.png",
+          "3855.png",
+          "3856.png",
+          "3859.png",
+          "3861.png",
+          "3862.png",
+          "3864.png",
+          "3865.png",
+          "3866.png",
+          "3867.png",
+          "3868.png",
+          "3873.png",
+          "3875.png",
+          "3876.png",
+          "3878.png",
+          "3879.png",
+          "3882.png",
+          "3883.png",
+          "3884.png",
+          "3885.png",
+          "3886.png",
+          "3887.png",
+          "3891.png",
+          "3892.png",
+          "3893.png",
+          "3896.png",
+          "3897.png",
+          "3898.png",
+          "3900.png",
+          "3902.png",
+          "3904.png",
+          "3906.png",
+          "3907.png",
+          "3908.png",
+          "3910.png",
+          "3913.png",
+          "3915.png",
+          "3920.png",
+          "3921.png",
+          "3922.png",
+          "3923.png",
+          "3924.png",
+          "3927.png",
+          "3928.png",
+          "3932.png",
+          "3938.png",
+          "3939.png",
+          "3941.png",
+          "3942.png",
+          "3944.png",
+          "3945.png",
+          "3948.png",
+          "3951.png",
+          "3952.png",
+          "3953.png",
+          "3955.png",
+          "3956.png",
+          "3958.png",
+          "3960.png",
+          "3962.png",
+          "3963.png",
+          "3965.png",
+          "3970.png",
+          "3972.png",
+          "3975.png",
+          "3979.png",
+          "3980.png",
+          "3981.png",
+          "3985.png",
+          "3986.png",
+          "3987.png",
+          "3993.png",
+          "3995.png",
+          "3997.png",
+          "3998.png",
+          "4001.png",
+          "4002.png",
+          "4003.png",
+          "4004.png",
+          "4005.png",
+          "4006.png",
+          "4010.png",
+          "4011.png",
+          "4012.png",
+          "4013.png",
+          "4015.png",
+          "4017.png",
+          "4018.png",
+          "4022.png",
+          "4023.png",
+          "4024.png",
+          "4025.png",
+          "4027.png",
+          "4030.png",
+          "4031.png",
+          "4033.png",
+          "4034.png",
+          "4040.png",
+          "4042.png",
+          "4046.png",
+          "4049.png",
+          "4050.png",
+          "4055.png",
+          "4058.png",
+          "4060.png",
+          "4061.png",
+          "4065.png",
+          "4066.png",
+          "4071.png",
+          "4075.png",
+          "4077.png",
+          "4078.png",
+          "4082.png",
+          "4083.png",
+          "4084.png",
+          "4085.png",
+          "4088.png",
+          "4091.png",
+          "4092.png",
+          "4094.png",
+          "4095.png",
+          "4097.png",
+          "4098.png",
+          "4104.png",
+          "4105.png",
+          "4106.png",
+          "4107.png",
+          "4112.png",
+          "4113.png",
+          "4116.png",
+          "4117.png",
+          "4120.png",
+          "4121.png",
+          "4122.png",
+          "4127.png",
+          "4128.png",
+          "4130.png",
+          "4133.png",
+          "4134.png",
+          "4136.png",
+          "4138.png",
+          "4140.png",
+          "4142.png",
+          "4143.png",
+          "4146.png",
+          "4148.png",
+          "4150.png",
+          "4151.png",
+          "4153.png",
+          "4156.png",
+          "4157.png",
+          "4160.png",
+          "4162.png",
+          "4168.png",
+          "4169.png",
+          "4170.png",
+          "4173.png",
+          "4174.png",
+          "4175.png",
+          "4176.png",
+          "4181.png",
+          "4182.png",
+          "4186.png",
+          "4188.png",
+          "4189.png"
+        ],
+        "Rural": [
+          "2522.png",
+          "2523.png",
+          "2525.png",
+          "2526.png",
+          "2528.png",
+          "2529.png",
+          "2531.png",
+          "2532.png",
+          "2533.png",
+          "2536.png",
+          "2538.png",
+          "2539.png",
+          "2543.png",
+          "2544.png",
+          "2551.png",
+          "2552.png",
+          "2554.png",
+          "2555.png",
+          "2556.png",
+          "2560.png",
+          "2561.png",
+          "2562.png",
+          "2564.png",
+          "2565.png",
+          "2566.png",
+          "2569.png",
+          "2570.png",
+          "2572.png",
+          "2573.png",
+          "2574.png",
+          "2579.png",
+          "2581.png",
+          "2582.png",
+          "2583.png",
+          "2584.png",
+          "2587.png",
+          "2588.png",
+          "2589.png",
+          "2594.png",
+          "2595.png",
+          "2598.png",
+          "2600.png",
+          "2604.png",
+          "2605.png",
+          "2609.png",
+          "2610.png",
+          "2617.png",
+          "2619.png",
+          "2624.png",
+          "2626.png",
+          "2629.png",
+          "2630.png",
+          "2632.png",
+          "2635.png",
+          "2636.png",
+          "2637.png",
+          "2638.png",
+          "2647.png",
+          "2651.png",
+          "2652.png",
+          "2653.png",
+          "2654.png",
+          "2656.png",
+          "2657.png",
+          "2659.png",
+          "2661.png",
+          "2665.png",
+          "2668.png",
+          "2671.png",
+          "2673.png",
+          "2674.png",
+          "2676.png",
+          "2678.png",
+          "2679.png",
+          "2681.png",
+          "2691.png",
+          "2693.png",
+          "2694.png",
+          "2696.png",
+          "2698.png",
+          "2700.png",
+          "2701.png",
+          "2702.png",
+          "2704.png",
+          "2705.png",
+          "2706.png",
+          "2709.png",
+          "2710.png",
+          "2712.png",
+          "2713.png",
+          "2714.png",
+          "2715.png",
+          "2718.png",
+          "2719.png",
+          "2724.png",
+          "2725.png",
+          "2726.png",
+          "2729.png",
+          "2732.png",
+          "2733.png",
+          "2735.png",
+          "2737.png",
+          "2739.png",
+          "2740.png",
+          "2746.png",
+          "2748.png",
+          "2750.png",
+          "2752.png",
+          "2753.png",
+          "2754.png",
+          "2755.png",
+          "2757.png",
+          "2758.png",
+          "2759.png",
+          "2761.png",
+          "2762.png",
+          "2763.png",
+          "2764.png",
+          "2765.png",
+          "2769.png",
+          "2770.png",
+          "2771.png",
+          "2774.png",
+          "2777.png",
+          "2778.png",
+          "2779.png",
+          "2780.png",
+          "2781.png",
+          "2782.png",
+          "2784.png",
+          "2785.png",
+          "2787.png",
+          "2788.png",
+          "2789.png",
+          "2790.png",
+          "2793.png",
+          "2794.png",
+          "2797.png",
+          "2798.png",
+          "2801.png",
+          "2802.png",
+          "2804.png",
+          "2805.png",
+          "2807.png",
+          "2808.png",
+          "2809.png",
+          "2810.png",
+          "2811.png",
+          "2815.png",
+          "2816.png",
+          "2817.png",
+          "2820.png",
+          "2822.png",
+          "2823.png",
+          "2824.png",
+          "2828.png",
+          "2829.png",
+          "2830.png",
+          "2831.png",
+          "2833.png",
+          "2834.png",
+          "2837.png",
+          "2838.png",
+          "2839.png",
+          "2841.png",
+          "2842.png",
+          "2844.png",
+          "2846.png",
+          "2850.png",
+          "2853.png",
+          "2854.png",
+          "2855.png",
+          "2857.png",
+          "2858.png",
+          "2860.png",
+          "2861.png",
+          "2863.png",
+          "2864.png",
+          "2867.png",
+          "2869.png",
+          "2871.png",
+          "2873.png",
+          "2874.png",
+          "2883.png",
+          "2884.png",
+          "2886.png",
+          "2890.png",
+          "2891.png",
+          "2892.png",
+          "2894.png",
+          "2895.png",
+          "2897.png",
+          "2899.png",
+          "2900.png",
+          "2901.png",
+          "2905.png",
+          "2907.png",
+          "2912.png",
+          "2914.png",
+          "2915.png",
+          "2918.png",
+          "2919.png",
+          "2921.png",
+          "2924.png",
+          "2926.png",
+          "2927.png",
+          "2929.png",
+          "2930.png",
+          "2931.png",
+          "2932.png",
+          "2935.png",
+          "2936.png",
+          "2937.png",
+          "2941.png",
+          "2946.png",
+          "2947.png",
+          "2948.png",
+          "2949.png",
+          "2950.png",
+          "2952.png",
+          "2953.png",
+          "2956.png",
+          "2957.png",
+          "2960.png",
+          "2962.png",
+          "2963.png",
+          "2964.png",
+          "2966.png",
+          "2970.png",
+          "2975.png",
+          "2977.png",
+          "2978.png",
+          "2979.png",
+          "2980.png",
+          "2982.png",
+          "2983.png",
+          "2985.png",
+          "2987.png",
+          "2988.png",
+          "2991.png",
+          "2995.png",
+          "2998.png",
+          "3000.png",
+          "3005.png",
+          "3009.png",
+          "3010.png",
+          "3011.png",
+          "3012.png",
+          "3013.png",
+          "3014.png",
+          "3018.png",
+          "3021.png",
+          "3023.png",
+          "3025.png",
+          "3026.png",
+          "3029.png",
+          "3032.png",
+          "3038.png",
+          "3042.png",
+          "3045.png",
+          "3047.png",
+          "3048.png",
+          "3050.png",
+          "3054.png",
+          "3057.png",
+          "3058.png",
+          "3059.png",
+          "3062.png",
+          "3063.png",
+          "3065.png",
+          "3068.png",
+          "3069.png",
+          "3071.png",
+          "3074.png",
+          "3076.png",
+          "3081.png",
+          "3083.png",
+          "3084.png",
+          "3085.png",
+          "3087.png",
+          "3090.png",
+          "3092.png",
+          "3093.png",
+          "3095.png",
+          "3096.png",
+          "3102.png",
+          "3103.png",
+          "3104.png",
+          "3107.png",
+          "3108.png",
+          "3110.png",
+          "3113.png",
+          "3114.png",
+          "3115.png",
+          "3118.png",
+          "3120.png",
+          "3122.png",
+          "3129.png",
+          "3130.png",
+          "3134.png",
+          "3135.png",
+          "3136.png",
+          "3138.png",
+          "3139.png",
+          "3141.png",
+          "3144.png",
+          "3146.png",
+          "3148.png",
+          "3152.png",
+          "3153.png",
+          "3154.png",
+          "3155.png",
+          "3159.png",
+          "3161.png",
+          "3165.png",
+          "3166.png",
+          "3170.png",
+          "3172.png",
+          "3173.png",
+          "3177.png",
+          "3178.png",
+          "3180.png",
+          "3182.png",
+          "3183.png",
+          "3184.png",
+          "3185.png",
+          "3186.png",
+          "3188.png",
+          "3190.png",
+          "3191.png",
+          "3192.png",
+          "3197.png",
+          "3198.png",
+          "3199.png",
+          "3202.png",
+          "3203.png",
+          "3204.png",
+          "3205.png",
+          "3207.png",
+          "3209.png",
+          "3210.png",
+          "3211.png",
+          "3216.png",
+          "3217.png",
+          "3218.png",
+          "3221.png",
+          "3222.png",
+          "3223.png",
+          "3224.png",
+          "3226.png",
+          "3228.png",
+          "3231.png",
+          "3232.png",
+          "3233.png",
+          "3235.png",
+          "3238.png",
+          "3240.png",
+          "3241.png",
+          "3242.png",
+          "3246.png",
+          "3247.png",
+          "3252.png",
+          "3254.png",
+          "3258.png",
+          "3259.png",
+          "3260.png",
+          "3265.png",
+          "3266.png",
+          "3268.png",
+          "3269.png",
+          "3271.png",
+          "3272.png",
+          "3273.png",
+          "3274.png",
+          "3275.png",
+          "3278.png",
+          "3279.png",
+          "3280.png",
+          "3281.png",
+          "3287.png",
+          "3288.png",
+          "3289.png",
+          "3291.png",
+          "3294.png",
+          "3295.png",
+          "3297.png",
+          "3301.png",
+          "3302.png",
+          "3304.png",
+          "3306.png",
+          "3309.png",
+          "3311.png",
+          "3317.png",
+          "3318.png",
+          "3319.png",
+          "3321.png",
+          "3322.png",
+          "3323.png",
+          "3324.png",
+          "3328.png",
+          "3329.png",
+          "3330.png",
+          "3332.png",
+          "3336.png",
+          "3338.png",
+          "3339.png",
+          "3340.png",
+          "3344.png",
+          "3345.png",
+          "3346.png",
+          "3348.png",
+          "3349.png",
+          "3352.png",
+          "3353.png",
+          "3355.png",
+          "3357.png",
+          "3358.png",
+          "3360.png",
+          "3361.png",
+          "3362.png",
+          "3363.png",
+          "3364.png",
+          "3366.png",
+          "3367.png",
+          "3371.png",
+          "3372.png",
+          "3375.png",
+          "3378.png",
+          "3386.png",
+          "3387.png",
+          "3389.png",
+          "3390.png",
+          "3394.png",
+          "3397.png",
+          "3398.png",
+          "3400.png",
+          "3401.png",
+          "3403.png",
+          "3405.png",
+          "3407.png",
+          "3409.png",
+          "3410.png",
+          "3411.png",
+          "3413.png",
+          "3414.png",
+          "3415.png",
+          "3418.png",
+          "3420.png",
+          "3423.png",
+          "3427.png",
+          "3428.png",
+          "3429.png",
+          "3430.png",
+          "3432.png",
+          "3433.png",
+          "3436.png",
+          "3437.png",
+          "3443.png",
+          "3446.png",
+          "3447.png",
+          "3448.png",
+          "3449.png",
+          "3450.png",
+          "3453.png",
+          "3456.png",
+          "3457.png",
+          "3458.png",
+          "3460.png",
+          "3462.png",
+          "3463.png",
+          "3465.png",
+          "3469.png",
+          "3470.png",
+          "3471.png",
+          "3472.png",
+          "3473.png",
+          "3475.png",
+          "3476.png",
+          "3477.png",
+          "3481.png",
+          "3483.png",
+          "3484.png",
+          "3485.png",
+          "3489.png",
+          "3490.png",
+          "3491.png",
+          "3494.png",
+          "3496.png",
+          "3497.png",
+          "3502.png",
+          "3504.png",
+          "3507.png",
+          "3509.png",
+          "3510.png",
+          "3511.png",
+          "3512.png"
+        ]
+      },
+      "forward_seconds": 33.78731474909,
+      "wall_seconds": 57.763945673941635
+    }
+  }
+}
