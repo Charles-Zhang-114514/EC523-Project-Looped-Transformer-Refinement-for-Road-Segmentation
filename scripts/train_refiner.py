@@ -113,9 +113,19 @@ def inference_steps(model, features, draft, ks, device, ablation="none"):
                     yield str(step), current, elapsed, peak
 
 
-def deep_supervision(outputs, targets, valid, pos_weight=4.):
+def step_mean(losses, weights=None):
+    """Keep the original reduction/graph exactly when weights are unspecified."""
+    values = torch.stack(losses)
+    if weights is None:
+        return values.mean()
+    if len(weights) != len(losses):
+        raise ValueError('Step weight count must match supervised outputs')
+    return (values * values.new_tensor(weights)).sum()
+
+
+def deep_supervision(outputs, targets, valid, pos_weight=4., step_weights=None):
     losses = [probe.masked_bce_with_logits(answer, targets, valid, pos_weight=pos_weight) for answer in outputs]
-    return torch.stack(losses).mean(), losses
+    return step_mean(losses, step_weights), losses
 
 
 def noadd_penalties(outputs, draft, targets, valid):
@@ -129,13 +139,15 @@ def noadd_penalties(outputs, draft, targets, valid):
     return torch.stack(penalties).mean(), penalties
 
 
-def refiner_objective(outputs, targets, valid, draft, noadd_lambda=0., pos_weight=4.):
+def refiner_objective(outputs, targets, valid, draft, noadd_lambda=0., pos_weight=4., step_weights=None):
     """Return total, per-step BCE, mean BCE, mean penalty and per-step penalty."""
-    bce, losses = deep_supervision(outputs, targets, valid, pos_weight=pos_weight)
+    bce, losses = deep_supervision(outputs, targets, valid, pos_weight=pos_weight, step_weights=step_weights)
     if noadd_lambda == 0:
         # No new tensor operation, sigmoid, graph branch or RNG use at lambda=0.
         return bce, losses, bce, 0., [0.] * len(outputs)
     penalty, penalties = noadd_penalties(outputs, draft, targets, valid)
+    if step_weights is not None:
+        penalty = step_mean(penalties, step_weights)
     return bce + noadd_lambda * penalty, losses, bce, penalty, penalties
 
 
@@ -358,18 +370,21 @@ def lr_multiplier(completed, total_steps, warmup=500):
     return .5 * (1. + math.cos(math.pi * progress))
 
 
-def capture_rng(loader):
+def capture_rng(loader, k_generator=None):
     """Use tensors and Python primitives so weights_only=True can load states."""
     numpy_state = np.random.get_state()
-    return {"python": random.getstate(), "torch": torch.get_rng_state(),
+    state = {"python": random.getstate(), "torch": torch.get_rng_state(),
             "cuda": torch.cuda.get_rng_state_all() if torch.cuda.is_initialized() else [],
             "loader": loader.generator.get_state(),
             "numpy": {"algorithm": numpy_state[0], "keys": numpy_state[1].tolist(),
                       "position": numpy_state[2], "has_gauss": numpy_state[3],
                       "cached_gaussian": numpy_state[4]}}
+    if k_generator is not None:
+        state['k_train_generator'] = k_generator.get_state()
+    return state
 
 
-def restore_rng(state, loader, device):
+def restore_rng(state, loader, device, k_generator=None):
     random.setstate(state["python"])
     numpy_state = state["numpy"]
     np.random.set_state((numpy_state["algorithm"], np.asarray(numpy_state["keys"], dtype=np.uint32),
@@ -378,6 +393,58 @@ def restore_rng(state, loader, device):
     loader.generator.set_state(state["loader"].cpu())
     if device.type == "cuda" and state["cuda"]:
         torch.cuda.set_rng_state_all([value.cpu() for value in state["cuda"]])
+    if k_generator is not None:
+        if 'k_train_generator' not in state:
+            raise ValueError('Random-K resume requires the dedicated generator state')
+        k_generator.set_state(state['k_train_generator'].cpu())
+
+
+def parse_step_weights(text):
+    try:
+        values = [float(value) for value in text.split(',')]
+        total = math.fsum(values)
+        if not values or any(not math.isfinite(v) or v < 0 for v in values) or not math.isfinite(total) or total <= 0:
+            raise ValueError
+        return [v / total for v in values]
+    except (ValueError, OverflowError) as error:
+        raise argparse.ArgumentTypeError('Expected finite nonnegative comma-separated weights with positive sum') from error
+
+
+def parse_k_train_choices(text):
+    try:
+        values = [int(value) for value in text.split(',')]
+        if not values or min(values) < 1 or len(set(values)) != len(values):
+            raise ValueError
+        return values
+    except ValueError as error:
+        raise argparse.ArgumentTypeError('Expected unique positive comma-separated training depths') from error
+
+
+def validate_step_training(args):
+    if args.step_weights is not None and args.k_train_choices is not None:
+        raise ValueError('--step-weights and --k-train-choices are mutually exclusive')
+    if args.step_weights is not None and len(args.step_weights) != args.k_train:
+        raise ValueError('--step-weights length must equal --k-train')
+    if args.k_train_choices is not None:
+        check_untied_limit(args.untied_steps, args.k_train_choices, '--k-train-choices')
+
+
+def make_k_generator(seed):
+    """Manual seeding a separate CPU generator consumes no global RNG draws."""
+    return torch.Generator(device='cpu').manual_seed((seed + 0x4B545241494E) % (2**63))
+
+
+def choose_training_k(choices, generator):
+    return choices[int(torch.randint(len(choices), (1,), generator=generator).item())]
+
+
+def ragged_step_means(batches, key):
+    """Conditional per-step means: only samples supervised at that step count."""
+    width = max(len(row[key]) for row in batches)
+    totals = [sum(row['samples'] for row in batches if len(row[key]) > step) for step in range(width)]
+    means = [sum(row[key][step] * row['samples'] for row in batches if len(row[key]) > step) / totals[step]
+             for step in range(width)]
+    return means, totals
 
 
 def parse_selection_ks(text):
@@ -495,12 +562,22 @@ def summary_markdown(report):
         for key, item in variants.items():
             values = " | ".join(str(item["structure"][name]) for name in STRUCTURE_KEYS)
             lines.append(f"| {domain} | {key} | {values} |")
-    step_headers = " | ".join(f"Loss t={step}" for step in range(1, report["config"]["k_train"] + 1))
+    reported_steps = report['config']['k_train']
+    if report['config'].get('k_train_choices'):
+        reported_steps = max((len(row['step_losses']) for row in report['epochs']), default=reported_steps)
+    step_headers = " | ".join(f"Loss t={step}" for step in range(1, reported_steps + 1))
     lines += ["", "## Training epochs", "", f"| Epoch | Loss | {step_headers} | Wall s | Encoder+probe s | Refiner forward+backward s | Peak CUDA bytes |",
-              "|" + "---|" * (6 + report["config"]["k_train"])]
+              "|" + "---|" * (6 + reported_steps)]
     for epoch in report["epochs"]:
         losses = " | ".join(f"{value:.6f}" for value in epoch["step_losses"])
+        if len(epoch['step_losses']) < reported_steps:
+            losses += ' | NA' * (reported_steps - len(epoch['step_losses']))
         lines.append(f"| {epoch['epoch']} | {epoch['loss']:.6f} | {losses} | {epoch['seconds']:.3f} | {epoch['encoder_seconds']:.3f} | {epoch['refiner_forward_backward_seconds']:.3f} | {epoch['peak_cuda_bytes']} |")
+    if report['config'].get('step_weights') or report['config'].get('k_train_choices'):
+        lines += ['', '## Training-depth distribution', '',
+                  'Observed per-epoch K counts are batches. Per-step means condition on samples reaching that step.', '',
+                  '| Epoch | K distribution |', '|---|---|']
+        lines += [f"| {row['epoch']} | {row.get('k_distribution', {})} |" for row in report['epochs']]
     lines += ["", "## Fixed-subset monitoring (not used for selection)", "",
               "| Epoch | y0_draft A | K=1 A | K=4 A | Seconds |", "|---|---:|---:|---:|---:|"]
     for row in report["train_curve"]:
@@ -558,6 +635,10 @@ def build_parser():
     parser.add_argument('--false-add-calibration-batches', type=int, default=8)
     parser.add_argument('--augmentation', choices=('none', 'd4'), default='none')
     parser.add_argument("--k-train", type=int, default=4)
+    parser.add_argument('--step-weights', type=parse_step_weights, default=None,
+                        help='Normalize step weights to sum one; length must equal k-train')
+    parser.add_argument('--k-train-choices', type=parse_k_train_choices, default=None,
+                        help='Uniform per-batch depth using an independent, checkpointed CPU generator')
     parser.add_argument("--eval-k", type=parse_ks, default=parse_ks("1,2,4,6,8"))
     parser.add_argument("--limit-per-domain", type=int)
     parser.add_argument("--device", choices=("auto", "cpu", "cuda"), default="auto")
@@ -618,7 +699,8 @@ def main():
             args.eval_extra = restored['config'].get('eval_extra', False)
         settings = ["dimension", "layers", "heads", "mlp_ratio", "patch", "no_mask_feedback", "reset_state", "k_train", "head_type", "selection_ks", "untied_steps", "noadd_lambda", "pos_weight",
                     'loss', 'aux_weight', 'skeleton_iterations', 'false_add_gradient_ratio',
-                    'false_add_warmup_steps', 'false_add_calibration_batches', 'augmentation']
+                    'false_add_warmup_steps', 'false_add_calibration_batches', 'augmentation',
+                    'step_weights', 'k_train_choices']
         if args.resume:
             settings += ["batch_size", "lr", "seed", "limit_per_domain", "monitor_every", "monitor_per_domain", "select_every", "select_per_domain"]
         legacy_defaults = {'untied_steps': 0, 'noadd_lambda': 0., 'head_type': 'patch_linear', 'select_every': 0, 'select_per_domain': 100,
@@ -645,6 +727,7 @@ def main():
         elif args.resume and args.val_split is not None:
             parser.error('Cannot change a legacy training run to the controlled protocol on resume')
     try:
+        validate_step_training(args)
         validate_untied_settings(args)
         validate_noadd_lambda(args.noadd_lambda)
         if args.noadd_lambda and args.loss != 'bce':
@@ -724,6 +807,9 @@ def main():
                   refiner_dtype="float32", encoder=y0.ENCODER, probe_head=checkpoint["head"])
     if args.infer_ablations is None:
         config.pop('infer_ablations')
+    for name in ('step_weights', 'k_train_choices'):
+        if getattr(args, name) is None:
+            config.pop(name)
     objective = RefinerObjective(args.loss, args.pos_weight, args.aux_weight, args.skeleton_iterations,
                                  args.false_add_gradient_ratio, args.false_add_warmup_steps,
                                  args.false_add_calibration_batches,
@@ -754,6 +840,7 @@ def main():
         selection_files = restored.get('selection_files', {})
     config["scheduler_total_steps"] = (len(loader) * args.epochs if loader else
                                         restored["config"].get("scheduler_total_steps") if restored else None)
+    k_generator = make_k_generator(args.seed) if args.k_train_choices is not None else None
     if args.resume:
         if loader is None:
             parser.error("--resume requires a positive total --epochs target")
@@ -761,7 +848,7 @@ def main():
             parser.error("Resume requires optimizer, scheduler and RNG states")
         optimizer.load_state_dict(restored["optimizer"])
         scheduler.load_state_dict(restored["scheduler"])
-        restore_rng(restored["rng"], loader, device)
+        restore_rng(restored["rng"], loader, device, k_generator)
         print(f"RESUME loaded_epoch={start_epoch} next_epoch={start_epoch + 1} target_epochs={args.epochs} "
               f"scheduler_last_epoch={scheduler.last_epoch} lr={optimizer.param_groups[0]['lr']:.12g} "
               "restored=refiner,optimizer,scheduler,python_rng,numpy_rng,torch_rng,loader_rng "
@@ -781,6 +868,7 @@ def main():
             torch.cuda.reset_peak_memory_stats(device)
         epoch_started = stamp(device)
         batches, seen = [], 0
+        k_distribution = {str(k): 0 for k in (args.k_train_choices or [args.k_train])}
         for batch_index, (images, targets, valid, _, _) in enumerate(loader):
             images, targets, valid = (probe.as_device_tensor(value, device) for value in (images, targets, valid))
             optimizer.zero_grad(set_to_none=True)
@@ -788,17 +876,23 @@ def main():
             features, draft = frozen_draft(encoder, head, images)
             encoder_time = stamp(device) - phase
             phase = stamp(device)
+            training_k = (choose_training_k(args.k_train_choices, k_generator)
+                          if args.k_train_choices is not None else args.k_train)
+            k_distribution[str(training_k)] += 1
             with torch.autocast(device_type=device.type, enabled=False):
-                logits = refine_steps(model, features.float(), draft.float(), args.k_train)
+                logits = refine_steps(model, features.float(), draft.float(), training_k)
                 if args.loss == 'bce':
                     loss, losses, bce, penalty, penalties = refiner_objective(
-                        logits, targets, valid, draft, args.noadd_lambda, pos_weight=args.pos_weight)
+                        logits, targets, valid, draft, args.noadd_lambda, pos_weight=args.pos_weight,
+                        step_weights=args.step_weights)
                     loss_terms = {'bce': float(bce.detach()),
                                   'auxiliary': float(penalty.detach()) if args.noadd_lambda else 0.,
                                   'auxiliary_weight_used': args.noadd_lambda, 'phase': 'active'}
                 else:
                     loss, losses, loss_terms = objective(logits, targets, valid, draft,
                                                          step=epoch * len(loader) + batch_index + 1)
+                    if args.step_weights is not None:
+                        loss = step_mean(losses, args.step_weights)
                 if not torch.isfinite(loss):
                     raise FloatingPointError("Nonfinite training loss")
                 loss.backward()
@@ -812,6 +906,7 @@ def main():
                      "encoder_seconds": encoder_time, "refiner_forward_backward_seconds": refiner_time,
                      "lr": learning_rate, "gradient_norm_before_clip": float(gradient_norm),
                      "loss_terms": loss_terms}
+            batch['k_train'] = training_k
             if args.loss == 'bce':
                 batch.update(bce=float(bce.detach()), step_bce=batch['step_losses'],
                              penalty=float(penalty.detach()) if isinstance(penalty, torch.Tensor) else penalty,
@@ -822,20 +917,25 @@ def main():
             seen += images.shape[0]
             print(f"BATCH epoch={epoch + 1} " + json.dumps(batch), flush=True)
             del logits, loss, losses, features, draft
+        step_losses = ([sum(row["step_losses"][step] * row["samples"] for row in batches) / seen
+                        for step in range(args.k_train)] if args.k_train_choices is None else
+                       ragged_step_means(batches, 'step_losses')[0])
         record = {"epoch": epoch + 1, "loss": sum(row["loss"] * row["samples"] for row in batches) / seen,
-                  "step_losses": [sum(row["step_losses"][step] * row["samples"] for row in batches) / seen
-                                  for step in range(args.k_train)],
+                  "step_losses": step_losses,
                   "seconds": stamp(device) - epoch_started,
                   "encoder_seconds": sum(row["encoder_seconds"] for row in batches),
                   "refiner_forward_backward_seconds": sum(row["refiner_forward_backward_seconds"] for row in batches),
                   "peak_cuda_bytes": torch.cuda.max_memory_allocated(device) if device.type == "cuda" else None,
-                  "batches": batches}
+                  "batches": batches, "k_distribution": k_distribution}
+        if args.k_train_choices is not None:
+            record['step_sample_counts'] = ragged_step_means(batches, 'step_losses')[1]
         if args.loss == 'bce':
             record.update(bce=sum(row['bce'] * row['samples'] for row in batches) / seen,
                           step_bce=record['step_losses'],
                           penalty=sum(row['penalty'] * row['samples'] for row in batches) / seen,
-                          step_penalties=[sum(row['step_penalties'][step] * row['samples'] for row in batches) / seen
-                                          for step in range(args.k_train)])
+                          step_penalties=([sum(row['step_penalties'][step] * row['samples'] for row in batches) / seen
+                                           for step in range(args.k_train)] if args.k_train_choices is None else
+                                          ragged_step_means(batches, 'step_penalties')[0]))
         epochs.append(record)
         print("EPOCH " + json.dumps({key: value for key, value in record.items() if key != "batches"}), flush=True)
         if split is None and (epoch == 0 or (epoch + 1) % args.monitor_every == 0):
@@ -866,7 +966,7 @@ def main():
             print("SELECTION " + json.dumps(point), flush=True)
         payload = {"state_dict": model.state_dict(), "optimizer": optimizer.state_dict(),
                     "scheduler": scheduler.state_dict(), "epoch": epoch + 1, "config": config,
-                    "epochs": epochs, "train_curve": curve, "rng": capture_rng(loader)}
+                    "epochs": epochs, "train_curve": curve, "rng": capture_rng(loader, k_generator)}
         if args.select_every:
             payload.update(selection_curve=selection_curve, best_score=best_score, best_epoch=best_epoch,
                            selection_files=selection_files)
