@@ -773,3 +773,21 @@ Experiments: e7 changes only normalized training-step weights to 0.1/0.2/0.3/0.4
 The user-specified rule below is preserved verbatim and committed before rereading the two result files or calculating L in this task. Earlier acceptance work had already inspected per-seed results, so the wording does not establish that these data were previously unseen.
 
 - Addendum to the B decision rule (registered before reading per-seed numbers): define the Val-rep leaderboard proxy L = 0.2*A(K=1) + 0.2*A(K=2) + 0.6*A(K=4), Overall, ordinary images (the stressed K=4 term is approximated by ordinary K=4). Replace the current leaderboard submission (e6_convdraft seed 0) with e8_randk seed 1 only if L(e8 s1) - L(e6 s0) >= 0.002. Otherwise keep e6 seed 0 on the leaderboard and report e8 as a stability finding (no degradation up to K=8).
+
+## 2026-11-16 - Leaderboard replacement addendum decision
+
+- This calculation and file reading followed the separate rule-addendum commit 2521e86. As disclosed there, earlier acceptance work already inspected per-seed results; the sequence is prospective for this calculation, not a blind preregistration.
+- Read only the existing e6_convdraft_s0 and e8_randk_s1 reports. No training, evaluation or inference was rerun.
+
+| Model | Domain | A K1 | A K2 | A K4 | A K6 | A K8 | Source lines (K1/K2/K4/K6/K8) |
+|---|---|---:|---:|---:|---:|---:|---|
+| e6_convdraft seed 0 | Overall | 0.540162009156 | 0.541691146643 | 0.543100152192 | 0.542214370670 | 0.539980910016 | results/exp/e6_convdraft_s0/metrics.json: 222154/222223/222292/222361/222430 |
+| e6_convdraft seed 0 | Urban | 0.570407158552 | 0.573779457649 | 0.578404387248 | 0.579839755083 | 0.579687496084 | results/exp/e6_convdraft_s0/metrics.json: 221322/221391/221460/221529/221598 |
+| e6_convdraft seed 0 | Rural | 0.483056030491 | 0.481907831977 | 0.478829484889 | 0.474866436023 | 0.469991422919 | results/exp/e6_convdraft_s0/metrics.json: 221738/221807/221876/221945/222014 |
+| e8_randk seed 1 | Overall | 0.541220287021 | 0.541969162985 | 0.542169151084 | 0.542190130889 | 0.542309394646 | results/exp/e8_randk_s1/metrics.json: 228498/228567/228636/228705/228774 |
+| e8_randk seed 1 | Urban | 0.574090360688 | 0.575878692951 | 0.576494817361 | 0.576625637324 | 0.576762816401 | results/exp/e8_randk_s1/metrics.json: 227666/227735/227804/227873/227942 |
+| e8_randk seed 1 | Rural | 0.480095354926 | 0.479361071340 | 0.479018998725 | 0.478920970820 | 0.479048830736 | results/exp/e8_randk_s1/metrics.json: 228082/228151/228220/228289/228358 |
+
+- Observed Overall L(e6 seed 0)=0.542230722474813; L(e8 seed 1)=0.541939380651385; difference L(e8)-L(e6)=-0.000291341823428, below the required +0.002.
+- Decision under the committed addendum: do not replace the current leaderboard submission; retain e6_convdraft seed 0. Record e8 as a stability finding, scoped here to seed 1 Overall A increasing from K1 through K8, rather than as a replacement candidate under this threshold. This is not a claim of nondegradation in every domain.
+- L is an ordinary-image Val-rep proxy, with stressed K4 approximated by ordinary K4; it is not a measured new leaderboard score. Its inputs are evaluation.groups.Overall.<K>.scores.A at K1/K2/K4. Neither Val-rep result file nor any code, checkpoint, submission package or other result was changed. No network access, installation, scheduler submission, push or leaderboard upload occurred.
