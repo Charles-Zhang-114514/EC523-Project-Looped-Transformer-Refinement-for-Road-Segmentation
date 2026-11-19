@@ -791,3 +791,18 @@ The user-specified rule below is preserved verbatim and committed before rereadi
 - Observed Overall L(e6 seed 0)=0.542230722474813; L(e8 seed 1)=0.541939380651385; difference L(e8)-L(e6)=-0.000291341823428, below the required +0.002.
 - Decision under the committed addendum: do not replace the current leaderboard submission; retain e6_convdraft seed 0. Record e8 as a stability finding, scoped here to seed 1 Overall A increasing from K1 through K8, rather than as a replacement candidate under this threshold. This is not a claim of nondegradation in every domain.
 - L is an ordinary-image Val-rep proxy, with stressed K4 approximated by ordinary K4; it is not a measured new leaderboard score. Its inputs are evaluation.groups.Overall.<K>.scores.A at K1/K2/K4. Neither Val-rep result file nor any code, checkpoint, submission package or other result was changed. No network access, installation, scheduler submission, push or leaderboard upload occurred.
+
+## 2026-11-18 - Draft head v3 and D4 TTA preregistration
+
+Recorded before creating the job scripts or submitting any jobs. The predictions and decision rules below are preserved verbatim as supplied.
+
+P1：v3a（余弦）相对 A1-i，Val-rep y₀ A 变化在 +0.000 到 +0.004 之间。
+P2：v3b（余弦 + D4）相对 A1-i +0.002 到 +0.006，且高于 v3a。
+P3：余弦 arm 在 Val-sel 上 |A(最后 epoch) − A(最佳 epoch)| ≤ 0.002。
+P4：D4 TTA 让 y₀ A 提高 +0.003 到 +0.008（每个 checkpoint 都成立）。
+P5：A1-i s0 + TTA 初稿 + e6 s0 refiner，在 K=1/2/4 上都高于不做 TTA 的 e6 s0（Val-rep 0.5408 那条），但增益小于 P4 里 y₀ 的增益。
+判定规则：
+R1：某个 arm 被判为"更好"，需要 2 个 seed 的 Val-rep y₀ A 均值 ≥ A1-i 两 seed 均值 + 0.002，且 2/2 个 seed 都高于 A1-i 均值。
+R2：通过 R1 的 arm 里取均值最高的作为新初稿；都不通过就保留 A1-i。
+R3：P3 成立 → Train+Val 阶段用"训到最后"；不成立 → 用 Val-sel 上最佳 epoch 的中位数作为固定 epoch 数。
+R4：TTA 进入最终管线的条件是 P5 的 K=1/2/4 三项在 Val-rep 上都 ≥ +0.002；只有 y₀ 提升不算。
