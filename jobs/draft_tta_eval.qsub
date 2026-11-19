@@ -1,0 +1,42 @@
+#!/bin/bash -l
+#$ -N ec523-draft-tta-eval
+#$ -P ec523kb
+#$ -cwd
+#$ -pe omp 8
+#$ -l gpus=1
+#$ -l gpu_c=8.0
+#$ -l mem_per_core=8G
+#$ -l h_rt=02:00:00
+#$ -j y
+#$ -m ea
+#$ -o runs/logs/
+
+# Submit after all five training jobs have completed successfully.
+# Six heads, 200 Val-sel plus 835 Val-rep tiles, eight views including identity:
+# encoder 6*(200+835)*8*0.05 = 2484 s; two e6 trajectories 835*2*8*0.012 = 160.32 s.
+# Official metrics at the stated six-worker effective rate:
+# (6*(200+835)*2 + 835*2*4)*0.125 = 2387.5 s.
+# Total 5031.82 s (83.86 min); allow another 36.14 min for head forwards,
+# image I/O, tensor transforms, process startup, and runtime variation.
+source "${SGE_O_WORKDIR:?Submit from the repository root}/env.sh" || exit 1
+set -euo pipefail
+cd "$SGE_O_WORKDIR"
+: "${EC523_DATA_DIR:?Set EC523_DATA_DIR in env.sh}"
+: "${EC523_STARTER_DIR:?Set EC523_STARTER_DIR in env.sh}"
+export PYTHONPATH="$PWD/src:$PWD"
+export PYTHONDONTWRITEBYTECODE=1 OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1
+export HF_HUB_OFFLINE=1 TRANSFORMERS_OFFLINE=1 HF_HUB_DISABLE_TELEMETRY=1
+python - <<'PYINFO'
+from importlib.metadata import version
+import sys
+import torch
+
+print("GPU:", torch.cuda.get_device_name(), flush=True)
+print("Python:", sys.version.split()[0], "CUDA:", torch.version.cuda, flush=True)
+packages = ("torch", "numpy", "scipy", "scikit-image", "Pillow", "safetensors", "transformers", "torchvision")
+print("Versions:", " ".join(f"{name}={version(name)}" for name in packages), flush=True)
+PYINFO
+git rev-parse HEAD
+
+python -u analysis/evaluate_draft_tta.py --tta d4 --device cuda \
+    --loader-workers 1 --metric-workers 6 --out-dir results/draft_head_v3

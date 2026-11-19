@@ -4,6 +4,7 @@ import argparse
 from collections import deque
 import hashlib
 import json
+import math
 import multiprocessing as mp
 import os
 from pathlib import Path
@@ -19,11 +20,26 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 sys.path.insert(0, str(ROOT / "src"))
 from looproad.models.draft_head import ENCODER, build_draft, layer_text, parse_draft_layers
+from looproad.data.augmentation import D4TrainingDataset
 from scripts import train_linear_probe as probe
 from scripts.train_refiner import protocol_datasets, stamp
 
 
 DOMAINS = ("Urban", "Rural")
+WARMUP_STEPS = 300
+
+
+def cosine_lr(step, total_steps, peak_lr):
+    """LR for a zero-based optimizer update, with the final update at zero."""
+    if not 0 <= step < total_steps:
+        raise ValueError("Step must be within the training run")
+    if total_steps == 1:
+        return peak_lr
+    warmup = min(WARMUP_STEPS, total_steps - 1)
+    if step < warmup:
+        return peak_lr * (step + 1) / warmup
+    progress = (step - warmup + 1) / (total_steps - warmup)
+    return peak_lr * .5 * (1. + math.cos(math.pi * progress))
 
 
 def evaluate(encoder, head, datasets, device, loader_workers=1, metric_workers=6):
@@ -96,6 +112,9 @@ def main():
     parser.add_argument("--epochs", type=int, default=10)
     parser.add_argument("--batch-size", type=int, default=8)
     parser.add_argument("--lr", type=float, default=1e-3)
+    parser.add_argument("--lr-schedule", choices=("constant", "cosine"), default="constant")
+    parser.add_argument("--d4-aug", action="store_true")
+    parser.add_argument("--save-last", action="store_true", help="Also write the final epoch to last.pt")
     parser.add_argument("--seed", type=int, default=0)
     parser.add_argument("--select-per-domain", type=int, default=100)
     parser.add_argument("--limit-per-domain", type=int)
@@ -124,7 +143,8 @@ def main():
     if args.out_dir.exists() and any(args.out_dir.iterdir()):
         parser.error("Refusing to overwrite a nonempty report directory")
     checkpoint_path = args.ckpt_dir / "best.pt"
-    if checkpoint_path.exists():
+    last_path = args.ckpt_dir / "last.pt"
+    if checkpoint_path.exists() or (args.save_last and last_path.exists()):
         parser.error("Refusing to overwrite an existing checkpoint")
     split_bytes = args.val_split.read_bytes()
     split = json.loads(split_bytes)
@@ -148,6 +168,8 @@ def main():
           "encoder_frozen": sum(p.numel() for p in encoder.parameters())}), flush=True)
     train_sets = [probe.RoadDataset("Train", d, limit=args.limit_per_domain, seed=args.seed + i)
                   for i, d in enumerate(DOMAINS)]
+    if args.d4_aug:
+        train_sets = [D4TrainingDataset(dataset, args.seed + i) for i, dataset in enumerate(train_sets)]
     loader = DataLoader(ConcatDataset(train_sets), batch_size=args.batch_size, shuffle=True,
                         num_workers=args.loader_workers, pin_memory=True,
                         # Selection runs after every epoch: release all seven
@@ -159,12 +181,22 @@ def main():
     optimizer = torch.optim.AdamW(head.parameters(), lr=args.lr, weight_decay=0)
     config = {key: (value.resolve().relative_to(ROOT).as_posix() if value.resolve().is_relative_to(ROOT)
                    else value.name) if isinstance(value, Path) else value for key, value in vars(args).items()}
+    config.pop("save_last")
+    if args.lr_schedule == "constant":
+        config.pop("lr_schedule")
+    else:
+        config["warmup_steps"] = WARMUP_STEPS
+    if not args.d4_aug:
+        config.pop("d4_aug")
     config.update(draft_layers=layer_text(args.draft_layers), encoder=ENCODER, head="conv_up",
                   pos_weight=4., weight_decay=0., threshold=.5, feature_normalization="frozen_final_layernorm",
                   val_split_sha256=hashlib.sha256(split_bytes).hexdigest())
     logs, best_score, best_epoch = [], None, None
     args.ckpt_dir.mkdir(parents=True, exist_ok=True)
     for epoch in range(1, args.epochs + 1):
+        if args.d4_aug:
+            for dataset in train_sets:
+                dataset.set_epoch(epoch)
         encoder.eval()
         head.train()
         if device.type == "cuda":
@@ -182,12 +214,17 @@ def main():
             if not torch.isfinite(loss):
                 raise FloatingPointError("Nonfinite draft-head loss; hyperparameters were not changed")
             loss.backward()
+            if args.lr_schedule == "cosine":
+                step = (epoch - 1) * len(loader) + index - 1
+                optimizer.param_groups[0]["lr"] = cosine_lr(step, args.epochs * len(loader), args.lr)
             optimizer.step()
             head_seconds = stamp(device) - phase
             samples = len(images)
             value = float(loss.detach())
             row = dict(batch=index, samples=samples, loss=value, encoder_seconds=encoder_seconds,
                        head_forward_backward_seconds=head_seconds)
+            if args.lr_schedule == "cosine":
+                row["lr"] = optimizer.param_groups[0]["lr"]
             batches.append(row)
             print("BATCH " + json.dumps(row), flush=True)
             total += value * samples
@@ -200,9 +237,15 @@ def main():
         improved = best_score is None or score > best_score
         if improved:
             best_score, best_epoch = score, epoch
-            torch.save(dict(encoder=ENCODER, head="conv_up", draft_layers=layer_text(args.draft_layers),
-                            pos_weight=4., state_dict=head.state_dict(), epoch=epoch,
-                            config=config, trainable_parameters=parameters), checkpoint_path)
+        save_last = args.save_last and epoch == args.epochs
+        if improved or save_last:
+            checkpoint = dict(encoder=ENCODER, head="conv_up", draft_layers=layer_text(args.draft_layers),
+                              pos_weight=4., state_dict=head.state_dict(), epoch=epoch,
+                              config=config, trainable_parameters=parameters)
+            if improved:
+                torch.save(checkpoint, checkpoint_path)
+            if save_last:
+                torch.save(checkpoint, last_path)
         record = dict(epoch=epoch, loss=total / seen, seconds=elapsed, batches=batches,
                       peak_cuda_bytes=peak, selection_A=score, new_best=improved,
                       selection=selected)
