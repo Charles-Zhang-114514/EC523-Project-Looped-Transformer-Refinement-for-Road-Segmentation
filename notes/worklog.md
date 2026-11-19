@@ -853,3 +853,26 @@ R4：TTA 进入最终管线的条件是 P5 的 K=1/2/4 三项在 Val-rep 上都 
 - Verified the supplied CSV SHA-256 is 5700636926a9ae5713bde3dc3a454284bc003bf943d8164d15079bc928c3cbc3. Added summarize_manual_audit.py and joined the real key by audit_no: 30 unique rows, no missing audit_no. Exact red_main counts are A=20, A+C=2, B=4, B+A=1, C=1, D=2. Mixed categories retain the supplied text. The report identifies one reviewer's selected e0 v2 seed-0 linear-draft Urban degradation sample. It describes 29 paired percentage/precision ratings, excluding one missing percentage: median human fraction 1.0, median annotated added precision 0.133603239, median paired difference 0.824129695, Pearson correlation -0.539789779. These are descriptive observations for this selected sample.
 - Added two audit-join tests, including missing-key rejection. Observed full unittest discovery: 193 tests in 109.690 s, 192 passed, one existing CUDA-only test skipped. Log remains ignored in runs/draft_head_v3_acceptance_unittest.log. The real-key join, supplied CSV hash and markdown consistency also pass.
 - Original preregistration remains byte-for-byte preserved. Result scans for personal accounts and absolute paths are empty. Existing result changes relative to main are confined to draft_head_v3 and manual_audit. No new image or weight is staged. Only the supplied CSV, text results, summarizers, tests and this worklog are committed. No network access, installation, scheduler submission, checkpoint/job modification or push occurred.
+
+## 2026-11-19 - Wave 1 ensemble, output bias and encoder LoRA preregistration
+
+Recorded before any wave-1 job script or submission. The supplied predictions and rules are preserved verbatim.
+
+定义：
+- E0 = A1-i s0 + TTA + e6 s0；
+- E1 = {A1-i s0, s1} 集成 + TTA + e6 s0；
+- E2 = 6 个初稿头（A1-i s0/s1、v3a s0/s1、v3b s0/s1）集成 + TTA + e6 s0。
+  集成 = 所有初稿头 × 8 种 D4 变换的 logit 一起取平均。
+- 选择代理分 L = 0.2·A(K1) + 0.2·A(K2) + 0.6·A(K4)。
+- b = 加在最终输出 logit 上的常数偏置（对所有 K 相同，在循环结束后、取阈值前加）。
+
+A-P1：Val-rep 上 E1 − E0 的 L 在 +0.001 到 +0.004 之间。
+A-P2：E2 − E1 的 L 在 0 到 +0.002 之间。
+A-P3：在 Val-sel 上选出的 b 落在 [−0.6, −0.1]（即减少加路），在 Val-rep 上 L 提高 +0.001 到 +0.003。
+B-P1：LoRA s0 的 y₀（不做 TTA）在 Val-rep 上比 A1-i s0（0.538246）高 +0.005 到 +0.020，且 IoU 的提升大于 clDice 的提升。
+B-P2：batch 4 + 梯度检查点时，训练峰值显存 ≤ 40 GiB。
+判定规则：
+A-R1：E0/E1/E2 按 Val-sel 的 L 选一个；集成只有在 Val-sel 上比单个初稿头高 ≥ +0.001 时才采用。
+A-R2：b 在 Val-sel 上扫描选出；只有当 Val-rep 上 L 比 b=0 高 ≥ +0.001 时才采用，否则 b=0。
+B-R1：LoRA s0 的 Val-rep y₀ A ≥ 0.538246 + 0.005，且 Urban 和 Rural 都不低于 A1-i s0 超过 0.002 → 波次 2 用 LoRA encoder；否则波次 2 用冻结 encoder。
+（epoch、b 这类超参数只在 Val-sel 上选；方案之间的取舍按上面预先登记的规则，在 Val-rep 上判定。）
