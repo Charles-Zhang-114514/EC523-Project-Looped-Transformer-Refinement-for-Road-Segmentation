@@ -806,3 +806,10 @@ R1：某个 arm 被判为"更好"，需要 2 个 seed 的 Val-rep y₀ A 均值 
 R2：通过 R1 的 arm 里取均值最高的作为新初稿；都不通过就保留 A1-i。
 R3：P3 成立 → Train+Val 阶段用"训到最后"；不成立 → 用 Val-sel 上最佳 epoch 的中位数作为固定 epoch 数。
 R4：TTA 进入最终管线的条件是 P5 的 K=1/2/4 三项在 Val-rep 上都 ≥ +0.002；只有 y₀ 提升不算。
+
+### Operational definitions recorded before draft head v3 results
+
+- P1 and P2 compare two-seed mean Overall Val-rep A against the A1-i two-seed mean. P3 tests both v3a seeds and records v3b gaps separately. P4 requires all six individual Overall Val-rep draft TTA gains to meet the interval. The paired Val-sel TTA scores are reported as well.
+- P5 and R4 compare K1/K2/K4 Overall A against the individual archived e6 seed-0 values. The contextual 0.5408 is the rounded three-seed e6 K4 mean (results/exp/summary.md). The evaluator also recomputes the no-TTA e6 scores on the same images and reports paired differences. P5 uses the A1-i seed-0 Overall Val-rep y0 gain as its upper bound.
+- For an exact R2 tie, use the higher mean of the two best Val-sel A scores, with v3a first if those also tie. For R3 use the selected arm's two best Val-sel epochs and record the exact median. Round a half-integer up for a whole-epoch training command.
+- These definitions are blind to the new arms and TTA outcomes. The historical A1-i seed-0 and e6 seed-0 scores and curves were already recorded.
