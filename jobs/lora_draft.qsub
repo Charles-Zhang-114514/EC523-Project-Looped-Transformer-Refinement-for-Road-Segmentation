@@ -1,0 +1,37 @@
+#!/bin/bash -l
+#$ -N ec523-lora-draft
+#$ -P ec523kb
+#$ -cwd
+#$ -pe omp 8
+#$ -l gpus=1
+#$ -l gpu_c=8.0
+#$ -l mem_per_core=8G
+#$ -j y
+#$ -m ea
+#$ -o runs/logs/
+
+# Supply h_rt at submission using train_lora_draft.py --estimate on smoke.json.
+# T=max(batch4 update seconds); updates=5*ceil(2522/4)=3155.
+# I=smoke selection forward_seconds / selection image count (GPU inference).
+# Runtime seconds=ceil(1.5*(3155*T+(5*834+9*835)*(I+.125))+900).
+# The 9 report views conservatively charge one plain and eight TTA views.
+# This formula uses measured GPU update cost and an additional 50% margin.
+source "${SGE_O_WORKDIR:?Submit from the repository root}/env.sh" || exit 1
+set -euo pipefail
+cd "$SGE_O_WORKDIR"
+export PYTHONPATH="$PWD:$PWD/src"
+export PYTHONDONTWRITEBYTECODE=1 OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1
+export HF_HUB_OFFLINE=1 TRANSFORMERS_OFFLINE=1 HF_HUB_DISABLE_TELEMETRY=1
+python - <<'PYINFO'
+import sys, torch
+from importlib.metadata import version
+print("GPU:", torch.cuda.get_device_name(), flush=True)
+print("Python:", sys.version.split()[0], flush=True)
+for name in ("torch", "numpy", "scipy", "Pillow", "transformers", "safetensors"):
+    print(name, version(name), flush=True)
+PYINFO
+git rev-parse HEAD
+
+test -f runs/wave1/lora_smoke/smoke.json
+python scripts/train_lora_draft.py --estimate runs/wave1/lora_smoke/smoke.json --out-dir runs/wave1/lora
+python -u scripts/train_lora_draft.py --out-dir runs/wave1/lora

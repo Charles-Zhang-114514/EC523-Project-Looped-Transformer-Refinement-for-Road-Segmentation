@@ -214,6 +214,8 @@ def main():
     parser.add_argument("--loader-workers", type=int, default=1)
     parser.add_argument("--metric-workers", type=int, default=6)
     parser.add_argument("--refiner-regression", type=int, metavar="IMAGES_PER_DOMAIN")
+    parser.add_argument("--ensemble-bias", action="store_true")
+    parser.add_argument("--heads", nargs="+", type=Path)
     args = parser.parse_args()
     slots = int(os.environ.get("NSLOTS", "0"))
     if args.loader_workers < 0 or args.metric_workers < 1 or (slots and 1 + args.loader_workers + args.metric_workers > slots):
@@ -227,6 +229,8 @@ def main():
     if args.refiner_regression is None and args.tta != "d4":
         parser.error("The full comparison requires --tta d4")
 
+    if args.ensemble_bias:
+        return ensemble_bias_run(args)
     split_bytes = SPLIT.read_bytes()
     split, split_hash = json.loads(split_bytes), hashlib.sha256(split_bytes).hexdigest()
     runner.probe.initialize_data_worker(0)
@@ -269,6 +273,199 @@ def main():
             print(f"OBSERVED {arm} seed {seed} {part}: {len(row['tta'][part]['images'])} images", flush=True)
     report = summary.build_report(training, reference["evaluation"]["groups"], split_hash)
     write_report(args.out_dir, report, summary.markdown(report))
+
+
+
+
+@torch.no_grad()
+def ensemble_drafts(encoder, heads, image):
+    """Encode eight views once each; retain each head's float32 aligned mean."""
+    encoded = encoder(image)
+    features = heads[0].refiner_features(encoded) if hasattr(heads[0], "refiner_features") else encoded
+    totals = [head(encoded).float().clone() for head in heads]
+    for code in range(1, 8):
+        encoded = encoder(d4(image, code).contiguous())
+        for total, head in zip(totals, heads):
+            total.add_(d4(head(encoded).float(), code, inverse=True))
+    return features, [total.div_(8) for total in totals]
+
+
+def output_bias(logits, bias):
+    """Keep the recurrent state untouched and calibrate only exported logits."""
+    return logits if bias == 0 else logits + bias
+
+
+def bias_counts(domain, cache_path, label_path, biases):
+    labels = np.load(label_path, allow_pickle=False)
+    logits = np.load(cache_path, allow_pickle=False)
+    predictions = {}
+    for bias in biases:
+        if bias == 0:
+            continue
+        predictions[str(bias)] = {
+            str(step): (torch.from_numpy(logits[index] + bias).sigmoid().numpy() >= .5).astype(np.uint8)
+            for index, step in enumerate(KS)
+        }
+    return previous.score_predictions(domain, predictions, labels)
+
+
+def proxy(groups):
+    return sum(weight * groups[str(k)]["scores"]["quality"] for weight, k in ((.2, 1), (.2, 2), (.6, 4)))
+
+
+def ensemble_bias_run(args):
+    """Stream E0/E1/E2 inference and score cached output logits through official workers."""
+    import tempfile
+    metrics = runner.probe.official_metrics()
+    device = torch.device(args.device)
+    split = json.loads(SPLIT.read_text())
+    checkpoint_paths = args.heads or [paths(arm, seed)[1] for arm, seed in MATRIX]
+    if len(checkpoint_paths) < 2:
+        raise ValueError("E0/E1/E2 comparison requires at least two heads")
+    encoder, first, _ = runner.y0.load_frozen_probe(checkpoint_paths[0], device)
+    heads = [first]
+    import copy
+    for path in checkpoint_paths[1:]:
+        saved = torch.load(path, map_location="cpu", weights_only=True)
+        if saved["encoder"] != runner.y0.ENCODER or saved["head"] != "conv_up" or saved["draft_layers"] != "last":
+            raise ValueError("All ensemble heads must use the same last-layer conv_up encoder")
+        head = copy.deepcopy(first)
+        head.load_state_dict(saved["state_dict"], strict=True)
+        heads.append(head)
+    model, _ = previous.shared.load_model(ROOT/"runs/exp/e6_convdraft_s0/best.pt", device,
+                                          hashlib.sha256(SPLIT.read_bytes()).hexdigest())
+    regression = []
+    for domain, dataset in runner.protocol_datasets(split, "Val-sel", 1).items():
+        image = runner.probe.as_device_tensor(dataset[0][0][None], device)
+        with torch.no_grad():
+            original = heads[0](encoder(image))
+            reference = average_d4_logits(lambda view: heads[0](encoder(view)), image, original)
+            _, actual = ensemble_drafts(encoder, heads[:1], image)
+        difference = float((actual[0]-reference).abs().max())
+        masks_equal = np.array_equal(binary_mask(actual[0]), binary_mask(reference))
+        if difference > 1e-5 or not masks_equal:
+            raise ValueError("Single-head uncalibrated TTA regression failed")
+        regression.append(dict(domain=domain, maximum_logit_difference=difference, masks_equal=masks_equal))
+    print("REGRESSION " + json.dumps(regression), flush=True)
+    groups = {"E0": [0], "E1": [0, 1], "E2": list(range(len(heads)))}
+    biases = [round(index / 10, 1) for index in range(-15, 16)]
+    chosen = None
+    selected_bias = None
+    report = dict(heads=[str(path.resolve().relative_to(ROOT)) for path in checkpoint_paths],
+                  split_sha256=hashlib.sha256(SPLIT.read_bytes()).hexdigest(), regression=regression, splits={})
+
+    def buckets(names):
+        return {name: {d: {str(k): metrics.Counts() for k in KS} for d in runner.DOMAINS} for name in names}
+
+    def add(target, result):
+        domain, values = result
+        for name, steps in values.items():
+            for k, counts in steps.items():
+                target[name][domain][k] += metrics.Counts(**counts)
+
+    def summarize(target):
+        for name in target:
+            target[name]["Overall"] = {k: target[name]["Urban"][k]+target[name]["Rural"][k] for k in map(str, KS)}
+        return {name: {d: {k: dict(counts=asdict(c), scores=metrics.summarize(c)) for k,c in steps.items()}
+                       for d,steps in domains.items()} for name,domains in target.items()}
+
+    with tempfile.TemporaryDirectory(prefix="ec523-wave1-", dir=os.environ["TMPDIR"]) as temporary:
+        cache = Path(temporary)
+        for part in ("Val-sel", "Val-rep"):
+            datasets = runner.protocol_datasets(split, part)
+            counts = buckets(groups)
+            pending, files, timings = deque(), [], []
+            biased = buckets([str(selected_bias)]) if part == "Val-rep" else None
+            cached = []
+            with mp.get_context("spawn").Pool(args.metric_workers, initializer=runner.initialize_eval_worker,
+                                             initargs=(os.environ["EC523_STARTER_DIR"],)) as pool:
+                for domain in runner.DOMAINS:
+                    for images, _, _, ids, labels in runner.make_loader(datasets[domain], 1, args.loader_workers):
+                        image = runner.probe.as_device_tensor(images, device)
+                        started = runner.stamp(device)
+                        features, drafts = ensemble_drafts(encoder, heads, image)
+                        predictions, final_bias = {}, {}
+                        label = np.asarray(labels).squeeze(0).astype(np.uint8)
+                        image_no = len(files)
+                        label_path = cache/f"labels-{image_no}.npy"
+                        if part == "Val-sel":
+                            np.save(label_path, label)
+                        for name, indices in groups.items():
+                            draft = drafts[0] if len(indices) == 1 else torch.stack([drafts[i] for i in indices]).mean(0)
+                            predictions[name] = {}
+                            saved_logits = []
+                            for k, logits, _, _ in runner.inference_steps(model, features, draft, KS, device):
+                                predictions[name][k] = binary_mask(logits)
+                                if part == "Val-sel":
+                                    saved_logits.append(logits[0, 0].float().cpu().numpy())
+                                elif name == chosen:
+                                    final_bias[k] = binary_mask(output_bias(logits, selected_bias))
+                            if part == "Val-sel":
+                                path = cache/f"{name}-{image_no}.npy"
+                                np.save(path, np.stack(saved_logits))
+                                cached.append((name, domain, path, label_path))
+                        files.append(dict(domain=domain, image_id=ids[0]))
+                        timings.append(runner.stamp(device)-started)
+                        pending.append(pool.apply_async(previous.score_predictions, (domain, predictions, label)))
+                        if biased is not None:
+                            pending.append(pool.apply_async(previous.score_predictions,
+                                                            (domain, {str(selected_bias): final_bias}, label)))
+                        while len(pending) >= 2*args.metric_workers:
+                            result = pending.popleft().get()
+                            add(biased if str(selected_bias) in result[1] else counts, result)
+                while pending:
+                    result = pending.popleft().get()
+                    add(biased if str(selected_bias) in result[1] else counts, result)
+                scored = summarize(counts)
+                report["splits"][part] = dict(groups=scored, images=files, forward_seconds=timings)
+                if part == "Val-sel":
+                    scores = {name: proxy(domains["Overall"]) for name, domains in scored.items()}
+                    best = max(scores, key=scores.get)
+                    chosen = best if scores[best]-scores["E0"] >= .001 else "E0"
+                    sweep = buckets(map(str, biases))
+                    for name, domain, path, label_path in cached:
+                        if name == chosen:
+                            pending.append(pool.apply_async(bias_counts, (domain, path, label_path, biases)))
+                        while len(pending) >= 2*args.metric_workers:
+                            add(sweep, pending.popleft().get())
+                    while pending:
+                        add(sweep, pending.popleft().get())
+                    sweep["0.0"] = counts[chosen]
+                    sweep_scored = summarize(sweep)
+                    bias_scores = {b: proxy(sweep_scored[str(b)]["Overall"]) for b in biases}
+                    # Ties prefer zero/smaller absolute calibration.
+                    selected_bias = max(biases, key=lambda b: (bias_scores[b], -abs(b), -b))
+                    report.update(selected_ensemble=chosen, selection_L=scores,
+                                  selected_bias=selected_bias, bias_selection_L=bias_scores,
+                                  bias_selection_groups=sweep_scored)
+                else:
+                    report["biased_val_rep"] = summarize(biased)[str(selected_bias)]
+            print(f"OBSERVED {part} {len(files)} images", flush=True)
+        rep = report["splits"]["Val-rep"]["groups"]
+        scores = {name: proxy(domains["Overall"]) for name, domains in rep.items()}
+        gain = proxy(report["biased_val_rep"]["Overall"])-scores[chosen]
+        report["observations"] = dict(rep_L=scores, bias_rep_gain=gain,
+             A_P1=.001 <= scores["E1"]-scores["E0"] <= .004,
+             A_P2=0 <= scores["E2"]-scores["E1"] <= .002,
+             A_P3=-.6 <= selected_bias <= -.1 and .001 <= gain <= .003,
+             adopted_bias=selected_bias if gain >= .001 else 0.)
+    lines = ["# Observed ensemble and output-bias results", "",
+             f"Observed selected ensemble {chosen}, Val-sel bias {selected_bias}, Val-rep gain {gain:.12g}.",
+             "Observed inference adds bias only after each completed trajectory.", "",
+             "| Split | Ensemble | Domain | K | IoU | clDice | BIoU | A |",
+             "|---|---|---|---:|---:|---:|---:|---:|"]
+    for part, result in report["splits"].items():
+        for name, domains in result["groups"].items():
+            for domain, steps in domains.items():
+                for k, value in steps.items():
+                    values = " | ".join(f"{value['scores'][key]:.9f}" for key in SCORE_KEYS)
+                    lines.append(f"| {part} | {name} | {domain} | {k} | {values} |")
+    for domain, steps in report["biased_val_rep"].items():
+        for k,value in steps.items():
+            values = " | ".join(f"{value['scores'][key]:.9f}" for key in SCORE_KEYS)
+            lines.append(f"| Val-rep | {chosen} biased | {domain} | {k} | {values} |")
+    write_report(args.out_dir, report, "\n".join(lines)+"\n")
+
 
 
 if __name__ == "__main__":
