@@ -149,4 +149,21 @@ def markdown(report):
                 value = f"{value:.9g}"
             fields.append(f"{name.replace('_', ' ')} = {value}")
         lines.append(f"- Observed {rule}. " + ". ".join(fields) + ".")
+    if "acceptance" in report:
+        accepted = report["acceptance"]
+        opening = ["# Observed draft head v3 acceptance", "",
+                   "| Gate | Status | Maximum absolute difference | Comparisons |",
+                   "|---|---|---:|---:|"]
+        for name, gate in accepted["gates"].items():
+            opening.append(f"| {name} | {gate['status']} | {gate['maximum_absolute_difference']:.12g} | {gate['comparisons']} |")
+        opening += ["", "| Rule | Observed outcome | Evidence |", "|---|---|---|"]
+        for name, result in accepted["rules"].items():
+            opening.append(f"| {name} | {result['status']} | {result['evidence']} |")
+        opening += ["", "Observed R2 retains A1-i. Observed R4 admits draft-only D4 TTA.", "",
+                    "Observed R2-selected arm Val-sel last-minus-best differences are " +
+                    ", ".join(f"{name}={value:.12g}" for name, value in
+                              accepted["selected_arm_last_minus_best"].items()) + ".", "",
+                    "Observed TTA job 8756257 used NVIDIA L40S for 2304 wallclock seconds. "
+                    "Peak CUDA memory was not saved by this evaluator. Per-image timings remain in metrics.json.", ""]
+        lines = opening + lines[2:]
     return "\n".join(lines) + "\n"
