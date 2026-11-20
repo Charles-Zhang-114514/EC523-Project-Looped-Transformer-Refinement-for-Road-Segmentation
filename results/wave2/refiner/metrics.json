@@ -14,8 +14,8 @@
       "tolerance": 1e-05
     },
     "RG3": {
-      "status": "UNVERIFIED",
-      "reason": "Six startup manifest hashes were not persisted. Shared paths and the present file hash cannot establish six historical fingerprints.",
+      "status": "PASS",
+      "reason": "The user revised RG3 after viewing results: all current cache files precede the earliest refiner start, none has a later mtime after any refiner job, and the head hash matches A1-i s0.",
       "current_manifest_sha256": "06d97973fcec14cc113b7c3468d768e1e0a6d9b3d27998fd6aa14cf07c13dc90",
       "recorded_run_manifest_sha256": {
         "RW_s0": null,
@@ -30,7 +30,49 @@
       "head_sha256": "9429dacae36969948eddd5f4551c3fed9567a1acfee6526164fe1839bc3b568f",
       "current_A1_i_s0_sha256": "9429dacae36969948eddd5f4551c3fed9567a1acfee6526164fe1839bc3b568f",
       "head_hash_matches": true,
-      "all_refiner_jobs_started_after_cache_success": true
+      "all_refiner_jobs_started_after_cache_success": true,
+      "basis": "mtime evidence, not per-run fingerprints",
+      "mtime_evidence": {
+        "file_count": 4192,
+        "cache_npz_count": 4191,
+        "manifest_mtime": {
+          "epoch": 1795151745.278569,
+          "UTC": "2026-11-20T05:15:45.278569+00:00",
+          "America_New_York": "2026-11-20T00:15:45.278569-05:00"
+        },
+        "latest_cache_npz_mtime": {
+          "epoch": 1795151650.8065188,
+          "UTC": "2026-11-20T05:14:10.806519+00:00",
+          "America_New_York": "2026-11-20T00:14:10.806519-05:00"
+        },
+        "latest_any_file_mtime": {
+          "epoch": 1795151745.278569,
+          "UTC": "2026-11-20T05:15:45.278569+00:00",
+          "America_New_York": "2026-11-20T00:15:45.278569-05:00"
+        },
+        "earliest_refiner_start": {
+          "epoch": 1795151813,
+          "UTC": "2026-11-20T05:16:53+00:00",
+          "America_New_York": "2026-11-20T00:16:53-05:00"
+        },
+        "latest_refiner_end": {
+          "epoch": 1795155973,
+          "UTC": "2026-11-20T06:26:13+00:00",
+          "America_New_York": "2026-11-20T01:26:13-05:00"
+        },
+        "files_not_before_earliest_start": 0,
+        "files_after_last_refiner_end": 0,
+        "files_after_each_refiner_end": {
+          "RW_s0": 0,
+          "RW_s1": 0,
+          "RS_s0": 0,
+          "RS_s1": 0,
+          "RS_s2": 0,
+          "RW_s2": 0
+        },
+        "head_hash_matches": true
+      },
+      "rule_revision_blind": false
     }
   },
   "jobs": [
@@ -2135,112 +2177,86 @@
   },
   "decisions": {
     "R-P1": {
-      "status": "DEFERRED",
-      "reason": "RG3 is unverified; no R verdict is assigned.",
-      "numbers": {
-        "mean": 0.5437217708567741,
-        "population_std": 0.0023936073621910626,
-        "sample_std": 0.002931558340968654,
-        "mean_minus_E0": -0.0034136676750959882,
-        "selected_seed_by_Val_sel": 2
-      }
+      "status": "NOT_MET",
+      "mean": 0.5437217708567741,
+      "baseline": 0.5471354385318701,
+      "delta": -0.0034136676750959882,
+      "interval": [
+        -0.002,
+        0.003
+      ]
     },
     "R-P2": {
-      "status": "DEFERRED",
-      "reason": "RG3 is unverified; no R verdict is assigned.",
-      "numbers": {
-        "RW": {
-          "mean": 0.5458829931874126,
-          "population_std": 0.0008155802274398302,
-          "sample_std": 0.0009988777007653177,
-          "mean_minus_E0": -0.0012524453444574535,
-          "selected_seed_by_Val_sel": 0
-        },
-        "RS": {
-          "mean": 0.5437217708567741,
-          "population_std": 0.0023936073621910626,
-          "sample_std": 0.002931558340968654,
-          "mean_minus_E0": -0.0034136676750959882,
-          "selected_seed_by_Val_sel": 2
-        }
-      }
+      "status": "NOT_MET",
+      "mean": 0.5458829931874126,
+      "baseline": 0.5471354385318701,
+      "delta": -0.0012524453444574535,
+      "interval": [
+        0,
+        0.003
+      ],
+      "mean_interval_met": false,
+      "population_std": {
+        "RW": 0.0008155802274398302,
+        "RS": 0.0023936073621910626
+      },
+      "sample_std": {
+        "RW": 0.0009988777007653177,
+        "RS": 0.002931558340968654
+      },
+      "smaller_std_met": true
     },
     "R-P3": {
-      "status": "DEFERRED",
-      "reason": "RG3 is unverified; no R verdict is assigned.",
-      "numbers": {
+      "status": "NOT_MET",
+      "candidate_overall_deltas": {
+        "RS": -0.0010078438181098104,
+        "RW": -0.0004741556292741089
+      },
+      "minimum_gain": 0.001
+    },
+    "R-R1": {
+      "status": "Neither group passes",
+      "groups": {
         "RS": {
           "run": "RS_s2",
-          "selection_L": 0.5504684138141788,
-          "report_L": {
-            "Overall": 0.5461275947137603,
-            "Urban": 0.5768344083093552,
-            "Rural": 0.4881907820867615
-          },
-          "report_delta_vs_E0": {
-            "Overall": -0.0010078438181098104,
+          "overall_L": 0.5461275947137603,
+          "registered_minimum_overall_L": 0.548135,
+          "overall_pass": false,
+          "exact_gain_pass": false,
+          "domain_deltas": {
             "Urban": -0.001659900817584381,
             "Rural": 2.745043334739794e-05
-          }
+          },
+          "domain_pass": {
+            "Urban": true,
+            "Rural": true
+          },
+          "passed": false
         },
         "RW": {
           "run": "RW_s0",
-          "selection_L": 0.5492836100716876,
-          "report_L": {
-            "Overall": 0.546661282902596,
-            "Urban": 0.5745152002612066,
-            "Rural": 0.4933085839355961
-          },
-          "report_delta_vs_E0": {
-            "Overall": -0.0004741556292741089,
+          "overall_L": 0.546661282902596,
+          "registered_minimum_overall_L": 0.548135,
+          "overall_pass": false,
+          "exact_gain_pass": false,
+          "domain_deltas": {
             "Urban": -0.003979108865732939,
             "Rural": 0.0051452522821820446
-          }
-        }
-      }
-    },
-    "R-R1": {
-      "status": "DEFERRED",
-      "reason": "RG3 is unverified; no R verdict is assigned.",
-      "numbers": {
-        "candidates": {
-          "RS": {
-            "run": "RS_s2",
-            "selection_L": 0.5504684138141788,
-            "report_L": {
-              "Overall": 0.5461275947137603,
-              "Urban": 0.5768344083093552,
-              "Rural": 0.4881907820867615
-            },
-            "report_delta_vs_E0": {
-              "Overall": -0.0010078438181098104,
-              "Urban": -0.001659900817584381,
-              "Rural": 2.745043334739794e-05
-            }
           },
-          "RW": {
-            "run": "RW_s0",
-            "selection_L": 0.5492836100716876,
-            "report_L": {
-              "Overall": 0.546661282902596,
-              "Urban": 0.5745152002612066,
-              "Rural": 0.4933085839355961
-            },
-            "report_delta_vs_E0": {
-              "Overall": -0.0004741556292741089,
-              "Urban": -0.003979108865732939,
-              "Rural": 0.0051452522821820446
-            }
-          }
-        },
-        "registered_minimum_overall_L": 0.548135,
-        "baseline_exact": {
-          "Overall": 0.5471354385318701,
-          "Urban": 0.5784943091269396,
-          "Rural": 0.4881633316534141
-        },
-        "minimum_domain_delta": -0.003
-      }
+          "domain_pass": {
+            "Urban": false,
+            "Rural": true
+          },
+          "passed": false
+        }
+      },
+      "outcome": "Retain E0 (e6 seed 0)",
+      "baseline": {
+        "Overall": 0.5471354385318701,
+        "Urban": 0.5784943091269396,
+        "Rural": 0.4881633316534141
+      },
+      "minimum_domain_delta": -0.003
     }
   },
   "limitations": [
@@ -2275,5 +2291,10 @@
         "Rural": 0.0051452522821820446
       }
     }
+  },
+  "outcome": "Retain E0 (e6 seed 0)",
+  "RG3_revision": {
+    "timing": "After results were observed; explicitly authorized by the user",
+    "scope": "Only RG3 provenance acceptance changes; e58dfa0 predictions and selection thresholds remain unchanged"
   }
 }

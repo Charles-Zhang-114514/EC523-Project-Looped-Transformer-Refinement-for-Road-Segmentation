@@ -2,18 +2,18 @@
 
 | Gate | Status | Evidence |
 | --- | --- | --- |
-| RG1 | PASS | Observed 12 comparisons, max absolute difference 0.0, tolerance 1e-5. |
-| RG2 | PASS | Observed 48 comparisons, max absolute difference 0.0, tolerance 1e-5. |
-| RG3 | UNVERIFIED | Six historical manifest fingerprints are absent; current shared hash cannot replace them. |
+| RG1 | PASS | Observed 12 comparisons, max absolute difference 0, tolerance 1e-5. |
+| RG2 | PASS | Observed 48 comparisons, max absolute difference 0, tolerance 1e-5. |
+| RG3 | PASS | Observed all three user-revised checks pass; based on mtime, not per-run fingerprints. |
 
-| Prediction / rule | Status | Descriptive numbers; no verdict |
+| Prediction / rule | Status | Evidence |
 | --- | --- | --- |
-| R-P1 | Deferred | Observed RS mean 0.543721770857 minus E0 0.547135438532 = -0.003413667675. |
-| R-P2 | Deferred | Observed RW mean delta -0.001252445344; population SD RW 0.000815580227, RS 0.002393607362. |
-| R-P3 | Deferred | Observed candidate Overall deltas: RS -0.001007843818, RW -0.000474155629 |
-| R-R1 | Deferred | Observed RG3 cannot be fully verified; no adoption decision is assigned. |
+| R-P1 | Not met | Observed RS mean 0.543721770857 minus E0 0.547135438532 = -0.003413667675, outside [-0.002,0.003]. |
+| R-P2 | Not met | Observed RW mean delta -0.001252445344, outside [0,0.003]. Observed lower dispersion: population SD RW 0.000815580227 < RS 0.002393607362; sample SD RW 0.000998877701 < RS 0.002931558341. |
+| R-P3 | Not met | Observed selected candidate gains RS*=-0.001007843818 and RW*=-0.000474155629; neither reaches +0.001. |
+| R-R1 | Neither group passes | Observed RS* L=0.546127594714 and RW* L=0.546661282903, both below 0.548135; RW* Urban delta=-0.003979108866 also falls below -0.003. |
 
-Observed R-R1 adoption remains unadjudicated because historical RG3 hash evidence is absent.
+Observed R-R1 retains E0 (e6 seed 0).
 
 | Job | Run | GPU | Wall seconds | Peak GiB | Best epoch / step | Normal end |
 | --- | --- | --- | --- | --- | --- | --- |
@@ -29,7 +29,9 @@ Observed R-R1 adoption remains unadjudicated because historical RG3 hash evidenc
 
 Observed 4191 float32 cached drafts and zero flipped pixels in every Train/Val-sel/Val-rep domain. Current manifest SHA-256: 06d97973fcec14cc113b7c3468d768e1e0a6d9b3d27998fd6aa14cf07c13dc90.
 
-Observed head SHA-256 matches A1-i s0: 9429dacae36969948eddd5f4551c3fed9567a1acfee6526164fe1839bc3b568f. All six configs record runs/cache/tta_draft_a1i_s0. The loader checks head and split fingerprints before use (scripts/train_refiner.py:858; src/looproad/data/draft_cache.py:45). It does not save the manifest fingerprint in the run output. Present-day hash and publication timing support consistency but do not establish six historical hashes.
+Observed head SHA-256 matches A1-i s0: 9429dacae36969948eddd5f4551c3fed9567a1acfee6526164fe1839bc3b568f. All six configs record runs/cache/tta_draft_a1i_s0. The loader checks head and split fingerprints before use (scripts/train_refiner.py:858; src/looproad/data/draft_cache.py:45). It does not save the manifest fingerprint in the run output. Observed RG3 now passes under the user-authorized mtime replacement; historical per-run hashes remain unrecorded. Observed this provenance-rule revision was authorized after viewing results and is not blind. The original e58dfa0 predictions and thresholds are unchanged.
+
+Observed the complete current cache contains 4192 files: 4191 NPZ drafts and one manifest. Observed the manifest and latest file mtime is 2026-11-20T00:15:45.278569-05:00; the latest NPZ mtime is 2026-11-20T00:14:10.806519-05:00. Observed earliest refiner start is 2026-11-20T00:16:53-05:00 (jobs 8779167/8779168); the latest refiner end is 2026-11-20T01:26:13-05:00. Observed zero files at or after the earliest start, zero files after each job end, and zero files after the latest end. Observed the matching head SHA above satisfies the third check. These timestamps use America/New_York (UTC-05:00); exact epoch and UTC values are retained in metrics.json.
 
 | Run | Start epoch | Cache end epoch | Seconds after cache end |
 | --- | --- | --- | --- |
@@ -49,7 +51,7 @@ Observed head SHA-256 matches A1-i s0: 9429dacae36969948eddd5f4551c3fed9567a1acf
 
 Observed all seeds/configurations match their arm; K_train=4, per-step BCE pos_weight=4, AdamW wd=0.01, clip=1.0, L weights=(0.2,0.2,0.6), fixed selection 834 and report 835 names. All best.pt and last.pt files exist. Every job has accounting failed=0, exit_status=0, and a completion marker below its h_rt; no error or timeout was observed. Cache peak CUDA allocation is not recorded.
 
-## Descriptive seed scores; no R verdict
+## Seed scores and registered adjudication
 
 | Run | Best epoch | Val-sel L | Val-rep Overall L | Urban L | Rural L |
 | --- | --- | --- | --- | --- | --- |
@@ -66,7 +68,7 @@ Observed all seeds/configurations match their arm; K_train=4, per-step BCE pos_w
 | RS | 0.543721770857 | 0.002393607362 | 0.002931558341 | -0.003413667675 | RS_s2 |
 | RW | 0.545882993187 | 0.000815580227 | 0.000998877701 | -0.001252445344 | RW_s0 |
 
-Observed mean is sum(L_seed)/3; population SD uses divisor 3 and sample SD uses divisor 2. SD convention was not preregistered, so both are reported. Observed RW has smaller seed dispersion by both conventions. Descriptive Val-sel maxima identify RS*=RS_s2 and RW*=RW_s0; no adoption is assigned.
+Observed mean is sum(L_seed)/3; population SD uses divisor 3 and sample SD uses divisor 2. SD convention was not preregistered, so both are reported. Observed RW has smaller seed dispersion by both conventions. Observed Val-sel maxima select RS*=RS_s2 and RW*=RW_s0. Observed neither candidate passes R-R1.
 
 | Candidate | Domain | Val-rep L minus E0 |
 | --- | --- | --- |
@@ -162,4 +164,4 @@ Observed mean is sum(L_seed)/3; population SD uses divisor 3 and sample SD uses 
 | RW_s2 | 2 | 0.543833184883 |
 | RW_s2 | 3 | 0.543534410733 |
 
-Observed only archived official metrics were aggregated; no images, inference, official Counts recomputation, per-image table or cache is included. RG3 remains unverified; R decisions are deferred.
+Observed only archived official metrics were aggregated; no images, inference, official Counts recomputation, per-image table or cache is included. Observed the revised RG3 passes on mtime evidence, all R predictions are not met, and R-R1 retains E0.

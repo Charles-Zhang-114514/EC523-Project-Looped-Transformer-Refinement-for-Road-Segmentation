@@ -54,6 +54,8 @@ Observed best checkpoint at step 200, epoch 1, A=0.538982479791. Endpoint evalua
 
 Observed LC peaks at epoch 2, declines at epoch 3, rebounds at epoch 4 and declines at epoch 5; every post-peak score stays below its peak. Observed first LoRA peaks at epoch 1 with a later rebound at epoch 4. Curve similarity and subsequent decline remain qualitative; no threshold is added. LC last-minus-best=-0.003562884612.
 
+Observed LC epoch-1 Val-sel A=0.527155385725 versus first LoRA A=0.525868792451, a difference of 0.001286593273 (about 0.0013). Observed that continuing to train only the head without LoRA also produces a decline of almost the same magnitude at the first epoch. Observed that, with the LC report-A bound already satisfied, the literal LC-R1 branch in this comparison depends only on whether the best epoch is 1. Observed this condition does not represent the intended question well; the registered literal verdict is retained alongside this descriptive limitation.
+
 ## Val-rep component comparisons
 
 | Run | Mode | Domain | IoU | clDice | BIoU | A | Delta IoU | Delta clDice | Delta BIoU | Delta A |

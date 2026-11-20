@@ -700,5 +700,12 @@
       "outcome": "Observed registered wording: degradation is related to LoRA.",
       "limitation": "Registered wording is not independent causal evidence; LC also degrades relative to A1-i s0."
     }
+  },
+  "LC_post_result_observation": {
+    "LC_epoch1_A": 0.5271553857246614,
+    "first_LoRA_epoch1_A": 0.5258687924511738,
+    "difference": 0.0012865932734875685,
+    "text": "Observed LC epoch-1 Val-sel A=0.527155385725 versus first LoRA A=0.525868792451, a difference of 0.001286593273 (about 0.0013). Observed that continuing to train only the head without LoRA also produces a decline of almost the same magnitude at the first epoch. Observed that, with the LC report-A bound already satisfied, the literal LC-R1 branch in this comparison depends only on whether the best epoch is 1. Observed this condition does not represent the intended question well; the registered literal verdict is retained alongside this descriptive limitation.",
+    "rule_changed": false
   }
 }
