@@ -932,3 +932,21 @@ B-R1：LoRA s0 的 Val-rep y₀ A ≥ 0.538246 + 0.005，且 Urban 和 Rural 都
 - Observed B-R1=False: Overall A=0.525091501373 is below 0.543246. Urban A=0.562060868039 versus baseline 0.566749782363 (delta -0.004688914325); Rural A=0.453416981128 versus 0.483754211931 (delta -0.030337230803). Both domain drops exceed the allowed 0.002. Under the registered rule, wave 2 uses the frozen encoder.
 - Observed D4 Val-rep A is Overall 0.528748720540, Urban 0.565737357583 and Rural 0.456591089614. Tables retain IoU/clDice/BIoU/A for both inference modes, exact A1-i seed-0 comparisons, and all paired changes. Read the existing ensemble report only: its keys contain K1/K2/K4/K8 after refinement; E0/E1/E2 draft-only y0 is not recorded on either split.
 - Wrote only results/wave1/lora/summary.md and metrics.json with gate table, registered decision table and frozen-encoder outcome first. Files are 4360 and 15221 bytes; summary values match JSON and personal-path scans over results/wave1 are empty. Relative to fe10d7b result changes are confined to wave1/lora. No images, weights, logs, per-image tables or caches are included. Only these text/numeric reports and this worklog are committed.
+
+## 2026-11-19 - Wave 2 preregistration
+
+Recorded before creating or submitting wave-2 jobs. The supplied predictions and rules are preserved verbatim.
+
+定义：
+- RS = refiner 从头训练（e6 设置），seed 0/1/2；
+- RW = 从 e6 s0 接着训练（微调），seed 0/1/2；
+- 两组都以 A1-i s0 的 TTA y₀ 作为初稿；每组按 Val-sel 的 L 选一个 seed，记为 RS*、RW*。
+R-P1：RS 三个 seed 的 Val-rep L 均值减去 E0，落在 −0.002 到 +0.003 之间。
+R-P2：RW 三个 seed 的 Val-rep L 均值减去 E0，落在 0 到 +0.003 之间，且 seed 之间的标准差小于 RS。
+R-P3：RS* 和 RW* 里至少有一个，Val-rep L 比 E0 高 ≥ +0.001。
+LA-P1：LA 的 Val-rep y₀（不做 TTA）A 减去 0.538246，落在 −0.003 到 +0.008 之间。
+LC-P1：LC 的 Val-sel 曲线和第一次 LoRA 相似（最佳在第 1 个 epoch，之后下降），Val-rep y₀ A ≤ 0.533。
+判定规则：
+R-R1：一组被判为"通过"，需要该组选出的 seed 满足：Val-rep L ≥ E0 + 0.001（即 ≥ 0.548135），并且 Urban、Rural 的 L 都不低于 E0 对应值超过 0.003。两组都通过时，取 Val-sel L 更高的那组；都不通过就保留 E0（e6 s0）。
+LA-R1：LA 的 Val-rep y₀（不做 TTA）A ≥ 0.543246，并且 Urban、Rural 都不低于 A1-i s0 超过 0.002 → 波次 3 用 LoRA；否则放弃 LoRA，不再重试。
+LC-R1（只用于解释，不影响选择）：LC-P1 成立 → 报告写"第一次 LoRA 的退化主要来自初稿头继续训练"；不成立 → 写"退化和 LoRA 有关"。
