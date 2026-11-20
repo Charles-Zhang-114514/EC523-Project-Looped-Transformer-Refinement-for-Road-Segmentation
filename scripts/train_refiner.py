@@ -641,6 +641,21 @@ def initialize_refiner(model, path, probe_path):
     model.load_state_dict(saved["state_dict"], strict=True)
 
 
+def training_batches(loader, max_steps=None):
+    if max_steps is None:
+        yield from loader
+        return
+    if len(loader) == 0:
+        raise ValueError("Cannot repeat an empty training loader")
+    completed = 0
+    while completed < max_steps:
+        for batch in loader:
+            yield batch
+            completed += 1
+            if completed == max_steps:
+                return
+
+
 def build_parser():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--epochs", type=int, default=20, help="Zero evaluates an untrained zero-output refiner")
@@ -649,6 +664,7 @@ def build_parser():
     parser.add_argument("--draft-cache", type=Path)
     parser.add_argument("--init-refiner", type=Path)
     parser.add_argument("--warmup-steps", type=int, default=500)
+    parser.add_argument("--max-steps", type=int, help="Bound total updates, cycling a small dataset if needed")
     parser.add_argument("--pos-weight", type=float, default=4.,
                         help="Positive-class BCE weight for the refiner only; does not change the frozen probe")
     parser.add_argument('--loss', choices=('bce', 'false_add', 'lovasz', 'soft_cldice'), default='bce')
@@ -709,6 +725,8 @@ def main():
         parser.error("--init-refiner cannot be combined with resume/eval-only")
     if args.warmup_steps < 1:
         parser.error("Warmup steps must be positive")
+    if args.max_steps is not None and (args.max_steps < 1 or args.resume or args.eval_only):
+        parser.error("--max-steps requires positive updates in a fresh training run")
     if args.draft_cache is not None and args.augmentation != "none":
         parser.error("Cached drafts require original-direction training images")
     if args.infer_ablations is not None and not args.eval_only:
@@ -851,7 +869,7 @@ def main():
                   refiner_dtype="float32", encoder=y0.ENCODER, probe_head=checkpoint["head"])
     if args.infer_ablations is None:
         config.pop('infer_ablations')
-    for name in ('step_weights', 'k_train_choices', 'draft_cache', 'init_refiner'):
+    for name in ('step_weights', 'k_train_choices', 'draft_cache', 'init_refiner', 'max_steps'):
         if getattr(args, name) is None:
             config.pop(name)
     objective = RefinerObjective(args.loss, args.pos_weight, args.aux_weight, args.skeleton_iterations,
@@ -870,7 +888,8 @@ def main():
     loader = (make_loader(ConcatDataset(train_sets), args.batch_size, args.loader_workers, True, args.seed)
               if train_sets else None)
     optimizer = torch.optim.AdamW(model.parameters(), lr=args.lr, weight_decay=.01) if loader else None
-    scheduler = (torch.optim.lr_scheduler.LambdaLR(optimizer, lambda step: lr_multiplier(step, len(loader) * args.epochs, args.warmup_steps))
+    schedule_steps = args.max_steps if args.max_steps is not None else (len(loader)*args.epochs if loader else None)
+    scheduler = (torch.optim.lr_scheduler.LambdaLR(optimizer, lambda step: lr_multiplier(step, schedule_steps, args.warmup_steps))
                  if loader else None)
     start_epoch = int(restored["epoch"]) if restored is not None else 0
     epochs = list(restored.get("epochs", [])) if restored is not None else []
@@ -884,7 +903,7 @@ def main():
     selection_files = {domain: [pair[0].name for pair in dataset.pairs] for domain, dataset in selection_sets.items()}
     if split is not None and not selection_files and restored is not None:
         selection_files = restored.get('selection_files', {})
-    config["scheduler_total_steps"] = (len(loader) * args.epochs if loader else
+    config["scheduler_total_steps"] = (schedule_steps if loader else
                                         restored["config"].get("scheduler_total_steps") if restored else None)
     k_generator = make_k_generator(args.seed) if args.k_train_choices is not None else None
     if args.resume:
@@ -915,7 +934,7 @@ def main():
         epoch_started = stamp(device)
         batches, seen = [], 0
         k_distribution = {str(k): 0 for k in (args.k_train_choices or [args.k_train])}
-        for batch_index, (images, targets, valid, image_ids, _) in enumerate(loader):
+        for batch_index, (images, targets, valid, image_ids, _) in enumerate(training_batches(loader, args.max_steps)):
             images, targets, valid = (probe.as_device_tensor(value, device) for value in (images, targets, valid))
             optimizer.zero_grad(set_to_none=True)
             phase = stamp(device)
@@ -1022,6 +1041,8 @@ def main():
         torch.save(payload, args.ckpt_dir / "last.pt")
         if improved:
             torch.save(payload, args.ckpt_dir / "best.pt")
+        if args.max_steps is not None:
+            break
     if args.loss == 'false_add' and not args.eval_only and objective.state.get('effective_aux_weight') is None:
         raise RuntimeError('Training ended before false-add calibration completed; no final report will be written')
     del loader, train_sets

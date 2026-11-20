@@ -1,99 +1,139 @@
 #!/usr/bin/env python3
-"""GPU-only wave-2 smoke: cache gates, RS/RW updates, LA frozen BN and LC."""
-import copy
+"""Run four independent short GPU checks through the production training CLIs."""
+import argparse
+from collections import deque
+import gc
 import json
+import os
 from pathlib import Path
+import subprocess
 import sys
 import tempfile
+import time
+import traceback
 
-import numpy as np
 import torch
-from torch.utils.data import ConcatDataset
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path[:0] = [str(ROOT), str(ROOT/"src")]
 from scripts import cache_tta_draft as build
-from scripts import train_lora_draft as lora_train
-from scripts import train_refiner as runner
-from looproad.data.augmentation import D4TrainingDataset
-from looproad.data.draft_cache import CacheIds, frozen_cached_draft
-from looproad.models.lora import LoRAEncoder
+
+
+def stage_commands(cache_dir, out):
+    commands = {}
+    for arm in ("RS", "RW"):
+        directory = out/arm
+        command = [sys.executable, "-u", "scripts/train_refiner.py",
+                   "--head-type", "conv_upsample", "--epochs", "10" if arm=="RS" else "3",
+                   "--batch-size", "4", "--k-train", "4", "--seed", "0", "--device", "cuda",
+                   "--lr", "3e-4" if arm=="RS" else "1e-4", "--warmup-steps", "500" if arm=="RS" else "100",
+                   "--max-steps", "20", "--limit-per-domain", "2", "--select-per-domain", "2",
+                   "--select-every", "1", "--selection-ks", "1:0.2,2:0.2,4:0.6",
+                   "--val-split", "configs/val_split_seed0.json", "--eval-k", "1,2,4,8",
+                   "--loader-workers", "0", "--eval-loader-workers", "1", "--metric-workers", "6",
+                   "--probe-ckpt", "runs/draft_head/A1-i/best.pt", "--draft-cache", str(cache_dir),
+                   "--out-dir", str(directory/"report"), "--ckpt-dir", str(directory/"checkpoints")]
+        if arm=="RW":
+            command += ["--init-refiner", "runs/exp/e6_convdraft_s0/best.pt"]
+        commands[arm] = command
+    for arm in ("LA", "LC"):
+        command = [sys.executable, "-u", "scripts/train_lora_draft.py",
+                   "--max-steps", "20", "--limit-per-domain", "2", "--loader-workers", "0",
+                   "--out-dir", str(out/arm)]
+        if arm=="LA":
+            command += ["--freeze-head", "--lr", "2e-5", "--warmup-steps", "100",
+                        "--epochs", "2", "--eval-every-steps", "200"]
+        else:
+            command += ["--no-lora"]
+        commands[arm] = command
+    return commands
+
+
+def run_stage(arm, command, out):
+    log = out/(arm+".log")
+    record = dict(command=command[1:], log=log.name, passed=False, exit_code=None)
+    try:
+        with log.open("w") as stream:
+            result = subprocess.run(command, cwd=ROOT, stdout=stream, stderr=subprocess.STDOUT, check=False)
+        record["exit_code"] = result.returncode
+        with log.open() as stream:
+            record["log_tail"] = list(deque(stream, maxlen=12))
+        if result.returncode:
+            return record
+        path = out/arm/("report/metrics.json" if arm in ("RS","RW") else "metrics.json")
+        data = json.loads(path.read_text())
+        updates = sum(len(epoch["batches"]) for epoch in data["epochs"])
+        if updates != 20:
+            raise ValueError(f"Expected 20 optimizer updates, observed {updates}")
+        evaluation = data["evaluation"]
+        if arm in ("RS","RW"):
+            images = evaluation["images"]
+            counts = {d:sum(row["domain"]==d for row in images) for d in ("Urban","Rural")}
+            finite = all(torch.isfinite(torch.tensor(epoch["loss"])) for epoch in data["epochs"])
+        else:
+            images = evaluation["images"]
+            counts = {d:sum(row["domain"]==d for row in images) for d in ("Urban","Rural")}
+            finite = all(torch.isfinite(torch.tensor(batch["loss"])) for epoch in data["epochs"] for batch in epoch["batches"])
+        unique = {(row["domain"],row["image_id"]) for row in images}
+        if counts != dict(Urban=2,Rural=2) or len(unique) != 4 or not finite:
+            raise ValueError("Missing finite training losses or two scored images per domain")
+        record.update(updates=updates, scored_images=counts, evaluation=evaluation)
+        if arm=="LA":
+            record["head_and_BN_unchanged"] = data.get("frozen_head_unchanged",False)
+            if not record["head_and_BN_unchanged"]:
+                raise ValueError("LA frozen head/BN check did not pass")
+        record["passed"] = True
+    except Exception:
+        record["error"] = traceback.format_exc()
+    return record
+
+
+def run_stages(commands, out, report):
+    for arm, command in commands.items():
+        report[arm] = run_stage(arm, command, out)
+        (out/"metrics.json").write_text(json.dumps(report,indent=2,allow_nan=False)+"\n")
+        print("STAGE " + json.dumps(dict(arm=arm,passed=report[arm]["passed"],
+                                         exit_code=report[arm]["exit_code"])),flush=True)
+    return report
+
+
+def finish(report):
+    for arm in ("RS","RW","LA","LC"):
+        record=report[arm]
+        print(f"{arm}: {'PASS' if record['passed'] else 'FAIL'} exit_code={record['exit_code']}",flush=True)
+    passed = report.get("cache",{}).get("gates_passed",False) and all(report[arm]["passed"] for arm in ("RS","RW","LA","LC"))
+    print("WAVE2_SMOKE_COMPLETE" if passed else "WAVE2_SMOKE_FAILED",flush=True)
+    return passed
 
 
 def main():
+    parser=argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--out-dir",type=Path,default=ROOT/"runs/wave2"/("smoke_"+os.environ.get("JOB_ID",str(time.time_ns()))))
+    args=parser.parse_args()
+    out=args.out_dir.resolve()
+    if not out.is_relative_to(ROOT/"runs") or out.exists():
+        parser.error("Choose a fresh output directory under runs")
     if not torch.cuda.is_available():
-        raise ValueError("Run on an allocated GPU")
-    (ROOT/"runs/cache").mkdir(parents=True, exist_ok=True)
-    device = torch.device("cuda")
-    report = {}
-    with tempfile.TemporaryDirectory(prefix="wave2-smoke-", dir=ROOT/"runs/cache") as directory:
-        encoder, head, baseline, cache, train_sets, val_sets = build.build_cache(Path(directory)/"draft", smoke=True)
-        loader = runner.make_loader(ConcatDataset([CacheIds(ds) for ds in train_sets.values()]), 2, 0, True, 0)
-        baseline_state = copy.deepcopy(baseline.state_dict())
-        for arm in ("RS", "RW"):
-            torch.manual_seed(0)
-            model = runner.LoopRefiner(1024, head_type="conv_upsample").to(device)
-            if arm == "RW":
-                model.load_state_dict(baseline_state, strict=True)
-            optimizer = torch.optim.AdamW(model.parameters(), lr=3e-4 if arm=="RS" else 1e-4, weight_decay=.01)
-            scheduler = torch.optim.lr_scheduler.LambdaLR(
-                optimizer, lambda step: runner.lr_multiplier(step, 6310 if arm=="RS" else 1893, 500 if arm=="RS" else 100))
-            iterator = iter(loader)
-            rows = []
-            torch.cuda.reset_peak_memory_stats()
-            for step in range(20):
-                try:
-                    images, target, valid, ids, _ = next(iterator)
-                except StopIteration:
-                    iterator = iter(loader)
-                    images, target, valid, ids, _ = next(iterator)
-                images, target, valid = (runner.probe.as_device_tensor(x,device) for x in (images,target,valid))
-                optimizer.zero_grad(set_to_none=True)
-                start = runner.stamp(device)
-                features, draft = frozen_cached_draft(encoder, head, images, ids, cache)
-                outputs = runner.refine_steps(model, features, draft, 4)
-                loss = runner.deep_supervision(outputs, target, valid)
-                if not torch.isfinite(loss):
-                    raise FloatingPointError("Nonfinite smoke loss")
-                loss.backward()
-                torch.nn.utils.clip_grad_norm_(model.parameters(),1.)
-                optimizer.step()
-                scheduler.step()
-                rows.append(dict(step=step,loss=float(loss.detach()),seconds=runner.stamp(device)-start,
-                                 peak_cuda_bytes=torch.cuda.max_memory_allocated()))
-            scored = runner.evaluate(encoder,head,model,val_sets,[1,2,4,8],device,1,6,
-                                      geometry=False,draft_cache=cache)
-            report[arm] = dict(updates=rows,evaluation=scored)
-            del model,optimizer,scheduler,outputs,loss
-        del baseline,baseline_state,loader,iterator
-        train_sets = [D4TrainingDataset(ds,i) for i,ds in enumerate(train_sets.values())]
-        for arm in ("LA","LC"):
-            torch.manual_seed(0)
-            local_head = copy.deepcopy(head)
-            local_head.requires_grad_(arm=="LC")
-            before = {k:v.detach().cpu().clone() for k,v in local_head.state_dict().items()}
-            local_encoder = LoRAEncoder(encoder.encoder).to(device) if arm=="LA" else encoder
-            parameters = [p for p in local_encoder.parameters() if p.requires_grad]+[p for p in local_head.parameters() if p.requires_grad]
-            optimizer = torch.optim.AdamW(parameters,lr=2e-5 if arm=="LA" else 1e-4,weight_decay=0)
-            loader = runner.make_loader(ConcatDataset(train_sets),2,0,True,0)
-            torch.cuda.reset_peak_memory_stats()
-            rows = lora_train.train_updates(local_encoder,local_head,loader,optimizer,20,1262 if arm=="LA" else 3155,
-                      freeze_head=arm=="LA",lr=2e-5 if arm=="LA" else 1e-4,warmup=100 if arm=="LA" else 300)
-            unchanged = all(torch.equal(value, local_head.state_dict()[key].detach().cpu()) for key,value in before.items())
-            if arm=="LA" and (not unchanged or any(p.grad is not None for p in local_head.parameters())):
-                raise ValueError("LA changed frozen head weights or BN statistics")
-            scored = lora_train.draft.evaluate(local_encoder,local_head,val_sets,device,1,6)
-            report[arm] = dict(updates=rows,head_and_BN_unchanged=unchanged,evaluation=scored)
-            if arm=="LA":
-                # Rebuild the frozen base for LC; its control must have no adapters.
-                del local_encoder,optimizer,parameters
-                encoder, head, _ = runner.y0.load_frozen_probe(build.HEAD,device)
-        report["cache"] = cache.manifest
-    out=ROOT/"runs/wave2/smoke"
-    out.mkdir(parents=True,exist_ok=False)
-    (out/"metrics.json").write_text(json.dumps(report,indent=2,allow_nan=False)+"\n")
-    print("WAVE2_SMOKE_COMPLETE",flush=True)
+        parser.error("Run on an allocated GPU")
+    out.mkdir(parents=True)
+    print("SMOKE_OUTPUT " + out.relative_to(ROOT).as_posix(),flush=True)
+    (ROOT/"runs/cache").mkdir(parents=True,exist_ok=True)
+    report={}
+    with tempfile.TemporaryDirectory(prefix="wave2-smoke-",dir=ROOT/"runs/cache") as directory:
+        cache_dir=Path(directory)/"draft"
+        try:
+            built=build.build_cache(cache_dir,smoke=True,per_domain=2,training_entrypoints=True)
+            report["cache"]=built[3].manifest
+            del built
+            gc.collect()
+            torch.cuda.empty_cache()
+        except Exception:
+            report["cache"]=dict(gates_passed=False,error=traceback.format_exc())
+            print("CACHE_FAILED " + report["cache"]["error"],flush=True)
+        run_stages(stage_commands(cache_dir,out),out,report)
+    if not finish(report):
+        raise SystemExit(1)
 
 
-if __name__ == "__main__":
+if __name__=="__main__":
     main()

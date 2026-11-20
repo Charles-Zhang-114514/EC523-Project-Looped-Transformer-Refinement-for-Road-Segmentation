@@ -91,6 +91,9 @@ def main():
     parser.add_argument("--epochs", type=int, default=5)
     parser.add_argument("--lr", type=float, default=1e-4)
     parser.add_argument("--warmup-steps", type=int, default=300)
+    parser.add_argument("--max-steps", type=int, help="Bound total updates, cycling a small dataset if needed")
+    parser.add_argument("--limit-per-domain", type=int)
+    parser.add_argument("--loader-workers", type=int, default=7)
     parser.add_argument("--out-dir", type=Path, required=True)
     parser.add_argument("--estimate", type=Path, help="Print full-job h_rt from completed smoke JSON and exit")
     args = parser.parse_args()
@@ -98,6 +101,12 @@ def main():
         parser.error("Invalid training duration, evaluation interval or learning rate")
     if args.freeze_head and args.no_lora:
         parser.error("Freezing the head without LoRA leaves no trainable parameters")
+    if args.max_steps is not None and (args.max_steps < 1 or args.smoke or args.estimate):
+        parser.error("--max-steps requires a positive fresh training run")
+    if args.limit_per_domain is not None and args.limit_per_domain < 1:
+        parser.error("Sample limit must be positive")
+    if args.loader_workers < 0:
+        parser.error("Loader workers must be nonnegative")
     if args.estimate:
         report = json.loads(args.estimate.read_text())
         if not report["L0"]["passed"] or report["batch4_peak_bytes"] > 40 * 1024**3:
@@ -134,6 +143,8 @@ def main():
         raise ValueError("L0 initialization regression failed")
     del image, reference, actual, frozen
     head.requires_grad_(not args.freeze_head)
+    frozen_head_before = ({key:value.detach().cpu().clone() for key,value in head.state_dict().items()}
+                          if args.freeze_head else None)
     lora_parameters = sum(p.numel() for p in encoder.parameters() if p.requires_grad)
     head_parameters = sum(p.numel() for p in head.parameters() if p.requires_grad)
     counts = dict(lora=lora_parameters, head=head_parameters, refiner=1193025)
@@ -144,10 +155,15 @@ def main():
                   selection_images=834, gradient_checkpointing=not args.no_lora)
     if args.freeze_head or args.no_lora or args.eval_every_steps:
         config.update(freeze_head=args.freeze_head, no_lora=args.no_lora, eval_every_steps=args.eval_every_steps)
+    if args.max_steps is not None or args.limit_per_domain is not None:
+        config.update(max_steps=args.max_steps, limit_per_domain=args.limit_per_domain)
+    limit = 2 if args.smoke else args.limit_per_domain
     split = json.loads(tta.SPLIT.read_text())
-    sets = [D4TrainingDataset(runner.probe.RoadDataset("Train", domain, limit=2 if args.smoke else None), i)
+    sets = [D4TrainingDataset(runner.probe.RoadDataset("Train", domain, limit=limit), i)
             for i, domain in enumerate(runner.DOMAINS)]
-    selection = runner.protocol_datasets(split, "Val-sel", 2 if args.smoke else None)
+    selection = runner.protocol_datasets(split, "Val-sel", limit)
+    if args.limit_per_domain is not None:
+        config["selection_images"] = sum(len(dataset) for dataset in selection.values())
     parameters = [p for p in encoder.parameters() if p.requires_grad] + [p for p in head.parameters() if p.requires_grad]
     if args.smoke:
         rows = {}
@@ -165,8 +181,8 @@ def main():
         (args.out_dir / "smoke.json").write_text(json.dumps(report, indent=2, allow_nan=False)+"\n")
         print("SMOKE_COMPLETE", flush=True)
         return
-    loader = runner.make_loader(ConcatDataset(sets), 4, 0 if args.eval_every_steps else 7, shuffle=True, seed=0)
-    total = args.epochs * len(loader)
+    loader = runner.make_loader(ConcatDataset(sets), 4, 0 if args.eval_every_steps else args.loader_workers, shuffle=True, seed=0)
+    total = args.max_steps if args.max_steps is not None else args.epochs * len(loader)
     optimizer = torch.optim.AdamW(parameters, lr=args.lr, weight_decay=0)
     epochs, best_score, best_epoch = [], -1., None
     step_selection, best_step = [], None
@@ -189,11 +205,12 @@ def main():
             if step % args.eval_every_steps == 0:
                 select_step(step)
 
-        rows = train_updates(encoder, head, loader, optimizer, len(loader), total, (epoch-1)*len(loader),
+        epoch_steps = total if args.max_steps is not None else len(loader)
+        rows = train_updates(encoder, head, loader, optimizer, epoch_steps, total, (epoch-1)*len(loader),
                              freeze_head=args.freeze_head, lr=args.lr, warmup=args.warmup_steps,
                              callback=maybe_select if args.eval_every_steps else None)
         if args.eval_every_steps:
-            select_step(epoch*len(loader))
+            select_step(total if args.max_steps is not None else epoch*len(loader))
             selected = step_selection[-1]["selection"]
             score = selected["groups"]["Overall"]["quality"]
         else:
@@ -204,16 +221,27 @@ def main():
                 save(args.out_dir/"best.pt", encoder, head, epoch, config)
         epochs.append(dict(epoch=epoch, batches=rows, selection=selected, selection_A=score))
         save(args.out_dir/"last.pt", encoder, head, epoch, config)
+        if args.max_steps is not None:
+            break
+    frozen_head_check = None
+    if frozen_head_before is not None:
+        frozen_head_check = all(torch.equal(value, head.state_dict()[key].detach().cpu())
+                                for key,value in frozen_head_before.items())
+        if not frozen_head_check or any(p.grad is not None for p in head.parameters()):
+            raise ValueError("Frozen head parameters, BN statistics or gradients changed")
+        print("FROZEN_HEAD_PASS", flush=True)
     best = torch.load(args.out_dir/"best.pt", map_location="cpu", weights_only=True)
     if best["lora"]:
         encoder.load_adapters(best["lora"])
     head.load_state_dict(best["head"], strict=True)
-    evaluation = tta.evaluate(encoder, head, None, runner.protocol_datasets(split, "Val-rep"), (),
+    evaluation = tta.evaluate(encoder, head, None, runner.protocol_datasets(split, "Val-rep", args.limit_per_domain), (),
                               device, 1, 6, "d4")
     report = dict(config=config, L0=l0, parameters=counts, epochs=epochs, best_epoch=best_epoch,
                   best_selection_A=best_score, evaluation=evaluation)
     if args.eval_every_steps:
         report.update(step_selection=step_selection, best_step=best_step)
+    if frozen_head_check is not None:
+        report["frozen_head_unchanged"] = frozen_head_check
     baseline = json.loads((ROOT/"results/draft_head/A1-i/metrics.json").read_text())["evaluation"]["groups"]
     actual = evaluation["groups"]["none"]
     gain = actual["Overall"]["y0_draft"]["scores"]["quality"] - .538246

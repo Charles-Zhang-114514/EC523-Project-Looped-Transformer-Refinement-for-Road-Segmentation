@@ -20,16 +20,17 @@ HEAD = ROOT/"runs/draft_head/A1-i/best.pt"
 REFINER = ROOT/"runs/exp/e6_convdraft_s0/best.pt"
 
 
-def build_cache(root, smoke=False):
+def build_cache(root, smoke=False, per_domain=1, training_entrypoints=False):
     root = Path(root)
     if not root.resolve().is_relative_to(ROOT/"runs/cache") or root.exists():
         raise ValueError("Choose a fresh cache directory under runs/cache")
     split = json.loads(tta.SPLIT.read_text())
-    datasets = {"Train": {d: runner.probe.RoadDataset("Train", d, limit=1 if smoke else None)
-                           for d in runner.DOMAINS},
-                "Val-rep": runner.protocol_datasets(split, "Val-rep", 1 if smoke else None)}
-    if not smoke:
-        datasets["Val-sel"] = runner.protocol_datasets(split, "Val-sel")
+    datasets = {"Train": {d: runner.probe.RoadDataset("Train", d, limit=per_domain if smoke else None,
+                                                    seed=i if training_entrypoints else 0)
+                           for i,d in enumerate(runner.DOMAINS)},
+                "Val-rep": runner.protocol_datasets(split, "Val-rep", per_domain if smoke else None)}
+    if not smoke or training_entrypoints:
+        datasets["Val-sel"] = runner.protocol_datasets(split, "Val-sel", per_domain if smoke else None)
     count = sum(len(ds) for part in datasets.values() for ds in part.values())
     free = shutil.disk_usage(ROOT).free
     dtype = "float32" if free >= count*1024*1024*4 + 2*1024**3 else "float16"
