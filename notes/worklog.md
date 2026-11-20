@@ -1043,3 +1043,25 @@ LC-R1（只用于解释，不影响选择）：LC-P1 成立 → 报告写"第一
 - Observed R-P3 is not met: Val-sel-selected RS*=seed 2 and RW*=seed 0 have report gains -0.001007843818 and -0.000474155629, neither reaching +0.001. Observed neither group passes R-R1: RS* report L=0.546127594714 and RW* L=0.546661282903 are both below registered 0.548135; both also fail the exact archived E0+0.001 interpretation. RS* Urban/Rural deltas are -0.001659900818/+0.000027450433, both within the domain bound. RW* deltas are -0.003979108866/+0.005145252282, with Urban below -0.003. The registered outcome retains E0 (A1-i s0 + D4 TTA + e6 s0).
 - Added the requested LC descriptive observation without changing its registered verdict: epoch-1 Val-sel A is 0.527155385725 for LC and 0.525868792451 for first LoRA; difference 0.001286593273 (about 0.0013). Observed continuing the head alone without LoRA also produces almost the same first-epoch decline magnitude. With the LC report-A bound already satisfied, the literal LC-R1 branch in this comparison hinges on best epoch being 1; observed that condition poorly represents the intended question. This limitation is recorded alongside the unchanged literal branch rather than changing the preregistered rule.
 - Updated refiner summary/JSON consistently with RG3 PASS, all R predictions not met and E0 retained; added the LC paragraph and matching descriptive JSON metadata. Checked decision arithmetic and Markdown/JSON consistency, absence of stale deferred/unverified verdicts, whitespace and personal-path scans. All result files remain below 10 MB; only the four wave2 report files and this appended worklog are included in the local commit. No images, weights, logs, per-image tables or caches are added.
+
+## 2026-11-20 - Refiner focus preregistration
+
+Recorded before creating or submitting any new job. The following supplied definitions, predictions and rules are preserved verbatim.
+
+定义：
+- S5a：每张图 8 个视角 g ∈ D4，各自有自己的状态 z^g；每一步把 8 个视角打包成一批，只调用一次 core，Δ̄ = mean_g g⁻¹(Δ_g)，所有视角共享同一个答案：y_{t+1} = y_t + Δ̄（每个视角看到的答案是 g·y_t）。
+- S5b：8 个视角各自独立循环（各自的 y^g、z^g），每一步同样打包成一批只调用一次 core；第 t 步的输出取 mean_g g⁻¹(y_t^g)。
+- 两者的视角特征 f_g = E(g·x)，初稿用 g·y₀（TTA 初稿对 D4 是等变的）。
+- RS-D4 / RW-D4：分别是 RS / RW 的设置，加上训练时的 D4 增强，seed 0/1/2；每组按 Val-sel L 选一个 seed，记为 RS-D4*、RW-D4*。
+
+S5-P1：S5a 的 Val-rep L 减去 E0，落在 +0.002 到 +0.006 之间。
+S5-P2：|S5a − S5b| 的 Val-rep L 差 < 0.002。
+S5-P3：S5a 的 refiner 推理时间约为 E0 的 8 倍，峰值显存 ≤ 8 GiB。
+R1-P1：RS-D4 三 seed 的 Val-rep L 均值减去 RS 均值（0.543722），落在 +0.001 到 +0.004；并且至少 2/3 个 seed 的 best epoch ≥ 3。
+R1-P2：RW-D4 均值减去 RW 均值（0.545883），落在 0 到 +0.002 之间。
+R1-P3：RS-D4* 和 RW-D4* 里至少有一个，Val-rep L 比 E0 高 ≥ +0.001。
+
+判定规则：
+S5-R1：S5a、S5b 按 Val-sel L 选一个；如果它的 Val-rep LB ≥ E0 的 LB + 0.002，并且 Urban、Rural 的 L 都不低于 E0 超过 0.003，就采用（同时标注"待 TA 确认是否符合'每步调用一次 core'"）。
+R1-R1：每组选出的 seed 满足 Val-rep L ≥ E0 + 0.001，并且 Urban、Rural 的 L 都不低于 E0 超过 0.003，就算通过；两组都通过时取 Val-sel L 更高的那组；都不通过就保留 e6 s0。
+R1-R2：如果 RS-D4 三 seed 的均值比 RS 均值高 ≥ +0.001，并且按 seed 配对至少 2/3 为正，那么之后的 refiner 训练（方向 2、3、4）一律加 D4 增强；否则不加。
