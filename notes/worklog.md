@@ -1105,3 +1105,22 @@ R1-R2：如果 RS-D4 三 seed 的均值比 RS 均值高 ≥ +0.001，并且按 s
 - Observed seed-paired D4-minus-old report L changes: RS seeds0/1/2 +0.001337707734/+0.003526197393/+0.001226407608; RW -0.000209442397/-0.000711043074/-0.000183088622. R1-R2 is met: RS mean gain >=0.001 and 3/3 positive pairs. Subsequent refiner training in directions 2/3/4 uses D4, while the current checkpoint remains E0.
 - Observed Overall A rises through K4 then falls at K8 for E0, S5a, S5b and RS-D4*. Their Rural curves decrease throughout; E0/S5a/S5b Urban curves rise throughout, while RS-D4* Urban falls slightly from K4 to K8. RW-D4* Overall and Urban decrease throughout and Rural increases throughout. Full domain/component/K tables are saved. Per-corruption stress A is not recorded: stress outputs lack per-image Counts, so no shadow/occlusion/blur aggregate is invented. Per-domain Val-sel L was also not saved by the training loop; only Overall selection scores are available for D4 seeds.
 - Wrote results/wave3/s5 and refiner_d4 summary.md/metrics.json with gates, registered verdicts and outcomes first. All rows for L/LB, selected component/K curves, paired changes and finite numeric values were independently checked against JSON; personal-path scans are empty and each file is below 10 MB. No tests were run because no code changed. Only these four small reports and this appended English worklog are committed locally; no image, weight, log, per-image table or cache is included.
+
+## 2026-11-20 - Detail recovery preregistration
+
+Recorded before creating or submitting any new job. The supplied definitions, predictions and rules below are preserved verbatim.
+
+定义：
+- DR-S：RS-D4 的设置 + 细节恢复头，从头训练，seed 0/1/2；
+- DR-W：从 e6 s0 初始化（已有的参数照常加载，细节分支按设计初始化），RW-D4 的设置（lr 1e-4、100 步预热 + 余弦、3 epoch、D4）+ 细节恢复头，seed 0/1/2；
+- 每组按 Val-sel L 选一个 seed，记为 DR-S*、DR-W*。
+
+DR-P1：DR-S 三 seed 的 Val-rep L 均值减去 RS-D4 均值，落在 +0.002 到 +0.008 之间；按 seed 配对至少 2/3 为正。
+DR-P2：DR-S 在 K4 上的 BIoU 均值比 RS-D4 高 ≥ +0.005，IoU 均值也更高。
+DR-P3：DR-S 相对 RS-D4 的提升，乡村大于城市（用 L 的均值比较）。
+DR-P4：DR-W 均值减去 RW-D4 均值，落在 +0.001 到 +0.006 之间。
+DR-P5：DR-S* 和 DR-W* 里至少有一个，Val-rep LB 比 E0 高 ≥ +0.002。
+
+判定规则：
+DR-R1：每组选出的 seed 满足 Val-rep LB ≥ E0 的 LB + 0.002（即 ≥ 0.548636），并且 Urban、Rural 的 LB 都不低于 E0 超过 0.003，就算通过；两组都通过时取 Val-sel L 更高的那组；都不通过就保留 E0。
+DR-R2：如果 DR-S 均值比 RS-D4 均值高 ≥ +0.001，并且配对至少 2/3 为正，那么方向 3、4 默认加上细节恢复头；否则不加。
