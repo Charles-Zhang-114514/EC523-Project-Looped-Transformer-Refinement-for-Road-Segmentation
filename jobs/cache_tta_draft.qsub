@@ -1,0 +1,33 @@
+#!/bin/bash -l
+#$ -N ec523-cache-tta
+#$ -P ec523kb
+#$ -cwd
+#$ -pe omp 8
+#$ -l gpus=1
+#$ -l gpu_c=8.0
+#$ -l mem_per_core=8G
+#$ -l h_rt=01:00:00
+#$ -j y
+#$ -m ea
+#$ -o runs/logs/
+
+# 4191 images*.32 s = 1341.12 s (22.35 min) for TTA.
+# RG1/RG2 use one cached y0 and four refined outputs on 835 images:
+# 835*(.04+8*.012+5*.125)=635.435 s. Total 1976.555 s (32.94 min).
+# Request 60 min including writing about 16.38 GiB, loading and metric startup.
+source "${SGE_O_WORKDIR:?Submit from the repository root}/env.sh" || exit 1
+set -euo pipefail
+cd "$SGE_O_WORKDIR"
+export PYTHONPATH="$PWD:$PWD/src"
+export PYTHONDONTWRITEBYTECODE=1 OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1
+export HF_HUB_OFFLINE=1 TRANSFORMERS_OFFLINE=1 HF_HUB_DISABLE_TELEMETRY=1
+nvidia-smi --query-gpu=name,compute_mode --format=csv
+python - <<'PYINFO'
+import sys, torch
+from importlib.metadata import version
+print("Python:",sys.version.split()[0],flush=True)
+for name in ("torch","numpy","scipy","Pillow","transformers","safetensors"):
+    print(name,version(name),flush=True)
+PYINFO
+git rev-parse HEAD
+python -u scripts/cache_tta_draft.py --cache-dir runs/cache/tta_draft_a1i_s0

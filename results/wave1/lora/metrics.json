@@ -1,0 +1,498 @@
+{
+  "config": {
+    "seed": 0,
+    "epochs": 5,
+    "batch_size": 4,
+    "lr": 0.0001,
+    "weight_decay": 0,
+    "rank": 16,
+    "alpha": 16,
+    "warmup": 300,
+    "d4_aug": true,
+    "selection_per_domain": null,
+    "selection_images": 834,
+    "gradient_checkpointing": true
+  },
+  "parameters": {
+    "lora": 3145728,
+    "head": 656865,
+    "refiner": 1193025
+  },
+  "L0": {
+    "passed": true,
+    "maximum_pixel_difference": 0.0
+  },
+  "job": {
+    "job_id": 8766226,
+    "gpu": "NVIDIA L40S",
+    "source_head": "fe10d7b",
+    "wall_seconds": 2988,
+    "requested_seconds": 7741,
+    "failed": 0,
+    "exit_status": 0,
+    "training_peak_cuda_bytes": 5799431680,
+    "epoch_wall_seconds_note": "Whole-epoch wallclock was not recorded. Update seconds and selection wallclock are listed separately."
+  },
+  "provenance": {
+    "initial_head": "runs/draft_head/A1-i/best.pt",
+    "initialization_source": "scripts/train_lora_draft.py:88",
+    "attention_projections": [
+      "q_proj",
+      "k_proj",
+      "v_proj",
+      "o_proj"
+    ],
+    "blocks": 24,
+    "projection_verification": "Source and 3145728 adapter parameter count",
+    "checkpoint_bytes": {
+      "best.pt": 15279789,
+      "last.pt": 15279789
+    }
+  },
+  "gates": {
+    "LG1": {
+      "status": "not recorded",
+      "note": "No epoch-0 selection score; initialization L0 reports max pixel difference 0."
+    },
+    "LG2": {
+      "passed": true,
+      "selection_images": 834,
+      "report_images": 835,
+      "split_sha256": "bdd7d7a89237c96305f0ad404a5c9ae1254ed8cbc0b6e0e4fcc7b514bd323c68",
+      "exact_membership_all_epochs": true,
+      "exact_report_membership": true
+    }
+  },
+  "decisions": {
+    "B-P1": {
+      "met": false,
+      "reference_A": 0.538246,
+      "observed_A": 0.5250915013733346,
+      "A_gain": -0.0131544986266654,
+      "required_A_gain": [
+        0.005,
+        0.02
+      ],
+      "IoU_gain": -0.0068300100167137945,
+      "clDice_gain": -0.032646283700879075,
+      "IoU_gain_greater_than_clDice_gain": true
+    },
+    "B-R1": {
+      "met": false,
+      "observed_A": 0.5250915013733346,
+      "minimum_A": 0.543246,
+      "domains": {
+        "Urban": {
+          "actual": 0.562060868038877,
+          "reference": 0.566749782363382,
+          "minimum": 0.564749782363382,
+          "delta": -0.0046889143245050224,
+          "passed": false
+        },
+        "Rural": {
+          "actual": 0.45341698112800816,
+          "reference": 0.4837542119310475,
+          "minimum": 0.4817542119310475,
+          "delta": -0.03033723080303935,
+          "passed": false
+        }
+      },
+      "selected_encoder": "frozen"
+    }
+  },
+  "epochs": [
+    {
+      "epoch": 1,
+      "updates": 631,
+      "selection_A": 0.5258687924511738,
+      "train_update_seconds": 486.9287194615463,
+      "selection_wall_seconds": 46.69505663798191,
+      "recorded_phase_sum_seconds": 533.6237760995282,
+      "train_peak_cuda_bytes": 5799431680
+    },
+    {
+      "epoch": 2,
+      "updates": 631,
+      "selection_A": 0.5230118041424687,
+      "train_update_seconds": 484.5822693920927,
+      "selection_wall_seconds": 46.75395041500451,
+      "recorded_phase_sum_seconds": 531.3362198070972,
+      "train_peak_cuda_bytes": 5799431680
+    },
+    {
+      "epoch": 3,
+      "updates": 631,
+      "selection_A": 0.5155014430213225,
+      "train_update_seconds": 484.4522806571913,
+      "selection_wall_seconds": 47.08475078496849,
+      "recorded_phase_sum_seconds": 531.5370314421598,
+      "train_peak_cuda_bytes": 5799431680
+    },
+    {
+      "epoch": 4,
+      "updates": 631,
+      "selection_A": 0.5196898691228391,
+      "train_update_seconds": 484.2848025909625,
+      "selection_wall_seconds": 47.405096517002676,
+      "recorded_phase_sum_seconds": 531.6898991079652,
+      "train_peak_cuda_bytes": 5799431680
+    },
+    {
+      "epoch": 5,
+      "updates": 631,
+      "selection_A": 0.5173158427488437,
+      "train_update_seconds": 484.0222826334648,
+      "selection_wall_seconds": 47.09550393297104,
+      "recorded_phase_sum_seconds": 531.1177865664358,
+      "train_peak_cuda_bytes": 5799431680
+    }
+  ],
+  "best_epoch": 1,
+  "best_selection_A": 0.5258687924511738,
+  "last_minus_best_selection_A": -0.008552949702330115,
+  "evaluation_groups": {
+    "none": {
+      "Urban": {
+        "y0_draft": {
+          "counts": {
+            "valid": 340787183,
+            "intersection": 23536191,
+            "union": 35305935,
+            "predicted_skeleton": 659407,
+            "true_skeleton": 536072,
+            "skeleton_precision_hits": 421682,
+            "skeleton_recall_hits": 414965,
+            "boundary_intersection": 687359,
+            "boundary_union": 7379114
+          },
+          "scores": {
+            "road_iou": 0.6666355387557361,
+            "cldice": 0.7003774896429897,
+            "boundary_iou": 0.09314925884056,
+            "skeleton_precision": 0.6394866903141763,
+            "skeleton_recall": 0.774084451342357,
+            "quality": 0.562060868038877,
+            "counts": {
+              "valid": 340787183,
+              "intersection": 23536191,
+              "union": 35305935,
+              "predicted_skeleton": 659407,
+              "true_skeleton": 536072,
+              "skeleton_precision_hits": 421682,
+              "skeleton_recall_hits": 414965,
+              "boundary_intersection": 687359,
+              "boundary_union": 7379114
+            }
+          }
+        }
+      },
+      "Rural": {
+        "y0_draft": {
+          "counts": {
+            "valid": 512411151,
+            "intersection": 8064453,
+            "union": 16038592,
+            "predicted_skeleton": 293089,
+            "true_skeleton": 521605,
+            "skeleton_precision_hits": 241000,
+            "skeleton_recall_hits": 253936,
+            "boundary_intersection": 513402,
+            "boundary_union": 5539756
+          },
+          "scores": {
+            "road_iou": 0.5028155214622331,
+            "cldice": 0.611580119382516,
+            "boundary_iou": 0.09267592291068415,
+            "skeleton_precision": 0.8222758274790252,
+            "skeleton_recall": 0.4868358240430977,
+            "quality": 0.45341698112800816,
+            "counts": {
+              "valid": 512411151,
+              "intersection": 8064453,
+              "union": 16038592,
+              "predicted_skeleton": 293089,
+              "true_skeleton": 521605,
+              "skeleton_precision_hits": 241000,
+              "skeleton_recall_hits": 253936,
+              "boundary_intersection": 513402,
+              "boundary_union": 5539756
+            }
+          }
+        }
+      },
+      "Overall": {
+        "y0_draft": {
+          "counts": {
+            "valid": 853198334,
+            "intersection": 31600644,
+            "union": 51344527,
+            "predicted_skeleton": 952496,
+            "true_skeleton": 1057677,
+            "skeleton_precision_hits": 662682,
+            "skeleton_recall_hits": 668901,
+            "boundary_intersection": 1200761,
+            "boundary_union": 12918870
+          },
+          "scores": {
+            "road_iou": 0.6154627541899451,
+            "cldice": 0.6625695561959632,
+            "boundary_iou": 0.09294628709786537,
+            "skeleton_precision": 0.6957320555676875,
+            "skeleton_recall": 0.6324246438184814,
+            "quality": 0.5250915013733346,
+            "counts": {
+              "valid": 853198334,
+              "intersection": 31600644,
+              "union": 51344527,
+              "predicted_skeleton": 952496,
+              "true_skeleton": 1057677,
+              "skeleton_precision_hits": 662682,
+              "skeleton_recall_hits": 668901,
+              "boundary_intersection": 1200761,
+              "boundary_union": 12918870
+            }
+          }
+        }
+      }
+    },
+    "d4": {
+      "Urban": {
+        "y0_draft": {
+          "counts": {
+            "valid": 340787183,
+            "intersection": 23609837,
+            "union": 35138158,
+            "predicted_skeleton": 647623,
+            "true_skeleton": 536072,
+            "skeleton_precision_hits": 417916,
+            "skeleton_recall_hits": 414815,
+            "boundary_intersection": 680129,
+            "boundary_union": 7290263
+          },
+          "scores": {
+            "road_iou": 0.6719144754258319,
+            "cldice": 0.7037385372915758,
+            "boundary_iou": 0.09329279341499751,
+            "skeleton_precision": 0.6453075323143248,
+            "skeleton_recall": 0.7738046381829307,
+            "quality": 0.5657373575833882,
+            "counts": {
+              "valid": 340787183,
+              "intersection": 23609837,
+              "union": 35138158,
+              "predicted_skeleton": 647623,
+              "true_skeleton": 536072,
+              "skeleton_precision_hits": 417916,
+              "skeleton_recall_hits": 414815,
+              "boundary_intersection": 680129,
+              "boundary_union": 7290263
+            }
+          }
+        }
+      },
+      "Rural": {
+        "y0_draft": {
+          "counts": {
+            "valid": 512411151,
+            "intersection": 8053451,
+            "union": 15898342,
+            "predicted_skeleton": 284213,
+            "true_skeleton": 521605,
+            "skeleton_precision_hits": 239339,
+            "skeleton_recall_hits": 253108,
+            "boundary_intersection": 509493,
+            "boundary_union": 5478709
+          },
+          "scores": {
+            "road_iou": 0.5065591745353069,
+            "cldice": 0.6157082856020776,
+            "boundary_iou": 0.09299508333076277,
+            "skeleton_precision": 0.842111374215817,
+            "skeleton_recall": 0.485248415946933,
+            "quality": 0.45659108961442924,
+            "counts": {
+              "valid": 512411151,
+              "intersection": 8053451,
+              "union": 15898342,
+              "predicted_skeleton": 284213,
+              "true_skeleton": 521605,
+              "skeleton_precision_hits": 239339,
+              "skeleton_recall_hits": 253108,
+              "boundary_intersection": 509493,
+              "boundary_union": 5478709
+            }
+          }
+        }
+      },
+      "Overall": {
+        "y0_draft": {
+          "counts": {
+            "valid": 853198334,
+            "intersection": 31663288,
+            "union": 51036500,
+            "predicted_skeleton": 931836,
+            "true_skeleton": 1057677,
+            "skeleton_precision_hits": 657255,
+            "skeleton_recall_hits": 667923,
+            "boundary_intersection": 1189622,
+            "boundary_union": 12768972
+          },
+          "scores": {
+            "road_iou": 0.6204047691358145,
+            "cldice": 0.6663777487927189,
+            "boundary_iou": 0.09316505667018457,
+            "skeleton_precision": 0.705333341918535,
+            "skeleton_recall": 0.6314999758905602,
+            "quality": 0.5287487205397599,
+            "counts": {
+              "valid": 853198334,
+              "intersection": 31663288,
+              "union": 51036500,
+              "predicted_skeleton": 931836,
+              "true_skeleton": 1057677,
+              "skeleton_precision_hits": 657255,
+              "skeleton_recall_hits": 667923,
+              "boundary_intersection": 1189622,
+              "boundary_union": 12768972
+            }
+          }
+        }
+      }
+    }
+  },
+  "comparisons": [
+    {
+      "tta": "none",
+      "domain": "Overall",
+      "observed": {
+        "road_iou": 0.6154627541899451,
+        "cldice": 0.6625695561959632,
+        "boundary_iou": 0.09294628709786537,
+        "quality": 0.5250915013733346
+      },
+      "baseline": {
+        "road_iou": 0.6222927642066589,
+        "cldice": 0.6952158398968423,
+        "boundary_iou": 0.0926749341735806,
+        "quality": 0.5382461209070982
+      },
+      "delta": {
+        "road_iou": -0.0068300100167137945,
+        "cldice": -0.032646283700879075,
+        "boundary_iou": 0.0002713529242847762,
+        "quality": -0.013154619533763623
+      }
+    },
+    {
+      "tta": "none",
+      "domain": "Urban",
+      "observed": {
+        "road_iou": 0.6666355387557361,
+        "cldice": 0.7003774896429897,
+        "boundary_iou": 0.09314925884056,
+        "quality": 0.562060868038877
+      },
+      "baseline": {
+        "road_iou": 0.6658632643020084,
+        "cldice": 0.7217568194230823,
+        "boundary_iou": 0.08645552192726548,
+        "quality": 0.566749782363382
+      },
+      "delta": {
+        "road_iou": 0.0007722744537277393,
+        "cldice": -0.021379329780092604,
+        "boundary_iou": 0.006693736913294515,
+        "quality": -0.0046889143245050224
+      }
+    },
+    {
+      "tta": "none",
+      "domain": "Rural",
+      "observed": {
+        "road_iou": 0.5028155214622331,
+        "cldice": 0.611580119382516,
+        "boundary_iou": 0.09267592291068415,
+        "quality": 0.45341698112800816
+      },
+      "baseline": {
+        "road_iou": 0.5301918167635796,
+        "cldice": 0.6621049014323799,
+        "boundary_iou": 0.10013416559771868,
+        "quality": 0.4837542119310475
+      },
+      "delta": {
+        "road_iou": -0.027376295301346554,
+        "cldice": -0.05052478204986388,
+        "boundary_iou": -0.00745824268703453,
+        "quality": -0.03033723080303935
+      }
+    },
+    {
+      "tta": "d4",
+      "domain": "Overall",
+      "observed": {
+        "road_iou": 0.6204047691358145,
+        "cldice": 0.6663777487927189,
+        "boundary_iou": 0.09316505667018457,
+        "quality": 0.5287487205397599
+      },
+      "baseline": {
+        "road_iou": 0.6293406475103689,
+        "cldice": 0.7012979697793609,
+        "boundary_iou": 0.0937599145366937,
+        "quality": 0.5438116975963314
+      },
+      "delta": {
+        "road_iou": -0.00893587837455434,
+        "cldice": -0.03492022098664194,
+        "boundary_iou": -0.0005948578665091325,
+        "quality": -0.015062977056571558
+      }
+    },
+    {
+      "tta": "d4",
+      "domain": "Urban",
+      "observed": {
+        "road_iou": 0.6719144754258319,
+        "cldice": 0.7037385372915758,
+        "boundary_iou": 0.09329279341499751,
+        "quality": 0.5657373575833882
+      },
+      "baseline": {
+        "road_iou": 0.6717892766523061,
+        "cldice": 0.7241763837922114,
+        "boundary_iou": 0.08577439843637259,
+        "quality": 0.570302433151091
+      },
+      "delta": {
+        "road_iou": 0.000125198773525792,
+        "cldice": -0.020437846500635626,
+        "boundary_iou": 0.007518394978624915,
+        "quality": -0.004565075567702803
+      }
+    },
+    {
+      "tta": "d4",
+      "domain": "Rural",
+      "observed": {
+        "road_iou": 0.5065591745353069,
+        "cldice": 0.6157082856020776,
+        "boundary_iou": 0.09299508333076277,
+        "quality": 0.45659108961442924
+      },
+      "baseline": {
+        "road_iou": 0.5392948966692774,
+        "cldice": 0.6725485985402282,
+        "boundary_iou": 0.10337962796940559,
+        "quality": 0.49208795349058826
+      },
+      "delta": {
+        "road_iou": -0.03273572213397058,
+        "cldice": -0.05684031293815062,
+        "boundary_iou": -0.010384544638642815,
+        "quality": -0.035496863876159024
+      }
+    }
+  ],
+  "ensemble_y0_status": "not recorded"
+}

@@ -1,0 +1,31 @@
+audit_no,red_main,real_road_pct,blue_notable,wrong_connection,confidence,note
+1,A,100,N,N,3,
+2,B,100,Y,N,3,Upper-left road is labeled only halfway; the label stops midway.
+3,A+C,50,N,N,2,The red blob on the right is a genuine model error (C); there is also an unlabeled side road below (A).
+4,A,75,Y,Y,2,
+5,B+A,100,N,N,3,Road at the factory's left entrance is not labeled at full width (B); road above the factory is unlabeled (A).
+6,A,100,N,N,3,
+7,A,75,Y,N,3,
+8,A,100,N,N,3,
+9,A,100,Y,N,3,
+10,A+C,50,Y,Y,2,The diagonal road at upper left is a genuine model error: two parallel roads were merged into one. The small diagonal road at upper left and the road at upper right are unlabeled.
+11,A,100,Y,N,3,
+12,D,0,Y,N,3,Almost no red.
+13,A,100,N,N,3,
+14,A,100,Y,N,3,
+15,A,100,Y,N,3,
+16,A,100,N,N,3,
+17,A,100,N,N,3,
+18,D,,,,1,Almost no red.
+19,A,100,Y,Y,3,The side road parallel to the horizontal main road on the right is unlabeled; the model merged the side road and the main road into one.
+20,A,100,N,Y,3,
+21,A,100,N,N,3,Typical example: at K=1 the refiner misses the small road at the top; by K=4 it covers it completely. This road is not labeled.
+22,B,100,N,Y,2,"A horizontal road in the middle is unlabeled (A). On the vertical road, the model merged the road with a roadside parking lot in one segment (B)."
+23,A,100,Y,N,3,
+24,A,100,N,N,3,
+25,B,100,N,N,3,Only the beginnings of the two branch roads are labeled.
+26,B,75,Y,N,2,
+27,A,25,N,Y,1,Unsure about the red locations; the label seems to cover the road fully.
+28,C,0,N,N,3,Label is fine. The upper-right area is a rooftop that the model predicted as road.
+29,A,100,N,N,3,
+30,A,75,Y,N,2,

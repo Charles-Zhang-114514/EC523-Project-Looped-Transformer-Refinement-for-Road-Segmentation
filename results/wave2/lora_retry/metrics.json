@@ -1,0 +1,711 @@
+{
+  "preregistration": "e58dfa0",
+  "gates": {
+    "LG": {
+      "status": "PASS",
+      "frozen_head_unchanged": true,
+      "marker_line": 1278
+    }
+  },
+  "jobs": [
+    {
+      "job_id": 8779166,
+      "run": "LC",
+      "host": "scc-512.scc.bu.edu",
+      "start_epoch": 1795150258,
+      "end_epoch": 1795151661,
+      "failed": 0,
+      "exit_status": 0,
+      "wall_seconds": 1403,
+      "gpu": "NVIDIA L40S",
+      "compute_mode": "Exclusive_Process",
+      "normal_end": true,
+      "log": "runs/logs/ec523-lora-retry.o8779166",
+      "completion_line": 3171,
+      "peak_cuda_bytes": 4046129664,
+      "best_epoch": 2,
+      "best_step": null,
+      "epochs_completed": 5,
+      "updates": 3155,
+      "checkpoints": {
+        "best.pt": {
+          "exists": true,
+          "bytes": 2648300
+        },
+        "last.pt": {
+          "exists": true,
+          "bytes": 2648300
+        }
+      }
+    },
+    {
+      "job_id": 8779165,
+      "run": "LA",
+      "host": "scc-j07.scc.bu.edu",
+      "start_epoch": 1795150258,
+      "end_epoch": 1795152259,
+      "failed": 0,
+      "exit_status": 0,
+      "wall_seconds": 2001,
+      "gpu": "NVIDIA L40S",
+      "compute_mode": "Exclusive_Process",
+      "normal_end": true,
+      "log": "runs/logs/ec523-lora-retry.o8779165",
+      "completion_line": 1279,
+      "peak_cuda_bytes": 5792317440,
+      "best_epoch": 1,
+      "best_step": 200,
+      "epochs_completed": 2,
+      "updates": 1262,
+      "checkpoints": {
+        "best.pt": {
+          "exists": true,
+          "bytes": 15279917
+        },
+        "last.pt": {
+          "exists": true,
+          "bytes": 15279853
+        }
+      }
+    }
+  ],
+  "configuration_validation": {
+    "LA": {
+      "passed": true,
+      "config": {
+        "seed": 0,
+        "epochs": 2,
+        "batch_size": 4,
+        "lr": 2e-05,
+        "weight_decay": 0,
+        "rank": 16,
+        "alpha": 16,
+        "warmup": 100,
+        "d4_aug": true,
+        "selection_per_domain": null,
+        "selection_images": 834,
+        "gradient_checkpointing": true,
+        "freeze_head": true,
+        "no_lora": false,
+        "eval_every_steps": 200
+      },
+      "selection_images": 834,
+      "report_images": 835
+    },
+    "LC": {
+      "passed": true,
+      "config": {
+        "seed": 0,
+        "epochs": 5,
+        "batch_size": 4,
+        "lr": 0.0001,
+        "weight_decay": 0,
+        "rank": 16,
+        "alpha": 16,
+        "warmup": 300,
+        "d4_aug": true,
+        "selection_per_domain": null,
+        "selection_images": 834,
+        "gradient_checkpointing": false,
+        "freeze_head": false,
+        "no_lora": true,
+        "eval_every_steps": 0
+      },
+      "selection_images": 834,
+      "report_images": 835
+    }
+  },
+  "baseline": {
+    "Overall": {
+      "none": {
+        "road_iou": 0.6222927642066589,
+        "cldice": 0.6952158398968423,
+        "boundary_iou": 0.0926749341735806,
+        "quality": 0.5382461209070982
+      },
+      "d4": {
+        "road_iou": 0.6293406475103689,
+        "cldice": 0.7012979697793609,
+        "boundary_iou": 0.0937599145366937,
+        "quality": 0.5438116975963314
+      }
+    },
+    "Urban": {
+      "none": {
+        "road_iou": 0.6658632643020084,
+        "cldice": 0.7217568194230823,
+        "boundary_iou": 0.08645552192726548,
+        "quality": 0.566749782363382
+      },
+      "d4": {
+        "road_iou": 0.6717892766523061,
+        "cldice": 0.7241763837922114,
+        "boundary_iou": 0.08577439843637259,
+        "quality": 0.570302433151091
+      }
+    },
+    "Rural": {
+      "none": {
+        "road_iou": 0.5301918167635796,
+        "cldice": 0.6621049014323799,
+        "boundary_iou": 0.10013416559771868,
+        "quality": 0.4837542119310475
+      },
+      "d4": {
+        "road_iou": 0.5392948966692774,
+        "cldice": 0.6725485985402282,
+        "boundary_iou": 0.10337962796940559,
+        "quality": 0.49208795349058826
+      }
+    }
+  },
+  "runs": {
+    "LA": {
+      "config": {
+        "seed": 0,
+        "epochs": 2,
+        "batch_size": 4,
+        "lr": 2e-05,
+        "weight_decay": 0,
+        "rank": 16,
+        "alpha": 16,
+        "warmup": 100,
+        "d4_aug": true,
+        "selection_per_domain": null,
+        "selection_images": 834,
+        "gradient_checkpointing": true,
+        "freeze_head": true,
+        "no_lora": false,
+        "eval_every_steps": 200
+      },
+      "L0": {
+        "passed": true,
+        "maximum_pixel_difference": 0.0
+      },
+      "best_epoch": 1,
+      "best_step": 200,
+      "best_selection_A": 0.5389824797914375,
+      "epoch_curve": [
+        {
+          "epoch": 1,
+          "selection_A": 0.5356731713880861
+        },
+        {
+          "epoch": 2,
+          "selection_A": 0.5348705267092719
+        }
+      ],
+      "step_curve": [
+        {
+          "step": 200,
+          "epoch": 1,
+          "selection_A": 0.5389824797914375
+        },
+        {
+          "step": 400,
+          "epoch": 1,
+          "selection_A": 0.5348813031407987
+        },
+        {
+          "step": 600,
+          "epoch": 1,
+          "selection_A": 0.5360258521159295
+        },
+        {
+          "step": 631,
+          "epoch": 1,
+          "selection_A": 0.5356731713880861
+        },
+        {
+          "step": 800,
+          "epoch": 2,
+          "selection_A": 0.5351152695946253
+        },
+        {
+          "step": 1000,
+          "epoch": 2,
+          "selection_A": 0.5348566161673266
+        },
+        {
+          "step": 1200,
+          "epoch": 2,
+          "selection_A": 0.5348497402269801
+        },
+        {
+          "step": 1262,
+          "epoch": 2,
+          "selection_A": 0.5348705267092719
+        }
+      ],
+      "evaluation_groups": {
+        "none": {
+          "Urban": {
+            "road_iou": 0.6741385265625636,
+            "cldice": 0.7222317931564959,
+            "boundary_iou": 0.09286603075130581,
+            "quality": 0.5723120073784916
+          },
+          "Rural": {
+            "road_iou": 0.5247113268440144,
+            "cldice": 0.6449124791049105,
+            "boundary_iou": 0.10129759629297812,
+            "quality": 0.476088926412076
+          },
+          "Overall": {
+            "road_iou": 0.6261427347776675,
+            "cldice": 0.6877563009782185,
+            "boundary_iou": 0.09665456918185861,
+            "quality": 0.5387291715186711
+          }
+        },
+        "d4": {
+          "Urban": {
+            "road_iou": 0.6796021178070187,
+            "cldice": 0.7233741968630971,
+            "boundary_iou": 0.09124722739176393,
+            "quality": 0.5750627634407913
+          },
+          "Rural": {
+            "road_iou": 0.5332952452085603,
+            "cldice": 0.6536000895337152,
+            "boundary_iou": 0.10405546537641304,
+            "quality": 0.4835387425396773
+          },
+          "Overall": {
+            "road_iou": 0.6328163471757766,
+            "cldice": 0.6925748419660317,
+            "boundary_iou": 0.09699301776173204,
+            "quality": 0.5435792297300442
+          }
+        }
+      },
+      "comparisons": [
+        {
+          "mode": "none",
+          "domain": "Overall",
+          "baseline": {
+            "road_iou": 0.6222927642066589,
+            "cldice": 0.6952158398968423,
+            "boundary_iou": 0.0926749341735806,
+            "quality": 0.5382461209070982
+          },
+          "actual": {
+            "road_iou": 0.6261427347776675,
+            "cldice": 0.6877563009782185,
+            "boundary_iou": 0.09665456918185861,
+            "quality": 0.5387291715186711
+          },
+          "delta": {
+            "road_iou": 0.003849970571008554,
+            "cldice": -0.0074595389186238314,
+            "boundary_iou": 0.003979635008278012,
+            "quality": 0.0004830506115728328
+          }
+        },
+        {
+          "mode": "none",
+          "domain": "Urban",
+          "baseline": {
+            "road_iou": 0.6658632643020084,
+            "cldice": 0.7217568194230823,
+            "boundary_iou": 0.08645552192726548,
+            "quality": 0.566749782363382
+          },
+          "actual": {
+            "road_iou": 0.6741385265625636,
+            "cldice": 0.7222317931564959,
+            "boundary_iou": 0.09286603075130581,
+            "quality": 0.5723120073784916
+          },
+          "delta": {
+            "road_iou": 0.008275262260555194,
+            "cldice": 0.00047497373341354177,
+            "boundary_iou": 0.006410508824040331,
+            "quality": 0.005562225015109612
+          }
+        },
+        {
+          "mode": "none",
+          "domain": "Rural",
+          "baseline": {
+            "road_iou": 0.5301918167635796,
+            "cldice": 0.6621049014323799,
+            "boundary_iou": 0.10013416559771868,
+            "quality": 0.4837542119310475
+          },
+          "actual": {
+            "road_iou": 0.5247113268440144,
+            "cldice": 0.6449124791049105,
+            "boundary_iou": 0.10129759629297812,
+            "quality": 0.476088926412076
+          },
+          "delta": {
+            "road_iou": -0.005480489919565179,
+            "cldice": -0.017192422327469425,
+            "boundary_iou": 0.0011634306952594403,
+            "quality": -0.007665285518971499
+          }
+        },
+        {
+          "mode": "d4",
+          "domain": "Overall",
+          "baseline": {
+            "road_iou": 0.6293406475103689,
+            "cldice": 0.7012979697793609,
+            "boundary_iou": 0.0937599145366937,
+            "quality": 0.5438116975963314
+          },
+          "actual": {
+            "road_iou": 0.6328163471757766,
+            "cldice": 0.6925748419660317,
+            "boundary_iou": 0.09699301776173204,
+            "quality": 0.5435792297300442
+          },
+          "delta": {
+            "road_iou": 0.0034756996654077277,
+            "cldice": -0.008723127813329179,
+            "boundary_iou": 0.0032331032250383362,
+            "quality": -0.0002324678662871671
+          }
+        },
+        {
+          "mode": "d4",
+          "domain": "Urban",
+          "baseline": {
+            "road_iou": 0.6717892766523061,
+            "cldice": 0.7241763837922114,
+            "boundary_iou": 0.08577439843637259,
+            "quality": 0.570302433151091
+          },
+          "actual": {
+            "road_iou": 0.6796021178070187,
+            "cldice": 0.7233741968630971,
+            "boundary_iou": 0.09124722739176393,
+            "quality": 0.5750627634407913
+          },
+          "delta": {
+            "road_iou": 0.007812841154712591,
+            "cldice": -0.000802186929114268,
+            "boundary_iou": 0.0054728289553913345,
+            "quality": 0.004760330289700354
+          }
+        },
+        {
+          "mode": "d4",
+          "domain": "Rural",
+          "baseline": {
+            "road_iou": 0.5392948966692774,
+            "cldice": 0.6725485985402282,
+            "boundary_iou": 0.10337962796940559,
+            "quality": 0.49208795349058826
+          },
+          "actual": {
+            "road_iou": 0.5332952452085603,
+            "cldice": 0.6536000895337152,
+            "boundary_iou": 0.10405546537641304,
+            "quality": 0.4835387425396773
+          },
+          "delta": {
+            "road_iou": -0.005999651460717126,
+            "cldice": -0.018948509006513015,
+            "boundary_iou": 0.0006758374070074541,
+            "quality": -0.008549210950910935
+          }
+        }
+      ],
+      "last_minus_best": -0.004111953082165609
+    },
+    "LC": {
+      "config": {
+        "seed": 0,
+        "epochs": 5,
+        "batch_size": 4,
+        "lr": 0.0001,
+        "weight_decay": 0,
+        "rank": 16,
+        "alpha": 16,
+        "warmup": 300,
+        "d4_aug": true,
+        "selection_per_domain": null,
+        "selection_images": 834,
+        "gradient_checkpointing": false,
+        "freeze_head": false,
+        "no_lora": true,
+        "eval_every_steps": 0
+      },
+      "L0": {
+        "passed": true,
+        "maximum_pixel_difference": 0.0
+      },
+      "best_epoch": 2,
+      "best_step": null,
+      "best_selection_A": 0.5283386878257554,
+      "epoch_curve": [
+        {
+          "epoch": 1,
+          "selection_A": 0.5271553857246614
+        },
+        {
+          "epoch": 2,
+          "selection_A": 0.5283386878257554
+        },
+        {
+          "epoch": 3,
+          "selection_A": 0.5227759866828484
+        },
+        {
+          "epoch": 4,
+          "selection_A": 0.5261624633033488
+        },
+        {
+          "epoch": 5,
+          "selection_A": 0.5247758032141971
+        }
+      ],
+      "step_curve": [],
+      "evaluation_groups": {
+        "none": {
+          "Urban": {
+            "road_iou": 0.6665660235063958,
+            "cldice": 0.7107303324946999,
+            "boundary_iou": 0.09014597358594022,
+            "quality": 0.5645313062187959
+          },
+          "Rural": {
+            "road_iou": 0.507292328359711,
+            "cldice": 0.6311110693198463,
+            "boundary_iou": 0.09027102557562354,
+            "quality": 0.46103369009093415
+          },
+          "Overall": {
+            "road_iou": 0.6160865238908283,
+            "cldice": 0.6760942709096993,
+            "boundary_iou": 0.09020101492096717,
+            "quality": 0.5289117462025174
+          }
+        },
+        "d4": {
+          "Urban": {
+            "road_iou": 0.6710081477011909,
+            "cldice": 0.713616796166135,
+            "boundary_iou": 0.0899061004415692,
+            "quality": 0.5675703327887498
+          },
+          "Rural": {
+            "road_iou": 0.5146488181479881,
+            "cldice": 0.6363400051885314,
+            "boundary_iou": 0.09158750296086751,
+            "quality": 0.466543911222727
+          },
+          "Overall": {
+            "road_iou": 0.6217210904169584,
+            "cldice": 0.6802567341871494,
+            "boundary_iou": 0.090643327087184,
+            "quality": 0.5330662308820608
+          }
+        }
+      },
+      "comparisons": [
+        {
+          "mode": "none",
+          "domain": "Overall",
+          "baseline": {
+            "road_iou": 0.6222927642066589,
+            "cldice": 0.6952158398968423,
+            "boundary_iou": 0.0926749341735806,
+            "quality": 0.5382461209070982
+          },
+          "actual": {
+            "road_iou": 0.6160865238908283,
+            "cldice": 0.6760942709096993,
+            "boundary_iou": 0.09020101492096717,
+            "quality": 0.5289117462025174
+          },
+          "delta": {
+            "road_iou": -0.006206240315830613,
+            "cldice": -0.01912156898714301,
+            "boundary_iou": -0.0024739192526134213,
+            "quality": -0.009334374704580872
+          }
+        },
+        {
+          "mode": "none",
+          "domain": "Urban",
+          "baseline": {
+            "road_iou": 0.6658632643020084,
+            "cldice": 0.7217568194230823,
+            "boundary_iou": 0.08645552192726548,
+            "quality": 0.566749782363382
+          },
+          "actual": {
+            "road_iou": 0.6665660235063958,
+            "cldice": 0.7107303324946999,
+            "boundary_iou": 0.09014597358594022,
+            "quality": 0.5645313062187959
+          },
+          "delta": {
+            "road_iou": 0.0007027592043874487,
+            "cldice": -0.011026486928382484,
+            "boundary_iou": 0.003690451658674737,
+            "quality": -0.0022184761445861456
+          }
+        },
+        {
+          "mode": "none",
+          "domain": "Rural",
+          "baseline": {
+            "road_iou": 0.5301918167635796,
+            "cldice": 0.6621049014323799,
+            "boundary_iou": 0.10013416559771868,
+            "quality": 0.4837542119310475
+          },
+          "actual": {
+            "road_iou": 0.507292328359711,
+            "cldice": 0.6311110693198463,
+            "boundary_iou": 0.09027102557562354,
+            "quality": 0.46103369009093415
+          },
+          "delta": {
+            "road_iou": -0.022899488403868573,
+            "cldice": -0.030993832112533592,
+            "boundary_iou": -0.009863140022095138,
+            "quality": -0.02272052184011336
+          }
+        },
+        {
+          "mode": "d4",
+          "domain": "Overall",
+          "baseline": {
+            "road_iou": 0.6293406475103689,
+            "cldice": 0.7012979697793609,
+            "boundary_iou": 0.0937599145366937,
+            "quality": 0.5438116975963314
+          },
+          "actual": {
+            "road_iou": 0.6217210904169584,
+            "cldice": 0.6802567341871494,
+            "boundary_iou": 0.090643327087184,
+            "quality": 0.5330662308820608
+          },
+          "delta": {
+            "road_iou": -0.007619557093410445,
+            "cldice": -0.021041235592211494,
+            "boundary_iou": -0.0031165874495096973,
+            "quality": -0.010745466714270568
+          }
+        },
+        {
+          "mode": "d4",
+          "domain": "Urban",
+          "baseline": {
+            "road_iou": 0.6717892766523061,
+            "cldice": 0.7241763837922114,
+            "boundary_iou": 0.08577439843637259,
+            "quality": 0.570302433151091
+          },
+          "actual": {
+            "road_iou": 0.6710081477011909,
+            "cldice": 0.713616796166135,
+            "boundary_iou": 0.0899061004415692,
+            "quality": 0.5675703327887498
+          },
+          "delta": {
+            "road_iou": -0.0007811289511152619,
+            "cldice": -0.010559587626076339,
+            "boundary_iou": 0.004131702005196608,
+            "quality": -0.002732100362341172
+          }
+        },
+        {
+          "mode": "d4",
+          "domain": "Rural",
+          "baseline": {
+            "road_iou": 0.5392948966692774,
+            "cldice": 0.6725485985402282,
+            "boundary_iou": 0.10337962796940559,
+            "quality": 0.49208795349058826
+          },
+          "actual": {
+            "road_iou": 0.5146488181479881,
+            "cldice": 0.6363400051885314,
+            "boundary_iou": 0.09158750296086751,
+            "quality": 0.466543911222727
+          },
+          "delta": {
+            "road_iou": -0.024646078521289305,
+            "cldice": -0.036208593351696794,
+            "boundary_iou": -0.011792125008538074,
+            "quality": -0.025544042267861278
+          }
+        }
+      ],
+      "last_minus_best": -0.0035628846115582924
+    }
+  },
+  "first_LoRA_curve": [
+    {
+      "epoch": 1,
+      "selection_A": 0.5258687924511738
+    },
+    {
+      "epoch": 2,
+      "selection_A": 0.5230118041424687
+    },
+    {
+      "epoch": 3,
+      "selection_A": 0.5155014430213225
+    },
+    {
+      "epoch": 4,
+      "selection_A": 0.5196898691228391
+    },
+    {
+      "epoch": 5,
+      "selection_A": 0.5173158427488437
+    }
+  ],
+  "decisions": {
+    "LA-P1": {
+      "status": "MET",
+      "A": 0.5387291715186711,
+      "baseline_registered": 0.538246,
+      "delta": 0.000483171518671055,
+      "interval": [
+        -0.003,
+        0.008
+      ]
+    },
+    "LA-R1": {
+      "status": "NOT_MET",
+      "A": 0.5387291715186711,
+      "minimum_A": 0.543246,
+      "domain_deltas": {
+        "Urban": 0.005562225015109612,
+        "Rural": -0.007665285518971499
+      },
+      "minimum_domain_delta": -0.002,
+      "outcome": "Abandon LoRA; do not retry"
+    },
+    "LC-P1": {
+      "status": "NOT_MET; qualitative curve component",
+      "best_epoch": 2,
+      "best_epoch_one": false,
+      "report_A": 0.5289117462025174,
+      "maximum_A": 0.533,
+      "A_bound_met": true,
+      "curve_reading": "Observed peak at epoch 2, decline at 3, rebound at 4 and decline at 5. All post-peak values stay below peak. No decline threshold is introduced."
+    },
+    "LC-R1": {
+      "status": "Qualitative else branch because LC-P1 is not met",
+      "outcome": "Observed registered wording: degradation is related to LoRA.",
+      "limitation": "Registered wording is not independent causal evidence; LC also degrades relative to A1-i s0."
+    }
+  },
+  "LC_post_result_observation": {
+    "LC_epoch1_A": 0.5271553857246614,
+    "first_LoRA_epoch1_A": 0.5258687924511738,
+    "difference": 0.0012865932734875685,
+    "text": "Observed LC epoch-1 Val-sel A=0.527155385725 versus first LoRA A=0.525868792451, a difference of 0.001286593273 (about 0.0013). Observed that continuing to train only the head without LoRA also produces a decline of almost the same magnitude at the first epoch. Observed that, with the LC report-A bound already satisfied, the literal LC-R1 branch in this comparison depends only on whether the best epoch is 1. Observed this condition does not represent the intended question well; the registered literal verdict is retained alongside this descriptive limitation.",
+    "rule_changed": false
+  }
+}

@@ -1,0 +1,49 @@
+#!/bin/bash -l
+#$ -N ec523-draft-head-v3
+#$ -P ec523kb
+#$ -cwd
+#$ -pe omp 8
+#$ -l gpus=1
+#$ -l gpu_c=8.0
+#$ -l mem_per_core=8G
+#$ -l h_rt=01:15:00
+#$ -j y
+#$ -m ea
+#$ -o runs/logs/
+
+# L40S observed A1-i training, selection and reporting take about 32 min.
+# Encoder work is (10*2522 + 10*200 + 835)*0.05 = 1402.75 s (23.38 min).
+# The 32 min measurement already includes that work. Allow 43 additional min
+# for image augmentation, data I/O and node variation on the same GPU model.
+source "${SGE_O_WORKDIR:?Submit from the repository root}/env.sh" || exit 1
+set -euo pipefail
+cd "$SGE_O_WORKDIR"
+: "${EC523_DATA_DIR:?Set EC523_DATA_DIR in env.sh}"
+: "${EC523_STARTER_DIR:?Set EC523_STARTER_DIR in env.sh}"
+export PYTHONPATH="$PWD/src:$PWD"
+export PYTHONDONTWRITEBYTECODE=1 OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1
+export HF_HUB_OFFLINE=1 TRANSFORMERS_OFFLINE=1 HF_HUB_DISABLE_TELEMETRY=1
+
+case "${ARM:-}:${SEED:-}" in
+    A1-i:1) options=() ;;
+    v3a:0|v3a:1) options=(--lr-schedule cosine) ;;
+    v3b:0|v3b:1) options=(--lr-schedule cosine --d4-aug) ;;
+    *) printf '%s\n' 'Set ARM=A1-i with SEED=1, or ARM=v3a/v3b with SEED=0/1.' >&2; exit 2 ;;
+esac
+python - <<'PYINFO'
+from importlib.metadata import version
+import sys
+import torch
+
+print("GPU:", torch.cuda.get_device_name(), flush=True)
+print("Python:", sys.version.split()[0], "CUDA:", torch.version.cuda, flush=True)
+packages = ("torch", "numpy", "scipy", "scikit-image", "Pillow", "safetensors", "transformers", "torchvision")
+print("Versions:", " ".join(f"{name}={version(name)}" for name in packages), flush=True)
+PYINFO
+git rev-parse HEAD
+
+run="runs/draft_head_v3/${ARM}_s${SEED}"
+python -u scripts/train_draft_head.py --draft-layers last --epochs 10 --batch-size 8 \
+    --lr 1e-3 --seed "$SEED" --select-per-domain 100 --val-split configs/val_split_seed0.json \
+    --device cuda --loader-workers 7 --eval-loader-workers 1 --metric-workers 6 \
+    --save-last --out-dir "$run/report" --ckpt-dir "$run/checkpoints" "${options[@]}"

@@ -1,0 +1,56 @@
+#!/bin/bash -l
+#$ -N ec523-refiner-tta
+#$ -P ec523kb
+#$ -cwd
+#$ -pe omp 8
+#$ -l gpus=1
+#$ -l gpu_c=8.0
+#$ -l mem_per_core=8G
+#$ -l h_rt=02:30:00
+#$ -j y
+#$ -m ea
+#$ -o runs/logs/
+
+# Immediately reject submission before a successful full cache is available.
+if [[ ! -f "${SGE_O_WORKDIR:?}/runs/cache/tta_draft_a1i_s0/manifest.json" ]]; then
+    echo "Missing completed TTA draft manifest; finish cache job first." >&2
+    exit 2
+fi
+# RS: observed e6 45 min + 10*(834-200)*(.04+4*.012+3*.125)/60
+# = 93.92 min. Request 150 min for cache I/O and runtime variation.
+# RW has 3 epochs; the same conservative request also covers it.
+source "${SGE_O_WORKDIR:?Submit from the repository root}/env.sh" || exit 1
+set -euo pipefail
+cd "$SGE_O_WORKDIR"
+export PYTHONPATH="$PWD:$PWD/src"
+export PYTHONDONTWRITEBYTECODE=1 OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1
+export HF_HUB_OFFLINE=1 TRANSFORMERS_OFFLINE=1 HF_HUB_DISABLE_TELEMETRY=1
+nvidia-smi --query-gpu=name,compute_mode --format=csv
+python - <<'PYINFO'
+import sys, torch
+from importlib.metadata import version
+print("Python:",sys.version.split()[0],flush=True)
+for name in ("torch","numpy","scipy","Pillow","transformers","safetensors"):
+    print(name,version(name),flush=True)
+PYINFO
+git rev-parse HEAD
+
+python - <<'PYCACHE'
+import json
+from pathlib import Path
+m=json.loads(Path("runs/cache/tta_draft_a1i_s0/manifest.json").read_text())
+if m.get("smoke") or not m.get("gates_passed") or m["total_images"] != 4191:
+    raise SystemExit("A complete regression-passed full cache is required")
+PYCACHE
+case "${ARM:-}:${SEED:-}" in
+    RS:0|RS:1|RS:2) EPOCHS=10; LR=3e-4; WARMUP=500; INIT=() ;;
+    RW:0|RW:1|RW:2) EPOCHS=3; LR=1e-4; WARMUP=100; INIT=(--init-refiner runs/exp/e6_convdraft_s0/best.pt) ;;
+    *) echo "Set ARM=RS|RW and SEED=0|1|2" >&2; exit 2 ;;
+esac
+python -u scripts/train_refiner.py --head-type conv_upsample --epochs "$EPOCHS" \
+    --lr "$LR" --warmup-steps "$WARMUP" --batch-size 4 --k-train 4 --pos-weight 4 \
+    --seed "$SEED" --device cuda --select-every 1 --select-per-domain all \
+    --selection-ks 1:0.2,2:0.2,4:0.6 --val-split configs/val_split_seed0.json \
+    --eval-extra --eval-k 1,2,4,8 --probe-ckpt runs/draft_head/A1-i/best.pt \
+    --draft-cache runs/cache/tta_draft_a1i_s0 "${INIT[@]}" \
+    --out-dir "runs/wave2/${ARM}_s${SEED}/report" --ckpt-dir "runs/wave2/${ARM}_s${SEED}/checkpoints"

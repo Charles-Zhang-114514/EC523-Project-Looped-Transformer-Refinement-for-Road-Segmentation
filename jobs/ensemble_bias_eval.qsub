@@ -1,0 +1,45 @@
+#!/bin/bash -l
+#$ -N ec523-ensemble-bias
+#$ -P ec523kb
+#$ -cwd
+#$ -pe omp 8
+#$ -l gpus=1
+#$ -l gpu_c=8.0
+#$ -l mem_per_core=8G
+#$ -l h_rt=06:00:00
+#$ -j y
+#$ -m ea
+#$ -o runs/logs/
+
+# L40S estimate for 1669 images, eight shared views:
+# encoder 1669*8*.04=534.08 s; three K8 trajectories 1669*3*8*.012=480.672 s.
+# Base metric groups: 1669*3*4*.125=2503.5 s.
+# Bias selection conservatively scores all four stored K: 834*31*4*.125=12927 s.
+# Selected biased report: 835*4*.125=417.5 s.
+# Sum 16862.752 s (281.05 min). Request 360 min, with 78.95 min for six heads,
+# scratch I/O, startup and variability. Rates are effective six-worker rates.
+# Temporary logits use about 3*834*4*1024*1024*4 = 40 GiB plus labels.
+source "${SGE_O_WORKDIR:?Submit from the repository root}/env.sh" || exit 1
+set -euo pipefail
+cd "$SGE_O_WORKDIR"
+export PYTHONPATH="$PWD:$PWD/src"
+export PYTHONDONTWRITEBYTECODE=1 OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1
+export HF_HUB_OFFLINE=1 TRANSFORMERS_OFFLINE=1 HF_HUB_DISABLE_TELEMETRY=1
+python - <<'PYINFO'
+import sys, torch
+from importlib.metadata import version
+print("GPU:", torch.cuda.get_device_name(), flush=True)
+print("Python:", sys.version.split()[0], flush=True)
+for name in ("torch", "numpy", "scipy", "Pillow", "transformers", "safetensors"):
+    print(name, version(name), flush=True)
+PYINFO
+git rev-parse HEAD
+
+test -d "${TMPDIR:?Set TMPDIR}"
+python - <<'PYSPACE'
+import os, shutil
+if shutil.disk_usage(os.environ["TMPDIR"]).free < 48*1024**3:
+    raise SystemExit("Need 48 GiB free temporary space")
+PYSPACE
+python -u analysis/evaluate_draft_tta.py --ensemble-bias --tta d4 --device cuda \
+    --loader-workers 1 --metric-workers 6 --out-dir runs/wave1/ensemble_bias
