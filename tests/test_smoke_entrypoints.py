@@ -78,7 +78,7 @@ class SmokeEntrypointTests(unittest.TestCase):
                 path.write_text(json.dumps(dict(epochs=[dict(loss=.5,batches=[dict(loss=.5)]*20)],
                                                evaluation=dict(images=images),frozen_head_unchanged=True)))
                 return subprocess.CompletedProcess(command,0)
-            report=dict(cache=dict(gates_passed=True))
+            report=dict(cache=dict(gates_passed=True,passed=True,exit_code=0))
             output=io.StringIO()
             with patch.object(smoke.subprocess,"run",side_effect=process),redirect_stdout(output):
                 smoke.run_stages(commands,out,report)

@@ -2,8 +2,8 @@
 """Run four independent short GPU checks through the production training CLIs."""
 import argparse
 from collections import deque
-import gc
 import json
+import math
 import os
 from pathlib import Path
 import subprocess
@@ -12,11 +12,13 @@ import tempfile
 import time
 import traceback
 
-import torch
-
 ROOT = Path(__file__).resolve().parents[1]
 sys.path[:0] = [str(ROOT), str(ROOT/"src")]
-from scripts import cache_tta_draft as build
+
+
+def cache_command(cache_dir):
+    return [sys.executable, "-u", "scripts/cache_tta_draft.py", "--cache-dir", str(cache_dir),
+            "--smoke", "--per-domain", "2", "--training-entrypoints"]
 
 
 def stage_commands(cache_dir, out):
@@ -60,6 +62,14 @@ def run_stage(arm, command, out):
             record["log_tail"] = list(deque(stream, maxlen=12))
         if result.returncode:
             return record
+        if arm == "cache":
+            cache_dir = Path(command[command.index("--cache-dir")+1])
+            manifest = json.loads((cache_dir/"manifest.json").read_text())
+            record.update(manifest)
+            if not manifest.get("gates_passed") or not manifest.get("smoke") or manifest["total_images"] != 12:
+                raise ValueError("Smoke cache gate or sample count did not pass")
+            record["passed"] = True
+            return record
         path = out/arm/("report/metrics.json" if arm in ("RS","RW") else "metrics.json")
         data = json.loads(path.read_text())
         updates = sum(len(epoch["batches"]) for epoch in data["epochs"])
@@ -69,11 +79,11 @@ def run_stage(arm, command, out):
         if arm in ("RS","RW"):
             images = evaluation["images"]
             counts = {d:sum(row["domain"]==d for row in images) for d in ("Urban","Rural")}
-            finite = all(torch.isfinite(torch.tensor(epoch["loss"])) for epoch in data["epochs"])
+            finite = all(math.isfinite(epoch["loss"]) for epoch in data["epochs"])
         else:
             images = evaluation["images"]
             counts = {d:sum(row["domain"]==d for row in images) for d in ("Urban","Rural")}
-            finite = all(torch.isfinite(torch.tensor(batch["loss"])) for epoch in data["epochs"] for batch in epoch["batches"])
+            finite = all(math.isfinite(batch["loss"]) for epoch in data["epochs"] for batch in epoch["batches"])
         unique = {(row["domain"],row["image_id"]) for row in images}
         if counts != dict(Urban=2,Rural=2) or len(unique) != 4 or not finite:
             raise ValueError("Missing finite training losses or two scored images per domain")
@@ -98,10 +108,10 @@ def run_stages(commands, out, report):
 
 
 def finish(report):
-    for arm in ("RS","RW","LA","LC"):
+    for arm in ("cache","RS","RW","LA","LC"):
         record=report[arm]
         print(f"{arm}: {'PASS' if record['passed'] else 'FAIL'} exit_code={record['exit_code']}",flush=True)
-    passed = report.get("cache",{}).get("gates_passed",False) and all(report[arm]["passed"] for arm in ("RS","RW","LA","LC"))
+    passed = report["cache"].get("gates_passed",False) and report["cache"]["passed"] and all(report[arm]["passed"] for arm in ("RS","RW","LA","LC"))
     print("WAVE2_SMOKE_COMPLETE" if passed else "WAVE2_SMOKE_FAILED",flush=True)
     return passed
 
@@ -113,24 +123,14 @@ def main():
     out=args.out_dir.resolve()
     if not out.is_relative_to(ROOT/"runs") or out.exists():
         parser.error("Choose a fresh output directory under runs")
-    if not torch.cuda.is_available():
-        parser.error("Run on an allocated GPU")
     out.mkdir(parents=True)
     print("SMOKE_OUTPUT " + out.relative_to(ROOT).as_posix(),flush=True)
     (ROOT/"runs/cache").mkdir(parents=True,exist_ok=True)
     report={}
     with tempfile.TemporaryDirectory(prefix="wave2-smoke-",dir=ROOT/"runs/cache") as directory:
         cache_dir=Path(directory)/"draft"
-        try:
-            built=build.build_cache(cache_dir,smoke=True,per_domain=2,training_entrypoints=True)
-            report["cache"]=built[3].manifest
-            del built
-            gc.collect()
-            torch.cuda.empty_cache()
-        except Exception:
-            report["cache"]=dict(gates_passed=False,error=traceback.format_exc())
-            print("CACHE_FAILED " + report["cache"]["error"],flush=True)
-        run_stages(stage_commands(cache_dir,out),out,report)
+        commands={"cache":cache_command(cache_dir),**stage_commands(cache_dir,out)}
+        run_stages(commands,out,report)
     if not finish(report):
         raise SystemExit(1)
 

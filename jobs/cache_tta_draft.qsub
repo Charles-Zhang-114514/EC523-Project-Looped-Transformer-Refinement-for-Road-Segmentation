@@ -21,10 +21,10 @@ cd "$SGE_O_WORKDIR"
 export PYTHONPATH="$PWD:$PWD/src"
 export PYTHONDONTWRITEBYTECODE=1 OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1
 export HF_HUB_OFFLINE=1 TRANSFORMERS_OFFLINE=1 HF_HUB_DISABLE_TELEMETRY=1
+nvidia-smi --query-gpu=name,compute_mode --format=csv
 python - <<'PYINFO'
 import sys, torch
 from importlib.metadata import version
-print("GPU:",torch.cuda.get_device_name(),flush=True)
 print("Python:",sys.version.split()[0],flush=True)
 for name in ("torch","numpy","scipy","Pillow","transformers","safetensors"):
     print(name,version(name),flush=True)

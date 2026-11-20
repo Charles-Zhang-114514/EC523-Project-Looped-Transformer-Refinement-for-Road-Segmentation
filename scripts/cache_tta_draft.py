@@ -105,8 +105,17 @@ def build_cache(root, smoke=False, per_domain=1, training_entrypoints=False):
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--cache-dir", type=Path, default=ROOT/"runs/cache/tta_draft_a1i_s0")
+    parser.add_argument("--smoke", action="store_true")
+    parser.add_argument("--per-domain", type=int, default=1)
+    parser.add_argument("--training-entrypoints", action="store_true")
     args = parser.parse_args()
-    build_cache(args.cache_dir)
+    if args.per_domain < 1:
+        parser.error("Smoke sample count must be positive")
+    if args.smoke:
+        build_cache(args.cache_dir, smoke=True, per_domain=args.per_domain,
+                    training_entrypoints=args.training_entrypoints)
+    else:
+        build_cache(args.cache_dir)
 
 
 if __name__ == "__main__":
