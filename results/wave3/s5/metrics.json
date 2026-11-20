@@ -1,0 +1,1010 @@
+{
+  "preregistration": "5fcb5bd",
+  "gates": {
+    "SG1": {
+      "status": "PASS",
+      "comparisons": 48,
+      "maximum_absolute_difference": 0.0,
+      "tolerance": 1e-05,
+      "reference": "fe10d7b:results/wave1/ensemble_bias/metrics.json"
+    },
+    "SG2": {
+      "status": "PASS",
+      "method": "Check every S5a/S5b image and stored K against its cumulative hook count. Actual trajectory calls sum only the maximum K, avoiding duplicate counting of cumulative endpoints.",
+      "endpoint_checks": 15022,
+      "trajectories": 5008,
+      "actual_core_calls": 33384,
+      "mismatches": 0,
+      "splits": {
+        "Val-sel": {
+          "images": 834,
+          "endpoint_checks": 6672,
+          "actual_core_calls": 13344
+        },
+        "Val-rep": {
+          "images": 835,
+          "endpoint_checks": 6680,
+          "actual_core_calls": 13360
+        },
+        "stress": {
+          "images": 835,
+          "endpoint_checks": 1670,
+          "actual_core_calls": 6680
+        }
+      }
+    },
+    "SG3": {
+      "status": "PASS",
+      "images": 835,
+      "unique_ids": 835,
+      "seed": 523,
+      "exact_Val_rep_membership": true,
+      "shared_views_evidence": "A single stress image row carries E0/S5a/S5b predictions; evaluation reads each source image once before the mode loop.",
+      "stress_manifest_sha256": "5a0be892182b5d8c5156967919f2c519912f98d6747c22772299d032a65eb5ec"
+    }
+  },
+  "jobs": [
+    {
+      "job_id": 8804722,
+      "run": "s5_eval",
+      "host": "scc-j07.scc.bu.edu",
+      "start_epoch": 1795198304,
+      "end_epoch": 1795200319,
+      "failed": 0,
+      "exit_status": 0,
+      "wall_seconds": 2015,
+      "gpu": "NVIDIA L40S",
+      "compute_mode": "Exclusive_Process",
+      "normal_end": true,
+      "log": "runs/logs/ec523-s5-eval.o8804722",
+      "completion_line": 2518,
+      "best_epoch": null,
+      "peak_cuda_bytes": 3334970368
+    }
+  ],
+  "modes": {
+    "E0": {
+      "Val_sel_L": {
+        "Overall": 0.5519079865836032,
+        "Urban": 0.5692106390224501,
+        "Rural": 0.5186695544937351
+      },
+      "Val_rep_L": {
+        "Overall": 0.5471354385318701,
+        "Urban": 0.5784943091269396,
+        "Rural": 0.4881633316534141
+      },
+      "Val_rep_LB": {
+        "Overall": 0.5466359732742515,
+        "Urban": 0.5779756557766196,
+        "Rural": 0.4878215254874659
+      },
+      "evaluation_groups": {
+        "Overall": {
+          "1": {
+            "road_iou": 0.6325699595779621,
+            "cldice": 0.701023991247529,
+            "boundary_iou": 0.0947054169101911,
+            "quality": 0.5455332605452781
+          },
+          "2": {
+            "road_iou": 0.6351847772771064,
+            "cldice": 0.7006304831429582,
+            "boundary_iou": 0.09539027740504949,
+            "quality": 0.5468595890624506
+          },
+          "4": {
+            "road_iou": 0.6379340265432353,
+            "cldice": 0.6988184839152519,
+            "boundary_iou": 0.09574444618840312,
+            "quality": 0.5477614476838738
+          },
+          "8": {
+            "road_iou": 0.6355906880457636,
+            "cldice": 0.6949431523342393,
+            "boundary_iou": 0.09471844622035791,
+            "quality": 0.5452219789672252
+          }
+        },
+        "Urban": {
+          "1": {
+            "road_iou": 0.6767596563701479,
+            "cldice": 0.7265425406880038,
+            "boundary_iou": 0.08715565469766207,
+            "quality": 0.5737737213310076
+          },
+          "2": {
+            "road_iou": 0.6809969700553415,
+            "cldice": 0.728770749714494,
+            "boundary_iou": 0.08820260701527628,
+            "quality": 0.5767702313450742
+          },
+          "4": {
+            "road_iou": 0.6863721749772823,
+            "cldice": 0.7321703622108171,
+            "boundary_iou": 0.08902667417159482,
+            "quality": 0.5806425309862053
+          },
+          "8": {
+            "road_iou": 0.6869543694040674,
+            "cldice": 0.7383245786866067,
+            "boundary_iou": 0.08964367533039319,
+            "quality": 0.5829032933740943
+          }
+        },
+        "Rural": {
+          "1": {
+            "road_iou": 0.5393612917976784,
+            "cldice": 0.6690637542982137,
+            "boundary_iou": 0.10376971005984681,
+            "quality": 0.49115371420027265
+          },
+          "2": {
+            "road_iou": 0.5390685708288384,
+            "cldice": 0.6655272056268698,
+            "boundary_iou": 0.10400080099716538,
+            "quality": 0.48999260730191324
+          },
+          "4": {
+            "road_iou": 0.5371987639135847,
+            "cldice": 0.657337471824814,
+            "boundary_iou": 0.10378077708695842,
+            "quality": 0.4865567789216282
+          },
+          "8": {
+            "road_iou": 0.5300214119566119,
+            "cldice": 0.6415890743493124,
+            "boundary_iou": 0.10077501843988508,
+            "quality": 0.4776424319710767
+          }
+        }
+      },
+      "stress_groups": {
+        "Overall": {
+          "4": {
+            "road_iou": 0.6351740278543959,
+            "cldice": 0.6955542916722421,
+            "boundary_iou": 0.09505409983455344,
+            "quality": 0.5452641213957813
+          }
+        },
+        "Urban": {
+          "4": {
+            "road_iou": 0.683290030219127,
+            "cldice": 0.7289697691137053,
+            "boundary_iou": 0.08856659195464894,
+            "quality": 0.5780492642346049
+          }
+        },
+        "Rural": {
+          "4": {
+            "road_iou": 0.5359186945786271,
+            "cldice": 0.6544571333502875,
+            "boundary_iou": 0.10275630398743565,
+            "quality": 0.4848477480918869
+          }
+        }
+      }
+    },
+    "S5a": {
+      "Val_sel_L": {
+        "Overall": 0.5520631248294924,
+        "Urban": 0.5691347727031816,
+        "Rural": 0.519190783026361
+      },
+      "Val_rep_L": {
+        "Overall": 0.5474371827301602,
+        "Urban": 0.5789231429121928,
+        "Rural": 0.48825417713917874
+      },
+      "Val_rep_LB": {
+        "Overall": 0.5469362994472282,
+        "Urban": 0.5784017369481875,
+        "Rural": 0.48791282488552523
+      },
+      "evaluation_groups": {
+        "Overall": {
+          "1": {
+            "road_iou": 0.632629577133157,
+            "cldice": 0.7012334695481028,
+            "boundary_iou": 0.09480187353586084,
+            "quality": 0.5456452041381815
+          },
+          "2": {
+            "road_iou": 0.6353199224893825,
+            "cldice": 0.7007169635637706,
+            "boundary_iou": 0.09551009901834429,
+            "quality": 0.5469770701174913
+          },
+          "4": {
+            "road_iou": 0.6384376328361953,
+            "cldice": 0.6991049230317993,
+            "boundary_iou": 0.09618793235369334,
+            "quality": 0.5481878797983761
+          },
+          "8": {
+            "road_iou": 0.6368307112043052,
+            "cldice": 0.695746975144219,
+            "boundary_iou": 0.09525669698147538,
+            "quality": 0.5461907875417135
+          }
+        },
+        "Urban": {
+          "1": {
+            "road_iou": 0.676836104638825,
+            "cldice": 0.7268096905651046,
+            "boundary_iou": 0.0873027039243164,
+            "quality": 0.5739215002738072
+          },
+          "2": {
+            "road_iou": 0.6811739878054307,
+            "cldice": 0.7288732523956161,
+            "boundary_iou": 0.08840085124746433,
+            "quality": 0.576929139870893
+          },
+          "4": {
+            "road_iou": 0.6870252899481056,
+            "cldice": 0.732678474148278,
+            "boundary_iou": 0.0896941879344258,
+            "quality": 0.5812550248054213
+          },
+          "8": {
+            "road_iou": 0.6886097083789716,
+            "cldice": 0.7401175524701982,
+            "boundary_iou": 0.09027050948570846,
+            "quality": 0.584394221827687
+          }
+        },
+        "Rural": {
+          "1": {
+            "road_iou": 0.5393760503782863,
+            "cldice": 0.6691819552666645,
+            "boundary_iou": 0.10380671423305007,
+            "quality": 0.4912039546157525
+          },
+          "2": {
+            "road_iou": 0.5391001053699931,
+            "cldice": 0.6655182815812273,
+            "boundary_iou": 0.1040279946074827,
+            "quality": 0.4900111360808613
+          },
+          "4": {
+            "road_iou": 0.5373698719978178,
+            "cldice": 0.6573644000332729,
+            "boundary_iou": 0.10395504495434603,
+            "quality": 0.48668526499976
+          },
+          "8": {
+            "road_iou": 0.5304062346704524,
+            "cldice": 0.6410453782334214,
+            "boundary_iou": 0.10121673024139378,
+            "quality": 0.47776007685353145
+          }
+        }
+      },
+      "stress_groups": {
+        "Overall": {
+          "4": {
+            "road_iou": 0.6357129515401886,
+            "cldice": 0.6958319364879876,
+            "boundary_iou": 0.09538703333612564,
+            "quality": 0.5456834633837157
+          }
+        },
+        "Urban": {
+          "4": {
+            "road_iou": 0.6839440837281573,
+            "cldice": 0.7295359208086564,
+            "boundary_iou": 0.08907588439359364,
+            "quality": 0.5786479949853942
+          }
+        },
+        "Rural": {
+          "4": {
+            "road_iou": 0.5361959857825728,
+            "cldice": 0.6543465490793163,
+            "boundary_iou": 0.10288273058205616,
+            "quality": 0.48497850373149254
+          }
+        }
+      }
+    },
+    "S5b": {
+      "Val_sel_L": {
+        "Overall": 0.5520641010298597,
+        "Urban": 0.5691381513411982,
+        "Rural": 0.5191880827628402
+      },
+      "Val_rep_L": {
+        "Overall": 0.5474402488936785,
+        "Urban": 0.5789278301160475,
+        "Rural": 0.48825404089819957
+      },
+      "Val_rep_LB": {
+        "Overall": 0.5469392111355569,
+        "Urban": 0.5784073786459938,
+        "Rural": 0.4879119773361726
+      },
+      "evaluation_groups": {
+        "Overall": {
+          "1": {
+            "road_iou": 0.632629577133157,
+            "cldice": 0.7012334695481028,
+            "boundary_iou": 0.09480187353586084,
+            "quality": 0.5456452041381815
+          },
+          "2": {
+            "road_iou": 0.6353202962566532,
+            "cldice": 0.7007184490627274,
+            "boundary_iou": 0.09550992312064494,
+            "quality": 0.5469776674712739
+          },
+          "4": {
+            "road_iou": 0.6384404628281278,
+            "cldice": 0.6991155994769428,
+            "boundary_iou": 0.09618939847916183,
+            "quality": 0.5481927909529791
+          },
+          "8": {
+            "road_iou": 0.6368350203596129,
+            "cldice": 0.6957637241261392,
+            "boundary_iou": 0.0952539866992531,
+            "quality": 0.5461974247574988
+          }
+        },
+        "Urban": {
+          "1": {
+            "road_iou": 0.676836104638825,
+            "cldice": 0.7268096905651046,
+            "boundary_iou": 0.0873027039243164,
+            "quality": 0.5739215002738072
+          },
+          "2": {
+            "road_iou": 0.6811746705598739,
+            "cldice": 0.7288741790711715,
+            "boundary_iou": 0.08840012960668413,
+            "quality": 0.5769296149226252
+          },
+          "4": {
+            "road_iou": 0.687030598743181,
+            "cldice": 0.7326948825315843,
+            "boundary_iou": 0.0896945716510129,
+            "quality": 0.5812626784612683
+          },
+          "8": {
+            "road_iou": 0.6886244762641645,
+            "cldice": 0.7401626349039683,
+            "boundary_iou": 0.09027069753246728,
+            "quality": 0.5844151681097662
+          }
+        },
+        "Rural": {
+          "1": {
+            "road_iou": 0.5393760503782863,
+            "cldice": 0.6691819552666645,
+            "boundary_iou": 0.10380671423305007,
+            "quality": 0.4912039546157525
+          },
+          "2": {
+            "road_iou": 0.5390998683237318,
+            "cldice": 0.6655202236190904,
+            "boundary_iou": 0.10402848437267631,
+            "quality": 0.4900116981221283
+          },
+          "4": {
+            "road_iou": 0.537368265662762,
+            "cldice": 0.6573638798662672,
+            "boundary_iou": 0.10395776896555584,
+            "quality": 0.4866848505843723
+          },
+          "8": {
+            "road_iou": 0.5303929063511124,
+            "cldice": 0.6410292193717175,
+            "boundary_iou": 0.10121026125247358,
+            "quality": 0.4777472712375661
+          }
+        }
+      },
+      "stress_groups": {
+        "Overall": {
+          "4": {
+            "road_iou": 0.6357155019604837,
+            "cldice": 0.6958414840034856,
+            "boundary_iou": 0.09538702990541484,
+            "quality": 0.5456876021623704
+          }
+        },
+        "Urban": {
+          "4": {
+            "road_iou": 0.6839492287128086,
+            "cldice": 0.7295687138931571,
+            "boundary_iou": 0.08907596293324042,
+            "quality": 0.5786604211109996
+          }
+        },
+        "Rural": {
+          "4": {
+            "road_iou": 0.5361939316076055,
+            "cldice": 0.6543367859728043,
+            "boundary_iou": 0.10288265589296673,
+            "quality": 0.4849745327742374
+          }
+        }
+      }
+    }
+  },
+  "resource_statistics": {
+    "E0": {
+      "Val-sel": {
+        "1": {
+          "images": 834,
+          "mean_seconds": 0.003198935840824927,
+          "median_seconds": 0.003190429008100182,
+          "sum_seconds": 2.6679124912479892,
+          "maximum_peak_cuda_bytes": 1678201344,
+          "time_ratio_to_E0": 1.0,
+          "memory_ratio_to_E0": 1.0
+        },
+        "2": {
+          "images": 834,
+          "mean_seconds": 0.0064105271045325155,
+          "median_seconds": 0.00637931699748151,
+          "sum_seconds": 5.346379605180118,
+          "maximum_peak_cuda_bytes": 1682395648,
+          "time_ratio_to_E0": 1.0,
+          "memory_ratio_to_E0": 1.0
+        },
+        "4": {
+          "images": 834,
+          "mean_seconds": 0.011945229597326605,
+          "median_seconds": 0.011924765509320423,
+          "sum_seconds": 9.962321484170388,
+          "maximum_peak_cuda_bytes": 1682395648,
+          "time_ratio_to_E0": 1.0,
+          "memory_ratio_to_E0": 1.0
+        },
+        "8": {
+          "images": 834,
+          "mean_seconds": 0.022283484112447332,
+          "median_seconds": 0.022319452982628718,
+          "sum_seconds": 18.584425749781076,
+          "maximum_peak_cuda_bytes": 1682395648,
+          "time_ratio_to_E0": 1.0,
+          "memory_ratio_to_E0": 1.0
+        }
+      },
+      "Val-rep": {
+        "1": {
+          "images": 835,
+          "mean_seconds": 0.003210627256117449,
+          "median_seconds": 0.003215764998458326,
+          "sum_seconds": 2.6808737588580698,
+          "maximum_peak_cuda_bytes": 1678201344,
+          "time_ratio_to_E0": 1.0,
+          "memory_ratio_to_E0": 1.0
+        },
+        "2": {
+          "images": 835,
+          "mean_seconds": 0.006402708323599916,
+          "median_seconds": 0.00640205095987767,
+          "sum_seconds": 5.34626145020593,
+          "maximum_peak_cuda_bytes": 1682395648,
+          "time_ratio_to_E0": 1.0,
+          "memory_ratio_to_E0": 1.0
+        },
+        "4": {
+          "images": 835,
+          "mean_seconds": 0.011962092635821283,
+          "median_seconds": 0.011956301983445883,
+          "sum_seconds": 9.988347350910772,
+          "maximum_peak_cuda_bytes": 1682395648,
+          "time_ratio_to_E0": 1.0,
+          "memory_ratio_to_E0": 1.0
+        },
+        "8": {
+          "images": 835,
+          "mean_seconds": 0.022351687596581075,
+          "median_seconds": 0.022363157011568546,
+          "sum_seconds": 18.663659143145196,
+          "maximum_peak_cuda_bytes": 1682395648,
+          "time_ratio_to_E0": 1.0,
+          "memory_ratio_to_E0": 1.0
+        }
+      },
+      "stress": {
+        "4": {
+          "images": 835,
+          "mean_seconds": 0.010530286859079616,
+          "median_seconds": 0.010527453036047518,
+          "sum_seconds": 8.792789527331479,
+          "maximum_peak_cuda_bytes": 1682395648,
+          "time_ratio_to_E0": 1.0,
+          "memory_ratio_to_E0": 1.0
+        }
+      }
+    },
+    "S5a": {
+      "Val-sel": {
+        "1": {
+          "images": 834,
+          "mean_seconds": 0.024121022089962384,
+          "median_seconds": 0.02420617250027135,
+          "sum_seconds": 20.11693242302863,
+          "maximum_peak_cuda_bytes": 3263667200,
+          "time_ratio_to_E0": 7.54032693689229,
+          "memory_ratio_to_E0": 1.9447411430508306
+        },
+        "2": {
+          "images": 834,
+          "mean_seconds": 0.046348018493705456,
+          "median_seconds": 0.046418915007961914,
+          "sum_seconds": 38.65424742375035,
+          "maximum_peak_cuda_bytes": 3334970368,
+          "time_ratio_to_E0": 7.2299855749670625,
+          "memory_ratio_to_E0": 1.9822747235256757
+        },
+        "4": {
+          "images": 834,
+          "mean_seconds": 0.09005357248395093,
+          "median_seconds": 0.0900556595006492,
+          "sum_seconds": 75.10467945161508,
+          "maximum_peak_cuda_bytes": 3334970368,
+          "time_ratio_to_E0": 7.538873300861904,
+          "memory_ratio_to_E0": 1.9822747235256757
+        },
+        "8": {
+          "images": 834,
+          "mean_seconds": 0.1769792910506703,
+          "median_seconds": 0.17708282201783732,
+          "sum_seconds": 147.60072873625904,
+          "maximum_peak_cuda_bytes": 3334970368,
+          "time_ratio_to_E0": 7.942173232767108,
+          "memory_ratio_to_E0": 1.9822747235256757
+        }
+      },
+      "Val-rep": {
+        "1": {
+          "images": 835,
+          "mean_seconds": 0.024117040115584267,
+          "median_seconds": 0.02417718298966065,
+          "sum_seconds": 20.137728496512864,
+          "maximum_peak_cuda_bytes": 3263667200,
+          "time_ratio_to_E0": 7.511628785195248,
+          "memory_ratio_to_E0": 1.9447411430508306
+        },
+        "2": {
+          "images": 835,
+          "mean_seconds": 0.0463726158357019,
+          "median_seconds": 0.04643116699298844,
+          "sum_seconds": 38.72113422281109,
+          "maximum_peak_cuda_bytes": 3334970368,
+          "time_ratio_to_E0": 7.24265630917089,
+          "memory_ratio_to_E0": 1.9822747235256757
+        },
+        "4": {
+          "images": 835,
+          "mean_seconds": 0.09009871646973812,
+          "median_seconds": 0.09009971900377423,
+          "sum_seconds": 75.23242825223133,
+          "maximum_peak_cuda_bytes": 3334970368,
+          "time_ratio_to_E0": 7.53201962338358,
+          "memory_ratio_to_E0": 1.9822747235256757
+        },
+        "8": {
+          "images": 835,
+          "mean_seconds": 0.1770076510519442,
+          "median_seconds": 0.17702122899936512,
+          "sum_seconds": 147.8013886283734,
+          "maximum_peak_cuda_bytes": 3334970368,
+          "time_ratio_to_E0": 7.919207455235701,
+          "memory_ratio_to_E0": 1.9822747235256757
+        }
+      },
+      "stress": {
+        "4": {
+          "images": 835,
+          "mean_seconds": 0.09030303091248554,
+          "median_seconds": 0.09031178598525003,
+          "sum_seconds": 75.40303081192542,
+          "maximum_peak_cuda_bytes": 3334970368,
+          "time_ratio_to_E0": 8.575552795565375,
+          "memory_ratio_to_E0": 1.9822747235256757
+        }
+      }
+    },
+    "S5b": {
+      "Val-sel": {
+        "1": {
+          "images": 834,
+          "mean_seconds": 0.023646544913562547,
+          "median_seconds": 0.02364286652300507,
+          "sum_seconds": 19.721218457911164,
+          "maximum_peak_cuda_bytes": 3263667200,
+          "time_ratio_to_E0": 7.392003494344758,
+          "memory_ratio_to_E0": 1.9447411430508306
+        },
+        "2": {
+          "images": 834,
+          "mean_seconds": 0.04565329321649493,
+          "median_seconds": 0.045634293026523665,
+          "sum_seconds": 38.07484654255677,
+          "maximum_peak_cuda_bytes": 3297221632,
+          "time_ratio_to_E0": 7.121613008112251,
+          "memory_ratio_to_E0": 1.9598372332451492
+        },
+        "4": {
+          "images": 834,
+          "mean_seconds": 0.08890392312057521,
+          "median_seconds": 0.08886419350164942,
+          "sum_seconds": 74.14587188255973,
+          "maximum_peak_cuda_bytes": 3297221632,
+          "time_ratio_to_E0": 7.44262991315565,
+          "memory_ratio_to_E0": 1.9598372332451492
+        },
+        "8": {
+          "images": 834,
+          "mean_seconds": 0.17506601326882268,
+          "median_seconds": 0.17514025699347258,
+          "sum_seconds": 146.0050550661981,
+          "maximum_peak_cuda_bytes": 3297221632,
+          "time_ratio_to_E0": 7.856312432355789,
+          "memory_ratio_to_E0": 1.9598372332451492
+        }
+      },
+      "Val-rep": {
+        "1": {
+          "images": 835,
+          "mean_seconds": 0.02363686758570351,
+          "median_seconds": 0.02362875797552988,
+          "sum_seconds": 19.73678443406243,
+          "maximum_peak_cuda_bytes": 3263667200,
+          "time_ratio_to_E0": 7.36207155180235,
+          "memory_ratio_to_E0": 1.9447411430508306
+        },
+        "2": {
+          "images": 835,
+          "mean_seconds": 0.04566744310707467,
+          "median_seconds": 0.045650306972675025,
+          "sum_seconds": 38.13231499440735,
+          "maximum_peak_cuda_bytes": 3297221632,
+          "time_ratio_to_E0": 7.132519677453962,
+          "memory_ratio_to_E0": 1.9598372332451492
+        },
+        "4": {
+          "images": 835,
+          "mean_seconds": 0.08894178388810377,
+          "median_seconds": 0.08891703601693735,
+          "sum_seconds": 74.26638954656664,
+          "maximum_peak_cuda_bytes": 3297221632,
+          "time_ratio_to_E0": 7.435303052390823,
+          "memory_ratio_to_E0": 1.9598372332451492
+        },
+        "8": {
+          "images": 835,
+          "mean_seconds": 0.17506555722145264,
+          "median_seconds": 0.17509188799886033,
+          "sum_seconds": 146.17974027991295,
+          "maximum_peak_cuda_bytes": 3297221632,
+          "time_ratio_to_E0": 7.832319437402604,
+          "memory_ratio_to_E0": 1.9598372332451492
+        }
+      },
+      "stress": {
+        "4": {
+          "images": 835,
+          "mean_seconds": 0.08782783168044588,
+          "median_seconds": 0.08776508597657084,
+          "sum_seconds": 73.33623945317231,
+          "maximum_peak_cuda_bytes": 3297221632,
+          "time_ratio_to_E0": 8.340497543494493,
+          "memory_ratio_to_E0": 1.9598372332451492
+        }
+      }
+    }
+  },
+  "decisions": {
+    "S5-P1": {
+      "status": "NOT_MET",
+      "delta": 0.00030174419829009924,
+      "interval": [
+        0.002,
+        0.006
+      ]
+    },
+    "S5-P2": {
+      "status": "MET",
+      "absolute_difference": 3.06616351830602e-06,
+      "strict_upper_bound": 0.002
+    },
+    "S5-P3": {
+      "status": "Qualitatively near eightfold time; memory bound met",
+      "clean_K4_time_ratio": 7.53201962338358,
+      "clean_K8_time_ratio": 7.919207455235701,
+      "peak_cuda_bytes": 3334970368,
+      "peak_GiB": 3.10593318939209,
+      "memory_bound_GiB": 8,
+      "memory_pass": true,
+      "limitation": "No tolerance or K was preregistered for approximately eightfold; report all K without adding a threshold."
+    },
+    "S5-R1": {
+      "status": "NOT_MET",
+      "selected_by_Val_sel": "S5b",
+      "selection_L": {
+        "S5a": 0.5520631248294924,
+        "S5b": 0.5520641010298597
+      },
+      "LB_gain": 0.0003032378613053721,
+      "minimum_LB_gain": 0.002,
+      "domain_L_deltas": {
+        "Urban": 0.00043352098910798276,
+        "Rural": 9.07092447854918e-05
+      },
+      "domain_pass": true,
+      "outcome": "Do not adopt S5; retain E0",
+      "TA_status": "Any future S5 adoption remains pending TA confirmation of one core call per step eligibility"
+    }
+  },
+  "stress_by_type": "Not recorded: per-image Counts are absent; only aggregate Counts and per-image timing/core metadata were saved, so shadow/occlusion/blur scores cannot be reconstructed without new inference.",
+  "outcome": "Retain E0; do not adopt S5",
+  "timing_scope": "Mean cumulative refiner time per image at K; excludes view encoders/TTA draft construction. Peak allocated CUDA bytes include resident models and shared view features; ratios are within this evaluation, not isolated incremental memory.",
+  "K_curves": {
+    "E0": {
+      "Overall": {
+        "A_by_K": {
+          "1": 0.5455332605452781,
+          "2": 0.5468595890624506,
+          "4": 0.5477614476838738,
+          "8": 0.5452219789672252
+        },
+        "transitions": [
+          {
+            "from_K": "1",
+            "to_K": "2",
+            "delta": 0.0013263285171725148,
+            "direction": "up"
+          },
+          {
+            "from_K": "2",
+            "to_K": "4",
+            "delta": 0.0009018586214232238,
+            "direction": "up"
+          },
+          {
+            "from_K": "4",
+            "to_K": "8",
+            "delta": -0.002539468716648563,
+            "direction": "down"
+          }
+        ]
+      },
+      "Urban": {
+        "A_by_K": {
+          "1": 0.5737737213310076,
+          "2": 0.5767702313450742,
+          "4": 0.5806425309862053,
+          "8": 0.5829032933740943
+        },
+        "transitions": [
+          {
+            "from_K": "1",
+            "to_K": "2",
+            "delta": 0.0029965100140666445,
+            "direction": "up"
+          },
+          {
+            "from_K": "2",
+            "to_K": "4",
+            "delta": 0.003872299641131116,
+            "direction": "up"
+          },
+          {
+            "from_K": "4",
+            "to_K": "8",
+            "delta": 0.0022607623878889704,
+            "direction": "up"
+          }
+        ]
+      },
+      "Rural": {
+        "A_by_K": {
+          "1": 0.49115371420027265,
+          "2": 0.48999260730191324,
+          "4": 0.4865567789216282,
+          "8": 0.4776424319710767
+        },
+        "transitions": [
+          {
+            "from_K": "1",
+            "to_K": "2",
+            "delta": -0.0011611068983594097,
+            "direction": "down"
+          },
+          {
+            "from_K": "2",
+            "to_K": "4",
+            "delta": -0.0034358283802850553,
+            "direction": "down"
+          },
+          {
+            "from_K": "4",
+            "to_K": "8",
+            "delta": -0.008914346950551488,
+            "direction": "down"
+          }
+        ]
+      }
+    },
+    "S5a": {
+      "Overall": {
+        "A_by_K": {
+          "1": 0.5456452041381815,
+          "2": 0.5469770701174913,
+          "4": 0.5481878797983761,
+          "8": 0.5461907875417135
+        },
+        "transitions": [
+          {
+            "from_K": "1",
+            "to_K": "2",
+            "delta": 0.0013318659793097876,
+            "direction": "up"
+          },
+          {
+            "from_K": "2",
+            "to_K": "4",
+            "delta": 0.0012108096808848279,
+            "direction": "up"
+          },
+          {
+            "from_K": "4",
+            "to_K": "8",
+            "delta": -0.001997092256662669,
+            "direction": "down"
+          }
+        ]
+      },
+      "Urban": {
+        "A_by_K": {
+          "1": 0.5739215002738072,
+          "2": 0.576929139870893,
+          "4": 0.5812550248054213,
+          "8": 0.584394221827687
+        },
+        "transitions": [
+          {
+            "from_K": "1",
+            "to_K": "2",
+            "delta": 0.0030076395970858316,
+            "direction": "up"
+          },
+          {
+            "from_K": "2",
+            "to_K": "4",
+            "delta": 0.004325884934528346,
+            "direction": "up"
+          },
+          {
+            "from_K": "4",
+            "to_K": "8",
+            "delta": 0.0031391970222656163,
+            "direction": "up"
+          }
+        ]
+      },
+      "Rural": {
+        "A_by_K": {
+          "1": 0.4912039546157525,
+          "2": 0.4900111360808613,
+          "4": 0.48668526499976,
+          "8": 0.47776007685353145
+        },
+        "transitions": [
+          {
+            "from_K": "1",
+            "to_K": "2",
+            "delta": -0.0011928185348912268,
+            "direction": "down"
+          },
+          {
+            "from_K": "2",
+            "to_K": "4",
+            "delta": -0.0033258710811012726,
+            "direction": "down"
+          },
+          {
+            "from_K": "4",
+            "to_K": "8",
+            "delta": -0.008925188146228558,
+            "direction": "down"
+          }
+        ]
+      }
+    },
+    "S5b": {
+      "Overall": {
+        "A_by_K": {
+          "1": 0.5456452041381815,
+          "2": 0.5469776674712739,
+          "4": 0.5481927909529791,
+          "8": 0.5461974247574988
+        },
+        "transitions": [
+          {
+            "from_K": "1",
+            "to_K": "2",
+            "delta": 0.0013324633330923374,
+            "direction": "up"
+          },
+          {
+            "from_K": "2",
+            "to_K": "4",
+            "delta": 0.0012151234817052714,
+            "direction": "up"
+          },
+          {
+            "from_K": "4",
+            "to_K": "8",
+            "delta": -0.0019953661954803525,
+            "direction": "down"
+          }
+        ]
+      },
+      "Urban": {
+        "A_by_K": {
+          "1": 0.5739215002738072,
+          "2": 0.5769296149226252,
+          "4": 0.5812626784612683,
+          "8": 0.5844151681097662
+        },
+        "transitions": [
+          {
+            "from_K": "1",
+            "to_K": "2",
+            "delta": 0.0030081146488180055,
+            "direction": "up"
+          },
+          {
+            "from_K": "2",
+            "to_K": "4",
+            "delta": 0.004333063538643156,
+            "direction": "up"
+          },
+          {
+            "from_K": "4",
+            "to_K": "8",
+            "delta": 0.0031524896484979026,
+            "direction": "up"
+          }
+        ]
+      },
+      "Rural": {
+        "A_by_K": {
+          "1": 0.4912039546157525,
+          "2": 0.4900116981221283,
+          "4": 0.4866848505843723,
+          "8": 0.4777472712375661
+        },
+        "transitions": [
+          {
+            "from_K": "1",
+            "to_K": "2",
+            "delta": -0.0011922564936241997,
+            "direction": "down"
+          },
+          {
+            "from_K": "2",
+            "to_K": "4",
+            "delta": -0.003326847537756028,
+            "direction": "down"
+          },
+          {
+            "from_K": "4",
+            "to_K": "8",
+            "delta": -0.008937579346806168,
+            "direction": "down"
+          }
+        ]
+      }
+    }
+  }
+}
