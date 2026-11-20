@@ -25,6 +25,7 @@ from looproad.models.refiner import LoopRefiner
 from looproad.models.refiner_losses import RefinerObjective
 from looproad.data.augmentation import D4TrainingDataset
 from looproad.data.draft_cache import CacheIds, DraftCache, frozen_cached_draft
+from looproad.data.d4_cache import D4CacheDataset, D4DraftCache
 
 DOMAINS = ("Urban", "Rural")
 INFER_ABLATIONS = ("none", "reset-state", "no-mask-feedback")
@@ -663,6 +664,7 @@ def build_parser():
     parser.add_argument("--lr", type=float, default=3e-4)
     parser.add_argument("--draft-cache", type=Path)
     parser.add_argument("--init-refiner", type=Path)
+    parser.add_argument("--d4-aug", action="store_true")
     parser.add_argument("--warmup-steps", type=int, default=500)
     parser.add_argument("--max-steps", type=int, help="Bound total updates, cycling a small dataset if needed")
     parser.add_argument("--pos-weight", type=float, default=4.,
@@ -856,6 +858,9 @@ def main():
     if args.init_refiner is not None:
         initialize_refiner(model, args.init_refiner, args.probe_ckpt)
     cache = DraftCache(args.draft_cache, args.probe_ckpt, args.val_split) if args.draft_cache else None
+    if args.d4_aug and (cache is None or args.augmentation != "none"):
+        raise ValueError("--d4-aug requires --draft-cache and no other augmentation")
+    training_cache = D4DraftCache(cache) if args.d4_aug else cache
     cache_options = {"draft_cache": cache} if cache is not None else {}
     parameters = model.parameter_counts()
     print("PARAMETERS " + json.dumps(parameters), flush=True)
@@ -867,6 +872,8 @@ def main():
               if isinstance(value, Path) else value for key, value in vars(args).items()}
     config.update(weight_decay=.01, warmup_steps=args.warmup_steps, clip_grad_norm=1.,
                   refiner_dtype="float32", encoder=y0.ENCODER, probe_head=checkpoint["head"])
+    if not args.d4_aug:
+        config.pop('d4_aug')
     if args.infer_ablations is None:
         config.pop('infer_ablations')
     for name in ('step_weights', 'k_train_choices', 'draft_cache', 'init_refiner', 'max_steps'):
@@ -883,7 +890,9 @@ def main():
                    for i, domain in enumerate(DOMAINS)] if args.epochs and not args.eval_only else [])
     if args.augmentation == 'd4':
         train_sets = [D4TrainingDataset(dataset, args.seed + i) for i, dataset in enumerate(train_sets)]
-    if cache is not None:
+    if args.d4_aug:
+        train_sets = [D4CacheDataset(dataset, args.seed+i) for i,dataset in enumerate(train_sets)]
+    elif cache is not None:
         train_sets = [CacheIds(dataset) for dataset in train_sets]
     loader = (make_loader(ConcatDataset(train_sets), args.batch_size, args.loader_workers, True, args.seed)
               if train_sets else None)
@@ -926,7 +935,7 @@ def main():
         print(f"EVAL_ONLY loaded_epoch={start_epoch}; Train is not constructed", flush=True)
     for epoch in range(start_epoch, args.epochs) if not args.eval_only else ():
         for dataset in train_sets:
-            if isinstance(dataset, D4TrainingDataset):
+            if isinstance(dataset, (D4TrainingDataset, D4CacheDataset)):
                 dataset.set_epoch(epoch)
         model.train()
         if device.type == "cuda":
@@ -941,7 +950,7 @@ def main():
             if cache is None:
                 features, draft = frozen_draft(encoder, head, images)
             else:
-                features, draft = frozen_cached_draft(encoder, head, images, image_ids, cache)
+                features, draft = frozen_cached_draft(encoder, head, images, image_ids, training_cache)
             encoder_time = stamp(device) - phase
             phase = stamp(device)
             training_k = (choose_training_k(args.k_train_choices, k_generator)
