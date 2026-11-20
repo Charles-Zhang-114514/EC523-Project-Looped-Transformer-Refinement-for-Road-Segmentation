@@ -1,0 +1,31 @@
+#!/bin/bash -l
+#$ -N ec523-wave2-smoke
+#$ -P ec523kb
+#$ -cwd
+#$ -pe omp 8
+#$ -l gpus=1
+#$ -l gpu_c=8.0
+#$ -l mem_per_core=8G
+#$ -l h_rt=00:30:00
+#$ -j y
+#$ -m ea
+#$ -o runs/logs/
+
+# Four cached tiles; 20 updates each for RS/RW/LA/LC and small official scores.
+# This short allocated-GPU workflow is required before the full wave-2 jobs.
+source "${SGE_O_WORKDIR:?Submit from the repository root}/env.sh" || exit 1
+set -euo pipefail
+cd "$SGE_O_WORKDIR"
+export PYTHONPATH="$PWD:$PWD/src"
+export PYTHONDONTWRITEBYTECODE=1 OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1
+export HF_HUB_OFFLINE=1 TRANSFORMERS_OFFLINE=1 HF_HUB_DISABLE_TELEMETRY=1
+python - <<'PYINFO'
+import sys, torch
+from importlib.metadata import version
+print("GPU:",torch.cuda.get_device_name(),flush=True)
+print("Python:",sys.version.split()[0],flush=True)
+for name in ("torch","numpy","scipy","Pillow","transformers","safetensors"):
+    print(name,version(name),flush=True)
+PYINFO
+git rev-parse HEAD
+python -u scripts/wave2_smoke.py

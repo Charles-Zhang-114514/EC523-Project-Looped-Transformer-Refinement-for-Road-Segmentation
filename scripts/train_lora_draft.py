@@ -21,9 +21,26 @@ from scripts import train_draft_head as draft
 from scripts import train_refiner as runner
 
 
-def train_updates(encoder, head, loader, optimizer, steps, total, offset=0):
+def set_training(encoder, head, freeze_head=False):
     encoder.train()
-    head.train()
+    head.train(not freeze_head)
+
+
+def update_lr(step, total, peak, warmup):
+    if warmup == 300:
+        return draft.cosine_lr(step, total, peak)
+    if total == 1:
+        return peak
+    warmup = min(warmup, total-1)
+    if step < warmup:
+        return peak*(step+1)/warmup
+    return peak*.5*(1+math.cos(math.pi*(step-warmup+1)/(total-warmup)))
+
+
+def train_updates(encoder, head, loader, optimizer, steps, total, offset=0,
+                  freeze_head=False, lr=1e-4, warmup=300, callback=None):
+    set_training(encoder, head, freeze_head)
+    device = next(head.parameters()).device
     rows = []
     iterator = iter(loader)
     for index in range(steps):
@@ -33,37 +50,54 @@ def train_updates(encoder, head, loader, optimizer, steps, total, offset=0):
             iterator = iter(loader)
             batch = next(iterator)
         images, target, valid, _, _ = batch
-        images, target, valid = (runner.probe.as_device_tensor(x, torch.device("cuda"))
+        images, target, valid = (runner.probe.as_device_tensor(x, device)
                                  for x in (images, target, valid))
-        lr = draft.cosine_lr(offset + index, total, 1e-4)
+        rate = update_lr(offset + index, total, lr, warmup)
         for group in optimizer.param_groups:
-            group["lr"] = lr
+            group["lr"] = rate
         optimizer.zero_grad(set_to_none=True)
-        start = runner.stamp(torch.device("cuda"))
+        start = runner.stamp(device)
         logits = head(encoder(images))
         loss = runner.probe.masked_bce_with_logits(logits, target, valid, pos_weight=4.)
         if not torch.isfinite(loss):
             raise FloatingPointError("Nonfinite LoRA loss")
         loss.backward()
         optimizer.step()
-        seconds = runner.stamp(torch.device("cuda")) - start
-        row = dict(step=offset+index, seconds=seconds, loss=float(loss.detach()), lr=lr,
-                   peak_cuda_bytes=torch.cuda.max_memory_allocated())
+        seconds = runner.stamp(device) - start
+        row = dict(step=offset+index, seconds=seconds, loss=float(loss.detach()), lr=rate,
+                   peak_cuda_bytes=torch.cuda.max_memory_allocated() if device.type == "cuda" else None)
         rows.append(row)
         print("UPDATE " + json.dumps(row), flush=True)
+        if callback is not None:
+            callback(offset+index+1)
+            set_training(encoder, head, freeze_head)
     return rows
 
 
-def save(path, encoder, head, epoch, config):
-    torch.save(dict(lora=encoder.adapter_state(), head=head.state_dict(), epoch=epoch, config=config), path)
+def save(path, encoder, head, epoch, config, global_step=None):
+    payload = dict(lora=encoder.adapter_state() if hasattr(encoder, "adapter_state") else {},
+                   head=head.state_dict(), epoch=epoch, config=config)
+    if global_step is not None:
+        payload["global_step"] = global_step
+    torch.save(payload, path)
 
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--smoke", action="store_true")
+    parser.add_argument("--freeze-head", action="store_true")
+    parser.add_argument("--no-lora", action="store_true")
+    parser.add_argument("--eval-every-steps", type=int, default=0)
+    parser.add_argument("--epochs", type=int, default=5)
+    parser.add_argument("--lr", type=float, default=1e-4)
+    parser.add_argument("--warmup-steps", type=int, default=300)
     parser.add_argument("--out-dir", type=Path, required=True)
     parser.add_argument("--estimate", type=Path, help="Print full-job h_rt from completed smoke JSON and exit")
     args = parser.parse_args()
+    if min(args.epochs, args.warmup_steps) < 1 or args.eval_every_steps < 0 or not math.isfinite(args.lr) or args.lr <= 0:
+        parser.error("Invalid training duration, evaluation interval or learning rate")
+    if args.freeze_head and args.no_lora:
+        parser.error("Freezing the head without LoRA leaves no trainable parameters")
     if args.estimate:
         report = json.loads(args.estimate.read_text())
         if not report["L0"]["passed"] or report["batch4_peak_bytes"] > 40 * 1024**3:
@@ -90,7 +124,7 @@ def main():
     image = runner.probe.as_device_tensor(np.stack([dataset[i][0] for i in range(2)]), device)
     with torch.no_grad():
         reference = head(frozen(image)).float()
-    encoder = LoRAEncoder(frozen.encoder).to(device).eval()
+    encoder = frozen if args.no_lora else LoRAEncoder(frozen.encoder).to(device).eval()
     with torch.no_grad():
         actual = head(encoder(image)).float()
     difference = float((reference-actual).abs().max())
@@ -99,28 +133,31 @@ def main():
     if not l0["passed"]:
         raise ValueError("L0 initialization regression failed")
     del image, reference, actual, frozen
-    head.requires_grad_(True)
+    head.requires_grad_(not args.freeze_head)
     lora_parameters = sum(p.numel() for p in encoder.parameters() if p.requires_grad)
-    head_parameters = sum(p.numel() for p in head.parameters())
+    head_parameters = sum(p.numel() for p in head.parameters() if p.requires_grad)
     counts = dict(lora=lora_parameters, head=head_parameters, refiner=1193025)
     assert sum(counts.values()) <= 10_000_000
     print("PARAMETERS " + json.dumps(counts), flush=True)
-    config = dict(seed=0, epochs=5, batch_size=4, lr=1e-4, weight_decay=0, rank=16, alpha=16,
-                  warmup=300, d4_aug=True, selection_per_domain=None,
-                  selection_images=834, gradient_checkpointing=True)
+    config = dict(seed=0, epochs=args.epochs, batch_size=4, lr=args.lr, weight_decay=0, rank=16, alpha=16,
+                  warmup=args.warmup_steps, d4_aug=True, selection_per_domain=None,
+                  selection_images=834, gradient_checkpointing=not args.no_lora)
+    if args.freeze_head or args.no_lora or args.eval_every_steps:
+        config.update(freeze_head=args.freeze_head, no_lora=args.no_lora, eval_every_steps=args.eval_every_steps)
     split = json.loads(tta.SPLIT.read_text())
     sets = [D4TrainingDataset(runner.probe.RoadDataset("Train", domain, limit=2 if args.smoke else None), i)
             for i, domain in enumerate(runner.DOMAINS)]
     selection = runner.protocol_datasets(split, "Val-sel", 2 if args.smoke else None)
-    parameters = [p for p in encoder.parameters() if p.requires_grad] + list(head.parameters())
+    parameters = [p for p in encoder.parameters() if p.requires_grad] + [p for p in head.parameters() if p.requires_grad]
     if args.smoke:
         rows = {}
         for batch_size in (2, 4):
             torch.cuda.empty_cache()
             torch.cuda.reset_peak_memory_stats()
             loader = runner.make_loader(ConcatDataset(sets), batch_size, 0, shuffle=True)
-            optimizer = torch.optim.AdamW(parameters, lr=1e-4, weight_decay=0)
-            rows[str(batch_size)] = train_updates(encoder, head, loader, optimizer, 20, 3155)
+            optimizer = torch.optim.AdamW(parameters, lr=args.lr, weight_decay=0)
+            rows[str(batch_size)] = train_updates(encoder, head, loader, optimizer, 20, 3155,
+                                                 freeze_head=args.freeze_head, lr=args.lr, warmup=args.warmup_steps)
             del optimizer, loader
         selected = draft.evaluate(encoder, head, selection, device, 1, 6)
         report = dict(config=config, L0=l0, parameters=counts, batches=rows, selection=selected,
@@ -128,29 +165,55 @@ def main():
         (args.out_dir / "smoke.json").write_text(json.dumps(report, indent=2, allow_nan=False)+"\n")
         print("SMOKE_COMPLETE", flush=True)
         return
-    loader = runner.make_loader(ConcatDataset(sets), 4, 7, shuffle=True, seed=0)
-    total = 5 * len(loader)
-    optimizer = torch.optim.AdamW(parameters, lr=1e-4, weight_decay=0)
+    loader = runner.make_loader(ConcatDataset(sets), 4, 0 if args.eval_every_steps else 7, shuffle=True, seed=0)
+    total = args.epochs * len(loader)
+    optimizer = torch.optim.AdamW(parameters, lr=args.lr, weight_decay=0)
     epochs, best_score, best_epoch = [], -1., None
-    for epoch in range(1, 6):
+    step_selection, best_step = [], None
+    for epoch in range(1, args.epochs+1):
         for dataset in sets:
             dataset.set_epoch(epoch)
         torch.cuda.reset_peak_memory_stats()
-        rows = train_updates(encoder, head, loader, optimizer, len(loader), total, (epoch-1)*len(loader))
-        selected = draft.evaluate(encoder, head, selection, device, 1, 6)
-        score = selected["groups"]["Overall"]["quality"]
+        def select_step(step):
+            nonlocal best_score, best_epoch, best_step
+            if step_selection and step_selection[-1]["step"] == step:
+                return
+            selected = draft.evaluate(encoder, head, selection, device, 1, 6)
+            score = selected["groups"]["Overall"]["quality"]
+            step_selection.append(dict(step=step, epoch=epoch, selection_A=score, selection=selected))
+            if score > best_score:
+                best_score, best_epoch, best_step = score, epoch, step
+                save(args.out_dir/"best.pt", encoder, head, epoch, config, step)
+
+        def maybe_select(step):
+            if step % args.eval_every_steps == 0:
+                select_step(step)
+
+        rows = train_updates(encoder, head, loader, optimizer, len(loader), total, (epoch-1)*len(loader),
+                             freeze_head=args.freeze_head, lr=args.lr, warmup=args.warmup_steps,
+                             callback=maybe_select if args.eval_every_steps else None)
+        if args.eval_every_steps:
+            select_step(epoch*len(loader))
+            selected = step_selection[-1]["selection"]
+            score = selected["groups"]["Overall"]["quality"]
+        else:
+            selected = draft.evaluate(encoder, head, selection, device, 1, 6)
+            score = selected["groups"]["Overall"]["quality"]
+            if score > best_score:
+                best_score, best_epoch = score, epoch
+                save(args.out_dir/"best.pt", encoder, head, epoch, config)
         epochs.append(dict(epoch=epoch, batches=rows, selection=selected, selection_A=score))
-        if score > best_score:
-            best_score, best_epoch = score, epoch
-            save(args.out_dir/"best.pt", encoder, head, epoch, config)
         save(args.out_dir/"last.pt", encoder, head, epoch, config)
     best = torch.load(args.out_dir/"best.pt", map_location="cpu", weights_only=True)
-    encoder.load_adapters(best["lora"])
+    if best["lora"]:
+        encoder.load_adapters(best["lora"])
     head.load_state_dict(best["head"], strict=True)
     evaluation = tta.evaluate(encoder, head, None, runner.protocol_datasets(split, "Val-rep"), (),
                               device, 1, 6, "d4")
     report = dict(config=config, L0=l0, parameters=counts, epochs=epochs, best_epoch=best_epoch,
                   best_selection_A=best_score, evaluation=evaluation)
+    if args.eval_every_steps:
+        report.update(step_selection=step_selection, best_step=best_step)
     baseline = json.loads((ROOT/"results/draft_head/A1-i/metrics.json").read_text())["evaluation"]["groups"]
     actual = evaluation["groups"]["none"]
     gain = actual["Overall"]["y0_draft"]["scores"]["quality"] - .538246

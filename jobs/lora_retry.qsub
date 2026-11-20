@@ -1,0 +1,40 @@
+#!/bin/bash -l
+#$ -N ec523-lora-retry
+#$ -P ec523kb
+#$ -cwd
+#$ -pe omp 8
+#$ -l gpus=1
+#$ -l gpu_c=8.0
+#$ -l mem_per_core=8G
+#$ -l h_rt=01:30:00
+#$ -j y
+#$ -m ea
+#$ -o runs/logs/
+
+# L40S full wave-1 LoRA measured 2988 s (49.8 min).
+# LA update upper allowance 1262*.752=949.024 s; 8 full selections plus
+# two-mode report allowance (8*834+9*835)*(.0623+.125)=2657.2251 s.
+# Combined 60.11 min, request 90 min. LC has the measured 5-epoch horizon
+# with a frozen encoder, retaining the same 90-minute conservative allowance.
+source "${SGE_O_WORKDIR:?Submit from the repository root}/env.sh" || exit 1
+set -euo pipefail
+cd "$SGE_O_WORKDIR"
+export PYTHONPATH="$PWD:$PWD/src"
+export PYTHONDONTWRITEBYTECODE=1 OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1
+export HF_HUB_OFFLINE=1 TRANSFORMERS_OFFLINE=1 HF_HUB_DISABLE_TELEMETRY=1
+python - <<'PYINFO'
+import sys, torch
+from importlib.metadata import version
+print("GPU:",torch.cuda.get_device_name(),flush=True)
+print("Python:",sys.version.split()[0],flush=True)
+for name in ("torch","numpy","scipy","Pillow","transformers","safetensors"):
+    print(name,version(name),flush=True)
+PYINFO
+git rev-parse HEAD
+
+case "${ARM:-}" in
+    LA) OPTIONS=(--freeze-head --lr 2e-5 --warmup-steps 100 --epochs 2 --eval-every-steps 200) ;;
+    LC) OPTIONS=(--no-lora) ;;
+    *) echo "Set ARM=LA or LC" >&2; exit 2 ;;
+esac
+python -u scripts/train_lora_draft.py "${OPTIONS[@]}" --out-dir "runs/wave2/$ARM"

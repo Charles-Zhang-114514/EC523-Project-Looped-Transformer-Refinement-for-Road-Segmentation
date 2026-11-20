@@ -24,6 +24,7 @@ from scripts import train_linear_probe as probe
 from looproad.models.refiner import LoopRefiner
 from looproad.models.refiner_losses import RefinerObjective
 from looproad.data.augmentation import D4TrainingDataset
+from looproad.data.draft_cache import CacheIds, DraftCache, frozen_cached_draft
 
 DOMAINS = ("Urban", "Rural")
 INFER_ABLATIONS = ("none", "reset-state", "no-mask-feedback")
@@ -200,7 +201,7 @@ def make_loader(dataset, batch_size, workers, shuffle=False, seed=0):
 
 
 def evaluate(encoder, head, model, datasets, ks, device, loader_workers=1, metric_workers=6, geometry=True, eval_extra=False,
-             infer_ablations=None):
+             infer_ablations=None, draft_cache=None):
     """One streamed trajectory to max(ks); workers receive only uint8 masks."""
     check_untied_limit(model.untied_steps, ks, "evaluation K")
     started = time.perf_counter()
@@ -244,13 +245,17 @@ def evaluate(encoder, head, model, datasets, ks, device, loader_workers=1, metri
                                         initargs=(os.environ.get("EC523_STARTER_DIR"),))
     try:
         for domain in DOMAINS:
-            loader = make_loader(datasets[domain], 1, loader_workers)
+            dataset = CacheIds(datasets[domain]) if draft_cache is not None else datasets[domain]
+            loader = make_loader(dataset, 1, loader_workers)
             for image, _, _, image_id, raw in loader:
                 image = probe.as_device_tensor(image, device)
                 if device.type == "cuda":
                     torch.cuda.reset_peak_memory_stats(device)
                 phase = stamp(device)
-                features, draft = frozen_draft(encoder, head, image)
+                if draft_cache is None:
+                    features, draft = frozen_draft(encoder, head, image)
+                else:
+                    features, draft = frozen_cached_draft(encoder, head, image, image_id, draft_cache)
                 encoder_seconds += stamp(device) - phase
                 predictions = {"y0_draft": (draft.sigmoid().squeeze() >= .5).cpu().numpy().astype(np.uint8)}
                 times[domain]["y0_draft"].append(0.)
@@ -619,11 +624,31 @@ def validate_noadd_lambda(value):
         raise ValueError('--noadd-lambda must be finite and nonnegative')
 
 
+def selection_limit(text):
+    if text == "all":
+        return None
+    value = int(text)
+    if value < 1:
+        raise argparse.ArgumentTypeError("Selection count must be positive or all")
+    return value
+
+
+def initialize_refiner(model, path, probe_path):
+    saved = torch.load(path, map_location="cpu", weights_only=True)
+    expected_probe = str(probe_path.resolve().relative_to(ROOT))
+    if saved["config"]["probe_ckpt"] != expected_probe:
+        raise ValueError("Initialization checkpoint uses a different draft head")
+    model.load_state_dict(saved["state_dict"], strict=True)
+
+
 def build_parser():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--epochs", type=int, default=20, help="Zero evaluates an untrained zero-output refiner")
     parser.add_argument("--batch-size", type=int, default=4)
     parser.add_argument("--lr", type=float, default=3e-4)
+    parser.add_argument("--draft-cache", type=Path)
+    parser.add_argument("--init-refiner", type=Path)
+    parser.add_argument("--warmup-steps", type=int, default=500)
     parser.add_argument("--pos-weight", type=float, default=4.,
                         help="Positive-class BCE weight for the refiner only; does not change the frozen probe")
     parser.add_argument('--loss', choices=('bce', 'false_add', 'lovasz', 'soft_cldice'), default='bce')
@@ -668,7 +693,7 @@ def build_parser():
                         help='Weight of the valid-background probability-increase penalty')
     parser.add_argument("--head-type", choices=("patch_linear", "conv_upsample"), default="patch_linear")
     parser.add_argument("--select-every", type=int, default=0, help="Zero preserves final-epoch-only v1 behavior")
-    parser.add_argument("--select-per-domain", type=int, default=100)
+    parser.add_argument("--select-per-domain", type=selection_limit, default=100)
     parser.add_argument('--val-split', type=Path)
     parser.add_argument('--selection-ks', type=parse_selection_ks, default='1:0.25,2:0.25,4:0.5')
     parser.add_argument('--eval-extra', action='store_true')
@@ -680,6 +705,12 @@ def build_parser():
 def main():
     parser = build_parser()
     args = parser.parse_args()
+    if args.init_refiner is not None and (args.resume or args.eval_only):
+        parser.error("--init-refiner cannot be combined with resume/eval-only")
+    if args.warmup_steps < 1:
+        parser.error("Warmup steps must be positive")
+    if args.draft_cache is not None and args.augmentation != "none":
+        parser.error("Cached drafts require original-direction training images")
     if args.infer_ablations is not None and not args.eval_only:
         parser.error('--infer-ablations requires --eval-only')
     if args.eval_only and args.ckpt is None:
@@ -692,6 +723,15 @@ def main():
         if not source.is_file():
             parser.error(f"Checkpoint not found: {source}")
         restored = torch.load(source, map_location="cpu", weights_only=True)
+        saved_cache = restored.get("config", {}).get("draft_cache")
+        if saved_cache:
+            if args.draft_cache is not None and args.draft_cache.resolve() != (ROOT/saved_cache).resolve():
+                parser.error("Cannot change draft cache when restoring")
+            args.draft_cache = ROOT/saved_cache
+        saved_warmup = restored.get("config", {}).get("warmup_steps", 500)
+        if "--warmup-steps" in sys.argv and args.warmup_steps != saved_warmup:
+            parser.error("Cannot change warmup when restoring")
+        args.warmup_steps = saved_warmup
         if not {"state_dict", "config", "epoch"}.issubset(restored):
             parser.error("Checkpoint lacks refiner weights/config/epoch")
         explicit = {value.split("=", 1)[0] for value in sys.argv[1:] if value.startswith("--")}
@@ -763,7 +803,7 @@ def main():
         parser.error('--false-add-gradient-ratio must be finite and positive')
     if min(args.skeleton_iterations, args.false_add_calibration_batches) < 1 or args.false_add_warmup_steps < 0:
         parser.error('Skeleton/calibration counts must be positive and warmup steps nonnegative')
-    if args.select_every < 0 or args.select_per_domain < 1:
+    if args.select_every < 0 or (args.select_per_domain is not None and args.select_per_domain < 1):
         parser.error("Selection interval must be nonnegative and subset size positive")
     if args.limit_per_domain is not None and args.limit_per_domain < 1:
         parser.error("--limit-per-domain must be positive")
@@ -795,6 +835,10 @@ def main():
                         untied_steps=args.untied_steps).to(device=device, dtype=torch.float32)
     if restored is not None:
         model.load_state_dict(restored["state_dict"])
+    if args.init_refiner is not None:
+        initialize_refiner(model, args.init_refiner, args.probe_ckpt)
+    cache = DraftCache(args.draft_cache, args.probe_ckpt, args.val_split) if args.draft_cache else None
+    cache_options = {"draft_cache": cache} if cache is not None else {}
     parameters = model.parameter_counts()
     print("PARAMETERS " + json.dumps(parameters), flush=True)
     frozen_parameters = {"encoder": sum(p.numel() for p in encoder.parameters()),
@@ -803,11 +847,11 @@ def main():
         raise AssertionError("Encoder and probe must be completely frozen")
     config = {key: (str(value.resolve().relative_to(ROOT)) if value.resolve().is_relative_to(ROOT) else value.name)
               if isinstance(value, Path) else value for key, value in vars(args).items()}
-    config.update(weight_decay=.01, warmup_steps=500, clip_grad_norm=1.,
+    config.update(weight_decay=.01, warmup_steps=args.warmup_steps, clip_grad_norm=1.,
                   refiner_dtype="float32", encoder=y0.ENCODER, probe_head=checkpoint["head"])
     if args.infer_ablations is None:
         config.pop('infer_ablations')
-    for name in ('step_weights', 'k_train_choices'):
+    for name in ('step_weights', 'k_train_choices', 'draft_cache', 'init_refiner'):
         if getattr(args, name) is None:
             config.pop(name)
     objective = RefinerObjective(args.loss, args.pos_weight, args.aux_weight, args.skeleton_iterations,
@@ -821,10 +865,12 @@ def main():
                    for i, domain in enumerate(DOMAINS)] if args.epochs and not args.eval_only else [])
     if args.augmentation == 'd4':
         train_sets = [D4TrainingDataset(dataset, args.seed + i) for i, dataset in enumerate(train_sets)]
+    if cache is not None:
+        train_sets = [CacheIds(dataset) for dataset in train_sets]
     loader = (make_loader(ConcatDataset(train_sets), args.batch_size, args.loader_workers, True, args.seed)
               if train_sets else None)
     optimizer = torch.optim.AdamW(model.parameters(), lr=args.lr, weight_decay=.01) if loader else None
-    scheduler = (torch.optim.lr_scheduler.LambdaLR(optimizer, lambda step: lr_multiplier(step, len(loader) * args.epochs))
+    scheduler = (torch.optim.lr_scheduler.LambdaLR(optimizer, lambda step: lr_multiplier(step, len(loader) * args.epochs, args.warmup_steps))
                  if loader else None)
     start_epoch = int(restored["epoch"]) if restored is not None else 0
     epochs = list(restored.get("epochs", [])) if restored is not None else []
@@ -869,11 +915,14 @@ def main():
         epoch_started = stamp(device)
         batches, seen = [], 0
         k_distribution = {str(k): 0 for k in (args.k_train_choices or [args.k_train])}
-        for batch_index, (images, targets, valid, _, _) in enumerate(loader):
+        for batch_index, (images, targets, valid, image_ids, _) in enumerate(loader):
             images, targets, valid = (probe.as_device_tensor(value, device) for value in (images, targets, valid))
             optimizer.zero_grad(set_to_none=True)
             phase = stamp(device)
-            features, draft = frozen_draft(encoder, head, images)
+            if cache is None:
+                features, draft = frozen_draft(encoder, head, images)
+            else:
+                features, draft = frozen_cached_draft(encoder, head, images, image_ids, cache)
             encoder_time = stamp(device) - phase
             phase = stamp(device)
             training_k = (choose_training_k(args.k_train_choices, k_generator)
@@ -943,7 +992,7 @@ def main():
             for dataset in monitor.values():
                 dataset.pairs = dataset.pairs[:args.monitor_per_domain]
             observed = evaluate(encoder, head, model, monitor, [1, 4], device,
-                                args.eval_loader_workers, args.metric_workers, geometry=False)
+                                args.eval_loader_workers, args.metric_workers, geometry=False, **cache_options)
             point = {"epoch": epoch + 1, "seconds": observed["wall_seconds"],
                      "images_per_domain": {domain: len(dataset) for domain, dataset in monitor.items()},
                      "selection": "first sorted filenames; monitoring only"}
@@ -954,7 +1003,7 @@ def main():
         improved = False
         if args.select_every and ((epoch + 1) % args.select_every == 0 or epoch + 1 == args.epochs):
             selected = evaluate(encoder, head, model, selection_sets, [int(k) for k in args.selection_ks], device,
-                                args.eval_loader_workers, args.metric_workers, geometry=False)
+                                args.eval_loader_workers, args.metric_workers, geometry=False, **cache_options)
             point = {"epoch": epoch + 1, "seconds": selected["wall_seconds"]}
             point.update({key: selected["groups"]["Overall"][key]["scores"]["A"] for key in ('y0_draft', *args.selection_ks)})
             point["score"] = selection_score(point, args.selection_ks)
@@ -983,7 +1032,9 @@ def main():
     if split is not None and not args.eval_only:
         best = torch.load(args.ckpt_dir/'best.pt', map_location='cpu', weights_only=True)
         model.load_state_dict(best['state_dict'])
-    evaluation_options = {} if args.infer_ablations is None else {'infer_ablations': args.infer_ablations}
+    evaluation_options = dict(cache_options)
+    if args.infer_ablations is not None:
+        evaluation_options['infer_ablations'] = args.infer_ablations
     observed = evaluate(encoder, head, model, datasets, args.eval_k, device,
                         args.eval_loader_workers, args.metric_workers, eval_extra=args.eval_extra, **evaluation_options)
     last_observed = None
@@ -992,7 +1043,7 @@ def main():
         best = torch.load(args.ckpt_dir / "best.pt", map_location="cpu", weights_only=True)
         model.load_state_dict(best["state_dict"])
         observed = evaluate(encoder, head, model, datasets, args.eval_k, device,
-                            args.eval_loader_workers, args.metric_workers, eval_extra=args.eval_extra)
+                            args.eval_loader_workers, args.metric_workers, eval_extra=args.eval_extra, **cache_options)
     warnings = []
     draft_a = observed["groups"]["Overall"]["y0_draft"]["scores"]["A"]
     regression = "not checked: CPU or limited subset"
