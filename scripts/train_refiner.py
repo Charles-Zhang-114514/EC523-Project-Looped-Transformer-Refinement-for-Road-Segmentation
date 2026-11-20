@@ -21,7 +21,8 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 from analysis import y0_error_analysis as y0
 from scripts import train_linear_probe as probe
-from looproad.models.refiner import LoopRefiner
+from looproad.models.refiner import LoopRefiner, load_initial_refiner
+from looproad.models.detail_features import DetailFeatures
 from looproad.models.refiner_losses import RefinerObjective
 from looproad.data.augmentation import D4TrainingDataset
 from looproad.data.draft_cache import CacheIds, DraftCache, frozen_cached_draft
@@ -257,6 +258,8 @@ def evaluate(encoder, head, model, datasets, ks, device, loader_workers=1, metri
                     features, draft = frozen_draft(encoder, head, image)
                 else:
                     features, draft = frozen_cached_draft(encoder, head, image, image_id, draft_cache)
+                if getattr(model,'detail_head',False):
+                    features = DetailFeatures(features, image)
                 encoder_seconds += stamp(device) - phase
                 predictions = {"y0_draft": (draft.sigmoid().squeeze() >= .5).cpu().numpy().astype(np.uint8)}
                 times[domain]["y0_draft"].append(0.)
@@ -639,7 +642,7 @@ def initialize_refiner(model, path, probe_path):
     expected_probe = str(probe_path.resolve().relative_to(ROOT))
     if saved["config"]["probe_ckpt"] != expected_probe:
         raise ValueError("Initialization checkpoint uses a different draft head")
-    model.load_state_dict(saved["state_dict"], strict=True)
+    load_initial_refiner(model, saved["state_dict"])
 
 
 def training_batches(loader, max_steps=None):
@@ -665,6 +668,7 @@ def build_parser():
     parser.add_argument("--draft-cache", type=Path)
     parser.add_argument("--init-refiner", type=Path)
     parser.add_argument("--d4-aug", action="store_true")
+    parser.add_argument("--detail-head", action="store_true")
     parser.add_argument("--warmup-steps", type=int, default=500)
     parser.add_argument("--max-steps", type=int, help="Bound total updates, cycling a small dataset if needed")
     parser.add_argument("--pos-weight", type=float, default=4.,
@@ -852,7 +856,7 @@ def main():
     model = LoopRefiner(encoder.out_channels, args.dimension, args.layers, args.heads,
                         args.mlp_ratio, args.patch, no_mask_feedback=args.no_mask_feedback,
                         reset_state=args.reset_state, head_type=args.head_type,
-                        untied_steps=args.untied_steps).to(device=device, dtype=torch.float32)
+                        untied_steps=args.untied_steps, detail_head=args.detail_head).to(device=device, dtype=torch.float32)
     if restored is not None:
         model.load_state_dict(restored["state_dict"])
     if args.init_refiner is not None:
@@ -872,6 +876,8 @@ def main():
               if isinstance(value, Path) else value for key, value in vars(args).items()}
     config.update(weight_decay=.01, warmup_steps=args.warmup_steps, clip_grad_norm=1.,
                   refiner_dtype="float32", encoder=y0.ENCODER, probe_head=checkpoint["head"])
+    if not args.detail_head:
+        config.pop("detail_head")
     if not args.d4_aug:
         config.pop('d4_aug')
     if args.infer_ablations is None:
@@ -945,12 +951,17 @@ def main():
         k_distribution = {str(k): 0 for k in (args.k_train_choices or [args.k_train])}
         for batch_index, (images, targets, valid, image_ids, _) in enumerate(training_batches(loader, args.max_steps)):
             images, targets, valid = (probe.as_device_tensor(value, device) for value in (images, targets, valid))
+            update_started = stamp(device) if args.max_steps is not None else None
+            if args.max_steps is not None and device.type == "cuda":
+                torch.cuda.reset_peak_memory_stats(device)
             optimizer.zero_grad(set_to_none=True)
             phase = stamp(device)
             if cache is None:
                 features, draft = frozen_draft(encoder, head, images)
             else:
                 features, draft = frozen_cached_draft(encoder, head, images, image_ids, training_cache)
+            if args.detail_head:
+                features = DetailFeatures(features, images)
             encoder_time = stamp(device) - phase
             phase = stamp(device)
             training_k = (choose_training_k(args.k_train_choices, k_generator)
@@ -983,6 +994,9 @@ def main():
                      "encoder_seconds": encoder_time, "refiner_forward_backward_seconds": refiner_time,
                      "lr": learning_rate, "gradient_norm_before_clip": float(gradient_norm),
                      "loss_terms": loss_terms}
+            if update_started is not None:
+                batch['update_seconds'] = stamp(device)-update_started
+                batch['peak_cuda_bytes'] = (torch.cuda.max_memory_allocated(device) if device.type == 'cuda' else None)
             batch['k_train'] = training_k
             if args.loss == 'bce':
                 batch.update(bce=float(bce.detach()), step_bce=batch['step_losses'],

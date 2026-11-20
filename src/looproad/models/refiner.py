@@ -4,6 +4,7 @@ import math
 import torch
 from torch import nn
 import torch.nn.functional as F
+from .detail_features import DetailFeatures
 
 
 def patchify(answer, patch=16):
@@ -59,8 +60,9 @@ class TransformerBlock(nn.Module):
 
 class ConvUpsampleHead(nn.Module):
     """Mix neighboring token features while decoding a smooth full-size delta."""
-    def __init__(self, dimension):
+    def __init__(self, dimension, detail_head=False):
         super().__init__()
+        self.detail_head = detail_head
         self.norm = nn.LayerNorm(dimension)
         self.project = nn.Linear(dimension, 16)
         self.conv1 = nn.Conv2d(16, 16, 3, padding=1)
@@ -68,10 +70,26 @@ class ConvUpsampleHead(nn.Module):
         self.final = nn.Conv2d(16, 1, 1)
         nn.init.zeros_(self.final.weight)
         nn.init.zeros_(self.final.bias)
+        if detail_head:
+            self.detail_encoder = nn.Sequential(
+                nn.Conv2d(3,16,3,stride=2,padding=1), nn.GELU(),
+                nn.Conv2d(16,32,3,stride=2,padding=1), nn.GELU(),
+                nn.Conv2d(32,32,3,padding=1), nn.GELU())
+            self.detail_fusion = nn.Sequential(nn.Conv2d(49,16,3,padding=1), nn.GELU())
+            self.detail_gate = nn.Conv2d(16,16,1)
+            nn.init.zeros_(self.detail_gate.weight)
+            nn.init.zeros_(self.detail_gate.bias)
 
-    def forward(self, tokens, grid):
+    def forward(self, tokens, grid, rgb=None, answer=None):
         values = self.project(self.norm(tokens)).transpose(1, 2).reshape(tokens.shape[0], 16, grid, grid)
         values = F.interpolate(values, scale_factor=4, mode="bilinear", align_corners=False)
+        if self.detail_head:
+            if rgb is None or answer is None:
+                raise ValueError('Detail output requires RGB and current answer')
+            details = self.detail_encoder(rgb)
+            feedback = F.avg_pool2d(answer.sigmoid(),4)
+            fused = self.detail_fusion(torch.cat((values,details,feedback),dim=1))
+            values = values + self.detail_gate(fused)
         values = F.gelu(self.conv1(values))
         values = F.interpolate(values, scale_factor=4, mode="bilinear", align_corners=False)
         return self.final(F.gelu(self.conv2(values)))
@@ -81,7 +99,7 @@ class LoopRefiner(nn.Module):
     def __init__(self, in_channels=1024, dimension=256, layers=1, heads=8,
                  mlp_ratio=4., patch=16, image_size=1024,
                  no_mask_feedback=False, reset_state=False, head_type="patch_linear",
-                 untied_steps=0):
+                 untied_steps=0, detail_head=False):
         super().__init__()
         if min(in_channels, dimension, layers, heads, patch, image_size) < 1 or mlp_ratio <= 0:
             raise ValueError("Model dimensions must be positive")
@@ -89,6 +107,9 @@ class LoopRefiner(nn.Module):
             raise ValueError("Incompatible attention dimension or patch grid")
         if not isinstance(untied_steps, int) or untied_steps < 0:
             raise ValueError("untied_steps must be a nonnegative integer")
+        if detail_head and (head_type != "conv_upsample" or untied_steps):
+            raise ValueError("Detail recovery requires the shared conv_upsample head")
+        self.detail_head = detail_head
         self.untied_steps = untied_steps
         self._step_index = 0
         self.image_size, self.patch = image_size, patch
@@ -114,7 +135,7 @@ class LoopRefiner(nn.Module):
             nn.init.zeros_(self.output_head[-1].weight)
             nn.init.zeros_(self.output_head[-1].bias)
         else:
-            self.output_head = ConvUpsampleHead(dimension)
+            self.output_head = ConvUpsampleHead(dimension, detail_head=detail_head)
         self._initial_state = None
         self.parameter_counts()
 
@@ -124,6 +145,13 @@ class LoopRefiner(nn.Module):
         return self.answer_projection(patchify(logits.sigmoid(), self.patch))
 
     def init(self, features, draft):
+        rgb = None
+        if self.detail_head:
+            if not isinstance(features, DetailFeatures):
+                raise ValueError('Detail recovery requires features plus full-resolution RGB')
+            features, rgb = features.features, features.rgb
+            if rgb.shape != (draft.shape[0],3,self.image_size,self.image_size):
+                raise ValueError('RGB must match full-resolution answer')
         if features.ndim != 4 or features.shape[-2:] != (self.grid, self.grid):
             raise ValueError("Feature grid must match image_size / patch (64x64 by default)")
         feature_tokens = self.feature_projection(features.flatten(2).transpose(1, 2))
@@ -131,9 +159,12 @@ class LoopRefiner(nn.Module):
         # Retain the graph for the reset-state ablation; never detach across steps.
         self._initial_state = initial_state
         self._step_index = 0
-        return initial_state, feature_tokens
+        return initial_state, (DetailFeatures(feature_tokens,rgb) if self.detail_head else feature_tokens)
 
     def step(self, state, answer, feature_tokens):
+        rgb = None
+        if self.detail_head:
+            feature_tokens, rgb = feature_tokens.features, feature_tokens.rgb
         if self.untied_steps:
             if self._initial_state is None:
                 raise RuntimeError("Call init before using the untied stack")
@@ -149,7 +180,8 @@ class LoopRefiner(nn.Module):
         core = self.core[self._step_index] if self.untied_steps else self.core
         next_state = core(state + feature_tokens + feedback + self.position_encoding)
         correction = (unpatchify(self.output_head(next_state), self.image_size, self.image_size, self.patch)
-                      if self.head_type == "patch_linear" else self.output_head(next_state, self.grid))
+                      if self.head_type == "patch_linear" else (self.output_head(next_state,self.grid,rgb,answer) if self.detail_head
+                            else self.output_head(next_state, self.grid)))
         if self.untied_steps:
             self._step_index += 1
         return next_state, answer + correction
@@ -159,6 +191,25 @@ class LoopRefiner(nn.Module):
         names = ("core", "feature_projection", "answer_projection", "initializer", "output_head")
         counts = {name: sum(p.numel() for p in getattr(self, name).parameters()) for name in names}
         counts["trainable_total"] = sum(p.numel() for p in self.parameters() if p.requires_grad)
+        if self.detail_head:
+            counts['detail_added'] = sum(p.numel() for name,p in self.named_parameters()
+                                        if name.startswith('output_head.detail_'))
+            if counts['detail_added'] != 21680:
+                raise AssertionError('Unexpected detail parameter count')
         if counts["core"] > 5_000_000 or counts["trainable_total"] > 10_000_000:
             raise ValueError(f"Refiner parameter budget exceeded: {counts}")
         return counts
+
+
+def load_initial_refiner(model, state):
+    """Strict old-key loading; only newly introduced detail keys may be absent."""
+    if not getattr(model,'detail_head',False):
+        return model.load_state_dict(state, strict=True)
+    keys=set(model.state_dict())
+    added={k for k in keys if k.startswith('output_head.detail_')}
+    if set(state) != keys-added:
+        raise ValueError('Initialization must contain every legacy key and no unexpected key')
+    result=model.load_state_dict(state,strict=False)
+    if set(result.missing_keys)!=added or result.unexpected_keys:
+        raise AssertionError('Unexpected initialization incompatibility')
+    return result

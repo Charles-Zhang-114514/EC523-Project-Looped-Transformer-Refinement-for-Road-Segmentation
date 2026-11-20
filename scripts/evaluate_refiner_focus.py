@@ -18,6 +18,7 @@ from analysis import evaluate_draft_tta as tta
 from scripts import train_refiner as runner
 from looproad.data.draft_cache import DraftCache, sha256
 from looproad.models.d4_refiner import trajectory, transform
+from looproad.models.detail_features import DetailFeatures
 
 HEAD=ROOT/'runs/draft_head/A1-i/best.pt'
 CACHE=ROOT/'runs/cache/tta_draft_a1i_s0'
@@ -103,6 +104,9 @@ def evaluate(encoder,head,model,rows,ks,device,modes,cache,stress=False,regressi
             for mode in modes:
                 masks[mode]={};timing[mode]={};peaks[mode]={};calls[mode]={}
                 fs=features[:1] if mode=='E0' else features
+                if getattr(model,'detail_head',False):
+                    if mode!='E0':raise ValueError('Detail evaluation currently supports identity-view refinement only')
+                    fs=DetailFeatures(fs,image)
                 cs=(0,) if mode=='E0' else codes
                 originals=({key:y.clone() for key,y,_,_ in runner.inference_steps(model,fs,draft,ks,device)}
                            if regression and mode=='E0' else {})
