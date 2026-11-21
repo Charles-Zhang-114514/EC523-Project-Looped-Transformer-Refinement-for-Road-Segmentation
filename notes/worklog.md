@@ -1353,3 +1353,25 @@ Observed timings below are corruption_seconds in milliseconds, excluding cache r
 - HO-P1 holds: held-out Train best epoch=7, Val-sel best epoch=1. HO-R1 uses difference 7-1=6 >=3 and returns its preregistered interpretation that early stopping is mainly associated with Train/Val distribution differences. This is the registered descriptive interpretation, not an independently identified causal mechanism. Held-out Train domain best epochs and Val-sel domain curves are retained in the reports.
 - Observed CD_s1 Val-sel domain best epochs Overall/Urban/Rural=1/2/1, CD_s2=2/3/1, BS_s0=1/4/2; the other runs are 1/1/1. Observed CD* Rural A rises throughout K1/2/4/8, while E0/RS-D4*/BS* Rural A declines. CD* Overall rises through K4 then declines at K8. Component changes, same-seed contrasts, all epoch domain curves and finite official scores are retained descriptively in the new reports.
 - Wrote only results/wave5/cd_bs/{summary.md,metrics.json}, results/wave5/holdout/{summary.md,metrics.json} and this worklog. Summary values were checked against JSON, arithmetic and sample standard deviations were cross-checked, files are below 10 MB, and the forbidden personal-path scan is empty. No tests were run because this task changes only acceptance records.
+
+## 2026-11-21 - CD probability, warm-start and Train-plus-Val-sel preregistration
+
+Recorded before creating or submitting any wave 6 job. The supplied definitions, predictions and rules are preserved verbatim below.
+
+定义：
+- CD-P8 = CD 的设置，只把 --draft-corrupt 改成 0.8，seed 0/1/2，按 Val-sel L 选 epoch 和 seed；
+- CD-W = RW-D4 的设置（从 e6 s0 初始化、lr 1e-4、100 步预热 + 余弦、3 epoch）+ --draft-corrupt 0.5，seed 0/1/2，按 Val-sel L 选 epoch 和 seed；
+- CD-TVS = CD 的设置（P = 0.5，10 epoch 的调度），训练集为 Train + Val-sel（2522 + 834 张），seed 0/1/2；预先固定采用第 2 个 epoch 的 checkpoint，不用任何划分来选 epoch。
+- 爬升幅度 = A(K4) − A(K1)，用 Val-rep 的 Overall A；城市爬升 = 同样的差，只看 Urban。
+
+P8-P1：CD-P8 三 seed 的 Val-rep L 均值减去 CD 均值，落在 −0.002 到 +0.002 之间。
+P8-P2：CD-P8 的爬升幅度均值比 CD 的（0.002127）大 ≥ +0.001。
+P8-P3：CD-P8 的城市爬升均值大于 CD 的城市爬升均值。
+W-P1：CD-W 三 seed 的 Val-rep L 均值减去 RW-D4 均值（0.545515），落在 +0.001 到 +0.004 之间；样本标准差小于 CD 的样本标准差。
+TVS-P1：CD-TVS 三 seed 的 Val-rep LB 均值减去 CD 的 LB 均值（0.546994），落在 +0.002 到 +0.008 之间。
+TVS-P2：CD-TVS 相对 CD 的提升，城市大于乡村（用 LB 的均值比较）。
+
+判定规则：
+R6-R1（CD-P8、CD-W）：各自按 Val-sel L 选出的 seed，满足 Val-rep LB ≥ CD s0 的 LB + 0.002（即 ≥ 0.551580），并且 Urban、Rural 的 LB 都不低于 CD s0 对应值超过 0.003，就算通过。
+R6-R2（CD-TVS）：如果三 seed 的 Val-rep LB 均值比 CD 均值高 ≥ +0.002，并且按 seed 配对至少 2/3 为正，就判定"加入 Val-sel 训练有效"；此时取 Val-rep LB 最高的那个 seed 作为候选（在 Val-rep 上做了选择，报告里注明这个分数偏乐观），候选还要满足 Val-rep LB ≥ CD s0 的 LB + 0.002 才能通过。
+R6-R3：如果有多组通过，取 Val-rep LB 最高的那组（如实注明选择方式）；都不通过就保留 CD s0 作为最终的 refiner。
