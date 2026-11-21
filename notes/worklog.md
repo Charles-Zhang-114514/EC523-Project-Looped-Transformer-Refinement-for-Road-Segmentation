@@ -1218,3 +1218,113 @@ HO-R1（解释，只用于报告）：
 - Time estimation uses measured RS-D4 approximately3600 s for the complete baseline. CD adds2522*10 times mean per-image corruption_seconds measured in the GPU smoke's CPU workers, excluding cache-read time, with no overlap or worker-parallelism discount (a conservative allowance). HO adds10*200*(.04+4*.012+4*.125)=1176 s for held-out evaluation, including draft/K1/K2/K4 official metric groups. Request ceil_to_minute(1.3*(3600+extra_CD_CPU+extra_HO)+300). BS gives4980 s (01:23:00), HO6540 s (01:49:00); CD awaits actual smoke CPU timings. The CPU-only estimator prints all measured terms and seven manual qsub commands with ARM/SEED/SMOKE_DIR. No login-node CPU timings are extrapolated to GPU training speed.
 - Observed initial controls tests passed8 in9.810 s, expanded related suites passed33 in20.329 s, and final controls suite passed12 in8.181 s. Coverage includes corruption reproducibility/label immutability/geometric bounds, true CPU spawn loading, disabled training/model loss/weights/Torch/NumPy/Python RNG versus9bcd97d, zero/bounded corrections, checkpoint-bound restoration, fixed disjoint holdouts, evaluation corruption rejection, failure isolation, estimator arithmetic and CUDA-free supervisor imports. The actual training entries for CD/BS/HO each run on tiny synthetic images through updates, checkpoint selection and official scoring. No pretrained model or real image is loaded on CPU. Synthetic estimator fixtures are not reported as actual resource measurements.
 - Observed the single final full unittest discovery passed245 tests in144.509 s:244 passed and one known CUDA-only skip. Log is ignored under runs/r5_unittest.log; no full-suite rerun occurred. Shell syntax and whitespace checks pass. Relative to9bcd97d, results and submission diffs are empty. Only scoped source, two new qsub files, synthetic tests and this appended worklog are committed, with no new images, weights, logs, features, caches or personal paths. All files are below50 MB. Actual GPU smoke gates and measured CD time budget remain pending manual execution; no scientific prediction is adjudicated from synthetic tests.
+
+## 2026-11-21 - Wave 5 smoke acceptance and measured CD/BS/HO budgets
+
+- Re-read AGENTS.md and confirmed clean charles/refiner-focus at 9fc1f48. Read only saved logs/JSON for job 8821468 and ran the authorized existing --estimate after all acceptance checks passed. Output is runs/wave5/smoke_8821468. No code, jobs, tests, checkpoint, cache or result was changed; no training, inference, unit test, network, scheduler command, polling or push occurred. Only this appended English worklog is committed locally.
+- Observed NVIDIA L40S / Exclusive_Process in main log lines1-5, source 9fc1f48e440de54fd55654a3f3c914865a706e2e at line13. All six stages CD/score-CD/BS/score-BS/HO/score-HO return exit_code=0 and passed=true at lines14-19. Main log line20 prints WAVE5_SMOKE_COMPLETE. Stage logs contain no Traceback/OOM/out-of-memory/killed/RuntimeError/TypeError. Training children finish their reports; each scoring child prints FOCUS_EVAL_COMPLETE at line9.
+- Observed CD completes20 updates with finite loss range [0.03291347250342369,0.2778220474720001]. Eighty presentations have80 unique image/view IDs. Selected for corruption:45/80=56.25%; actually modified:44/80=55%. One selected sample, Train/Urban/2082 with D4 code4, has zero gaps/blocks/changed pixels; distinguish selection probability from actual modification rather than calling both56.25%. There are99 actual gaps and47 actual false blocks. Gap-count frequencies are0:40,1:9,2:13,3:8,4:10; block-count frequencies0:51,1:11,2:18. Actual ellipse raster areas range51..375 pixels.
+- Observed CD changes134356 pixels total; all-sample min/median/mean/max changed pixels=0/667/1679.45/7672, and positive-change range269..7672. Selected-sample median/mean=2810/2985.688888888889; all35 unselected samples have zero changes/gaps/blocks. The small per-sample audit table below retains exactly the requested image-level counts and timing; it is not a copied training log or a pixel array.
+- Observed CPU corruption time across80 samples (excluding cache reads): min0.0003002579906024039, median0.03151731952675618, mean0.058771465166501, max0.3152119379956275, sum4.70171721332008 seconds. Selected45 mean0.10419597438045053 s; unselected35 mean0.0003685247485658952 s. Cache-read mean is separately0.009043578009004705 s and excluded from the resource increment. Two CPU worker PIDs are recorded. The training report and score-CD report both record evaluation_corruption_applied=false; selection/final evaluation use the ordinary cache, not the training-only corruption wrapper.
+- Observed BS completes20 updates, finite loss range [0.17118830978870392,0.17120350897312164]. All20*4=80 recorded pre-addition correction maxima satisfy |delta|<=1.0; maximum is0.00027068902272731066. Clean/stress inference saves48 further step maxima, all<=1.0, maximum0.0003034062101505697. These are maxima of the bounded correction before residual addition, not a reconstructed subtraction that could introduce rounding artifacts.
+- Observed HO completes20 updates, finite loss range [0.12057794630527496,0.120588019490242]. Smoke uses four retained Train and four held-out Train IDs (two/domain for each); their intersection is0. Held-out epoch1 L is Overall0.3975331654165237, Urban0.3350072742513335, Rural0.5963501539848193; Val-sel L is Overall0.5036035694503794, Urban0.6422153896190372, Rural0.12558364879967998. Both curves are recorded and checkpoint selection remains Val-sel. The formal holdout size remains100/domain; no early-stop prediction is adjudicated from this single partial smoke epoch.
+- Observed score-CD/BS/HO each complete four clean and four seed523 stress images, two/domain, with official finite Overall/Urban/Rural scores. Clean uses K1/2/4/8; stress uses K4 and live TTA drafts. Checked60 saved cumulative core-call endpoints across these three scoring reports; all equal K. Summing each trajectory's maximum K once gives144 actual core invocations. Stress Overall A(K4) is CD0.6607965066401883, BS0.6608237143063922, HO0.6607557465905028, retained only as workflow evidence. Every scoring report explicitly records evaluation_corruption_applied=false.
+- All requested smoke acceptance checks pass; step2 is cleared. Ran exactly OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 python scripts/train_refiner_r5.py --estimate runs/wave5/smoke_8821468. Observed h_rt CD6960 s=01:56:00, BS4980 s=01:23:00, HO6540 s=01:49:00; none exceeds3 hours. CD CPU allowance=25220*0.058771465166501=1482.2163514991553 s; HO allowance=1176 s; baseline=3600 s. The estimator uses ceil_to_minute(1.3*(baseline+added_CPU+added_holdout)+300), without a CPU-parallelism/overlap discount. No login-node CPU rate is extrapolated to GPU training.
+- Exact estimator command output follows for manual submission; no qsub was executed here.
+
+```bash
+qsub -l gpu_type=L40S,h_rt=01:56:00 -v ARM=CD,SEED=0,SMOKE_DIR=runs/wave5/smoke_8821468 jobs/refiner_r5.qsub
+qsub -l gpu_type=L40S,h_rt=01:56:00 -v ARM=CD,SEED=1,SMOKE_DIR=runs/wave5/smoke_8821468 jobs/refiner_r5.qsub
+qsub -l gpu_type=L40S,h_rt=01:56:00 -v ARM=CD,SEED=2,SMOKE_DIR=runs/wave5/smoke_8821468 jobs/refiner_r5.qsub
+qsub -l gpu_type=L40S,h_rt=01:23:00 -v ARM=BS,SEED=0,SMOKE_DIR=runs/wave5/smoke_8821468 jobs/refiner_r5.qsub
+qsub -l gpu_type=L40S,h_rt=01:23:00 -v ARM=BS,SEED=1,SMOKE_DIR=runs/wave5/smoke_8821468 jobs/refiner_r5.qsub
+qsub -l gpu_type=L40S,h_rt=01:23:00 -v ARM=BS,SEED=2,SMOKE_DIR=runs/wave5/smoke_8821468 jobs/refiner_r5.qsub
+qsub -l gpu_type=L40S,h_rt=01:49:00 -v ARM=HO,SEED=0,SMOKE_DIR=runs/wave5/smoke_8821468 jobs/refiner_r5.qsub
+```
+
+### Per-sample CD acceptance audit
+
+Observed timings below are corruption_seconds in milliseconds, excluding cache reads; the rows retain presentation order. Selected does not imply a nonzero change when no gap/block was produced.
+
+| Sample | Image/view ID | Selected | Changed pixels | Gaps | False blocks | CPU corruption ms |
+| --- | --- | --- | --- | --- | --- | --- |
+| 1 | Train/Rural/143\|d4=6 | Yes | 4007 | 4 | 2 | 110.450603 |
+| 2 | Train/Urban/1391\|d4=1 | No | 0 | 0 | 0 | 0.353303 |
+| 3 | Train/Urban/2191\|d4=6 | Yes | 4469 | 3 | 2 | 190.519555 |
+| 4 | Train/Rural/380\|d4=0 | No | 0 | 0 | 0 | 0.356196 |
+| 5 | Train/Rural/1247\|d4=0 | Yes | 4713 | 3 | 2 | 123.714975 |
+| 6 | Train/Urban/2337\|d4=4 | Yes | 915 | 1 | 2 | 148.595382 |
+| 7 | Train/Urban/1989\|d4=2 | Yes | 2616 | 2 | 1 | 150.586343 |
+| 8 | Train/Urban/1921\|d4=4 | No | 0 | 0 | 0 | 0.314498 |
+| 9 | Train/Urban/1404\|d4=5 | Yes | 4085 | 3 | 2 | 153.515903 |
+| 10 | Train/Urban/2395\|d4=7 | Yes | 744 | 1 | 2 | 126.589453 |
+| 11 | Train/Rural/1170\|d4=6 | Yes | 3580 | 4 | 0 | 16.512148 |
+| 12 | Train/Urban/1999\|d4=7 | No | 0 | 0 | 0 | 0.420797 |
+| 13 | Train/Rural/17\|d4=4 | No | 0 | 0 | 0 | 0.331379 |
+| 14 | Train/Urban/1815\|d4=2 | Yes | 6806 | 4 | 2 | 128.904757 |
+| 15 | Train/Rural/818\|d4=6 | No | 0 | 0 | 0 | 0.328618 |
+| 16 | Train/Rural/73\|d4=7 | Yes | 2928 | 2 | 0 | 27.096874 |
+| 17 | Train/Urban/1854\|d4=3 | No | 0 | 0 | 0 | 0.374829 |
+| 18 | Train/Urban/1411\|d4=1 | No | 0 | 0 | 0 | 0.381502 |
+| 19 | Train/Urban/1711\|d4=4 | No | 0 | 0 | 0 | 0.416451 |
+| 20 | Train/Urban/1937\|d4=4 | No | 0 | 0 | 0 | 0.397201 |
+| 21 | Train/Urban/2294\|d4=0 | No | 0 | 0 | 0 | 0.408955 |
+| 22 | Train/Rural/995\|d4=7 | No | 0 | 0 | 0 | 0.343183 |
+| 23 | Train/Urban/2082\|d4=4 | Yes | 0 | 0 | 0 | 9.326527 |
+| 24 | Train/Rural/1148\|d4=7 | No | 0 | 0 | 0 | 0.465700 |
+| 25 | Train/Urban/1369\|d4=6 | No | 0 | 0 | 0 | 0.373943 |
+| 26 | Train/Urban/2001\|d4=1 | Yes | 5831 | 4 | 0 | 142.738235 |
+| 27 | Train/Rural/322\|d4=2 | Yes | 6431 | 4 | 0 | 58.415477 |
+| 28 | Train/Rural/768\|d4=2 | No | 0 | 0 | 0 | 0.382001 |
+| 29 | Train/Urban/2241\|d4=4 | Yes | 1766 | 1 | 0 | 77.449526 |
+| 30 | Train/Urban/1468\|d4=7 | No | 0 | 0 | 0 | 0.381621 |
+| 31 | Train/Urban/2078\|d4=6 | Yes | 5130 | 2 | 2 | 157.160261 |
+| 32 | Train/Urban/2281\|d4=1 | Yes | 932 | 2 | 0 | 98.243008 |
+| 33 | Train/Rural/1326\|d4=6 | No | 0 | 0 | 0 | 0.328315 |
+| 34 | Train/Urban/2428\|d4=3 | Yes | 1975 | 3 | 0 | 95.658946 |
+| 35 | Train/Rural/787\|d4=1 | No | 0 | 0 | 0 | 0.480371 |
+| 36 | Train/Urban/2097\|d4=1 | Yes | 3189 | 2 | 1 | 315.211938 |
+| 37 | Train/Urban/2130\|d4=5 | Yes | 3514 | 1 | 1 | 153.791496 |
+| 38 | Train/Rural/238\|d4=0 | Yes | 2303 | 3 | 0 | 92.617115 |
+| 39 | Train/Rural/763\|d4=0 | No | 0 | 0 | 0 | 0.300258 |
+| 40 | Train/Rural/132\|d4=4 | No | 0 | 0 | 0 | 0.353289 |
+| 41 | Train/Rural/263\|d4=3 | No | 0 | 0 | 0 | 0.323721 |
+| 42 | Train/Rural/1100\|d4=4 | Yes | 1740 | 2 | 1 | 98.341356 |
+| 43 | Train/Urban/1681\|d4=4 | No | 0 | 0 | 0 | 0.347360 |
+| 44 | Train/Rural/433\|d4=6 | Yes | 4522 | 2 | 2 | 116.605897 |
+| 45 | Train/Rural/878\|d4=7 | Yes | 1737 | 2 | 2 | 79.520191 |
+| 46 | Train/Urban/2463\|d4=6 | No | 0 | 0 | 0 | 0.328018 |
+| 47 | Train/Rural/907\|d4=7 | No | 0 | 0 | 0 | 0.439320 |
+| 48 | Train/Rural/279\|d4=0 | Yes | 1901 | 2 | 0 | 15.229056 |
+| 49 | Train/Rural/1297\|d4=1 | No | 0 | 0 | 0 | 0.346744 |
+| 50 | Train/Urban/1567\|d4=5 | Yes | 3214 | 2 | 1 | 93.701465 |
+| 51 | Train/Rural/814\|d4=3 | Yes | 4140 | 4 | 2 | 93.853707 |
+| 52 | Train/Urban/1982\|d4=3 | Yes | 978 | 2 | 2 | 165.890996 |
+| 53 | Train/Urban/1450\|d4=6 | Yes | 2902 | 1 | 0 | 31.485664 |
+| 54 | Train/Rural/683\|d4=7 | Yes | 365 | 0 | 1 | 31.786208 |
+| 55 | Train/Rural/1307\|d4=5 | Yes | 345 | 0 | 1 | 32.353144 |
+| 56 | Train/Urban/1563\|d4=4 | Yes | 6702 | 2 | 0 | 61.006200 |
+| 57 | Train/Urban/1668\|d4=2 | No | 0 | 0 | 0 | 0.358634 |
+| 58 | Train/Urban/2519\|d4=3 | No | 0 | 0 | 0 | 0.324879 |
+| 59 | Train/Rural/422\|d4=6 | Yes | 1730 | 1 | 2 | 158.820324 |
+| 60 | Train/Rural/1149\|d4=1 | No | 0 | 0 | 0 | 0.312030 |
+| 61 | Train/Rural/32\|d4=6 | Yes | 7672 | 3 | 1 | 137.345973 |
+| 62 | Train/Urban/2358\|d4=1 | Yes | 1681 | 1 | 0 | 44.577300 |
+| 63 | Train/Urban/2316\|d4=0 | Yes | 2718 | 4 | 2 | 139.528095 |
+| 64 | Train/Rural/547\|d4=6 | Yes | 2810 | 2 | 0 | 83.161455 |
+| 65 | Train/Rural/672\|d4=3 | Yes | 3362 | 4 | 1 | 109.255339 |
+| 66 | Train/Urban/2345\|d4=0 | No | 0 | 0 | 0 | 0.363724 |
+| 67 | Train/Rural/1030\|d4=3 | Yes | 2840 | 1 | 1 | 110.509700 |
+| 68 | Train/Urban/1934\|d4=4 | Yes | 6683 | 4 | 2 | 258.967903 |
+| 69 | Train/Urban/1458\|d4=4 | No | 0 | 0 | 0 | 0.377142 |
+| 70 | Train/Rural/139\|d4=0 | Yes | 269 | 0 | 1 | 31.548975 |
+| 71 | Train/Rural/1161\|d4=1 | Yes | 590 | 0 | 2 | 45.029106 |
+| 72 | Train/Rural/964\|d4=1 | No | 0 | 0 | 0 | 0.467127 |
+| 73 | Train/Rural/1039\|d4=7 | No | 0 | 0 | 0 | 0.339972 |
+| 74 | Train/Urban/1384\|d4=7 | Yes | 1262 | 4 | 0 | 54.311524 |
+| 75 | Train/Rural/908\|d4=4 | Yes | 2659 | 3 | 2 | 79.791784 |
+| 76 | Train/Rural/333\|d4=4 | No | 0 | 0 | 0 | 0.324562 |
+| 77 | Train/Urban/2051\|d4=0 | Yes | 1061 | 3 | 0 | 106.079115 |
+| 78 | Train/Rural/756\|d4=5 | No | 0 | 0 | 0 | 0.356869 |
+| 79 | Train/Urban/2202\|d4=1 | Yes | 4539 | 1 | 2 | 133.019848 |
+| 80 | Train/Rural/386\|d4=7 | No | 0 | 0 | 0 | 0.395854 |
