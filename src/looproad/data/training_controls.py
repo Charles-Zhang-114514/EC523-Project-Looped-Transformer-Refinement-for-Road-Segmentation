@@ -56,10 +56,10 @@ def corrupt_logits(logits, probability, rng):
 
 class CorruptDraftDataset:
     """Loader workers read/transform/corrupt y0; images and labels stay intact."""
-    def __init__(self,dataset,cache,probability,seed,domain_index=0):
+    def __init__(self,dataset,cache,probability,seed,domain_index=0, *, allow_valsel=False):
         source=dataset
         while not hasattr(source,'split')and hasattr(source,'dataset'):source=source.dataset
-        if source.split!='Train':raise ValueError('Draft corruption is Train only')
+        if source.split!='Train' and not (allow_valsel and source.split=='Val'):raise ValueError('Draft corruption is Train only')
         self.dataset,self.cache=dataset,cache
         self.probability,self.seed,self.domain_index=probability,seed,domain_index
         self.epoch=0

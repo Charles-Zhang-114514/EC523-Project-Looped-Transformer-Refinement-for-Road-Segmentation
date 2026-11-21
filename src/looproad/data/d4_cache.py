@@ -5,8 +5,8 @@ from .augmentation import d4_transform
 
 
 class D4CacheDataset:
-    def __init__(self, dataset, seed=0):
-        if dataset.split != 'Train':
+    def __init__(self, dataset, seed=0, *, allow_valsel=False):
+        if dataset.split != 'Train' and not (allow_valsel and dataset.split == 'Val'):
             raise ValueError('Train only')
         self.dataset, self.seed, self.epoch = dataset, seed, 0
 
