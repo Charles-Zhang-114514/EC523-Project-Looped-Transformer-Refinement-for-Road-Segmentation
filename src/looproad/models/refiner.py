@@ -99,7 +99,7 @@ class LoopRefiner(nn.Module):
     def __init__(self, in_channels=1024, dimension=256, layers=1, heads=8,
                  mlp_ratio=4., patch=16, image_size=1024,
                  no_mask_feedback=False, reset_state=False, head_type="patch_linear",
-                 untied_steps=0, detail_head=False):
+                 untied_steps=0, detail_head=False, delta_bound=None):
         super().__init__()
         if min(in_channels, dimension, layers, heads, patch, image_size) < 1 or mlp_ratio <= 0:
             raise ValueError("Model dimensions must be positive")
@@ -109,6 +109,9 @@ class LoopRefiner(nn.Module):
             raise ValueError("untied_steps must be a nonnegative integer")
         if detail_head and (head_type != "conv_upsample" or untied_steps):
             raise ValueError("Detail recovery requires the shared conv_upsample head")
+        if delta_bound is not None and (not math.isfinite(delta_bound) or delta_bound<=0):
+            raise ValueError('Delta bound must be finite and positive')
+        self.delta_bound=delta_bound
         self.detail_head = detail_head
         self.untied_steps = untied_steps
         self._step_index = 0
@@ -145,6 +148,7 @@ class LoopRefiner(nn.Module):
         return self.answer_projection(patchify(logits.sigmoid(), self.patch))
 
     def init(self, features, draft):
+        if self.delta_bound is not None:self._delta_maxima=[]
         rgb = None
         if self.detail_head:
             if not isinstance(features, DetailFeatures):
@@ -182,6 +186,9 @@ class LoopRefiner(nn.Module):
         correction = (unpatchify(self.output_head(next_state), self.image_size, self.image_size, self.patch)
                       if self.head_type == "patch_linear" else (self.output_head(next_state,self.grid,rgb,answer) if self.detail_head
                             else self.output_head(next_state, self.grid)))
+        if self.delta_bound is not None:
+            correction=self.delta_bound*torch.tanh(correction/self.delta_bound)
+            self._delta_maxima.append(correction.detach().abs().max())
         if self.untied_steps:
             self._step_index += 1
         return next_state, answer + correction

@@ -100,7 +100,7 @@ def evaluate(encoder,head,model,rows,ks,device,modes,cache,stress=False,regressi
             codes=tuple(range(8)) if any(m!='E0'for m in modes) else (0,)
             features,_=feature_views(encoder,head,image,codes)
             draft=live_draft(encoder,head,image) if stress else cache.load([identity],device)
-            masks={};timing={};peaks={};calls={};regression_max=0.0
+            masks={};timing={};peaks={};calls={};regression_max=0.0;bound_maxima={}
             for mode in modes:
                 masks[mode]={};timing[mode]={};peaks[mode]={};calls[mode]={}
                 fs=features[:1] if mode=='E0' else features
@@ -118,10 +118,13 @@ def evaluate(encoder,head,model,rows,ks,device,modes,cache,stress=False,regressi
                         regression_max=max(regression_max,diff)
                         if diff>1e-5 or not np.array_equal(masks[mode][k],tta.binary_mask(original)):
                             raise AssertionError(f'Identity-view SG1 failed: {diff}')
+                if getattr(model,'delta_bound',None) is not None:
+                    bound_maxima[mode]=[float(x) for x in model._delta_maxima]
             with Image.open(label) as im:labels=np.array(im,dtype=np.uint8)
             pending.append(pool.apply_async(score_masks,(domain,masks,labels)))
             if len(pending)>=12:consume()
             images.append(dict(domain=domain,image_id=identity,refiner_seconds=timing,peak_cuda_bytes=peaks,core_calls=calls,identity_regression_max_difference=regression_max))
+            if bound_maxima:images[-1]['delta_maxima']=bound_maxima
             print('SCORED '+json.dumps(dict(id=identity,calls=calls)),flush=True)
         while pending:consume()
     groups={}
@@ -150,6 +153,7 @@ def main():
     p=argparse.ArgumentParser(description=__doc__)
     p.add_argument('--phase',choices=['full','sg1','S5a','S5b','dg1','stress','trained'],default='full')
     p.add_argument('--limit-per-domain',type=int)
+    p.add_argument('--audit-training-controls',action='store_true')
     p.add_argument('--checkpoint',type=Path,default=BASE)
     p.add_argument('--out-dir',type=Path,required=True)
     args=p.parse_args();args.out_dir.mkdir(parents=True,exist_ok=True)
@@ -157,6 +161,9 @@ def main():
     encoder,head,_=runner.y0.load_frozen_probe(HEAD,device)
     model,_=tta.previous.shared.load_model(args.checkpoint,device,sha256(tta.SPLIT));model.eval()
     report=dict(checkpoint=args.checkpoint.name,manifest_sha256=sha256(CACHE/'manifest.json'),splits={})
+    if args.audit_training_controls:
+        report['evaluation_corruption_applied']=False
+        report['delta_bound']=getattr(model,'delta_bound',None)
     if args.phase=='dg1':
         report['DG1']=dg1(encoder,head,device,cache)
     else:

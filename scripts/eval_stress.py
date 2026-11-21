@@ -235,6 +235,7 @@ def load_model(path, device, split_hash):
         raise ValueError('Expected an unmodified e0_v2 checkpoint')
     settings={key: config[key] for key in ('dimension', 'layers', 'heads', 'mlp_ratio', 'patch', 'head_type')}
     if config.get('detail_head',False):settings['detail_head']=True
+    if config.get('delta_bound') is not None:settings['delta_bound']=config['delta_bound']
     model = runner.LoopRefiner(1024, **settings)
     model.load_state_dict(checkpoint['state_dict'])
     model.requires_grad_(False).to(device).eval()
