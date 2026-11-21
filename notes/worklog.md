@@ -1176,3 +1176,30 @@ qsub -l gpu_type=L40S,h_rt=00:54:00 -v ARM=W,SEED=2,SMOKE_DIR=runs/wave4/smoke_8
 - Observed descriptive decomposition of mean L changes uses only saved official component scores and the official linear quality weights (metrics.py:69), followed by the registered L weights. No image metric or Counts was recomputed. DR-S Overall contributions from IoU/clDice/BIoU are -0.000240828799/-0.000111594076/-0.000065748587; Urban -0.000392343271/-0.000271842938/-0.000033488805; Rural -0.000023224958/+0.000034302982/-0.000104058551. DR-W Overall is +0.000010433616/-0.000005194006/+0.000001352766; Urban +0.000036652908/+0.000020898645/+0.000005517568; Rural -0.000038899637/-0.000035625256/-0.000003983990. Contribution sums match saved mean L differences; these are algebraic descriptions, not causal attributions.
 - Observed E0 and prior RS-D4* Overall rise through K4 then decline; selected DR-S* Overall rises through K2 then declines through K8. DR-S* Urban rises at K2 then declines; Rural declines throughout. Prior RW-D4* and selected DR-W* Overall/Urban decline throughout while Rural rises throughout. Full five-configuration/domain/K A tables and component comparisons are saved. Every DR best epoch is1; prior RS-D4 seed2 was epoch2 and the other prior D4 best epochs were1.
 - Wrote only results/wave4/detail_head/summary.md and metrics.json, opening with gates, decisions and the E0/no-default-detail outcome. Independently checked all seed/domain metric rows, pairings, K curves, gate norms, sample statistics and decision arithmetic against JSON; numeric values are finite, files are below 10 MB, and personal-path scans are empty. No tests were run because no code changed. Only the two reports and this appended English worklog are committed locally, with no images, weights, logs, per-image tables or caches.
+
+## 2026-11-20 - Corrupt drafts, bounded steps and Train holdout preregistration
+
+Recorded before creating or submitting any new job. The supplied definitions, predictions and rules are preserved verbatim below.
+
+定义：
+- CD = RS-D4 的设置 + 初稿扰动（细节见目标 1），seed 0/1/2；
+- BS = RS-D4 的设置 + 修正量上限 c = 1.0 + 各步权重 0.1/0.2/0.3/0.4，seed 0/1/2；
+- HO = RS-D4 的设置，seed 0，从 Train 里每个域留出 100 张不参与训练；
+- 爬升幅度 = A(K4) − A(K1)，用 Val-rep 的 Overall A。
+
+CD-P1：CD 三 seed 的 Val-rep L 均值减去 RS-D4 均值，落在 −0.001 到 +0.003 之间。
+CD-P2：CD 的爬升幅度均值，比 RS-D4 的爬升幅度均值大 ≥ +0.001。
+CD-P3：CD 在 K4 上的 clDice 均值比 RS-D4 高。
+CD-P4：CD 至少 2/3 个 seed 的 best epoch ≥ 2。
+BS-P1：BS 的爬升幅度均值 ≥ +0.003，并且大于 RS-D4 的爬升幅度均值。
+BS-P2：BS 至少 2/3 个 seed 满足 A(K8) ≥ A(K4) − 0.001。
+BS-P3：BS 的 Val-rep LB 均值减去 RS-D4 均值，落在 −0.002 到 +0.002 之间。
+HO-P1：留出 Train 上的 best epoch ≥ 5，同时 Val-sel 上的 best epoch ≤ 2。
+
+判定规则：
+CB-R1（采用）：CD、BS 各自按 Val-sel L 选一个 seed；选出的 seed 满足 Val-rep LB ≥ 0.548636（E0 + 0.002），并且 Urban、Rural 的 LB 都不低于 E0 超过 0.003，就算通过；两组都通过时取 Val-sel L 更高的那组；都不通过就保留 E0。
+CB-R2（爬升，只用于报告，不影响采用）：一组被记为"实现爬升"，需要至少 2/3 个 seed 同时满足：爬升幅度 ≥ +0.003，并且 A(K8) ≥ A(K4) − 0.001。
+HO-R1（解释，只用于报告）：
+- 留出 Train 的 best epoch 减去 Val-sel 的 best epoch ≥ 3 → 报告写"早停主要和 Train/Val 分布差异有关"；
+- 两者的 best epoch 都 ≤ 2 → 写"早停主要来自训练本身"；
+- 其他情况 → 写"不确定"。
