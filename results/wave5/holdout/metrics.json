@@ -1,0 +1,685 @@
+{
+  "preregistration": "7388dcd",
+  "source_head": "c09405c",
+  "manifest_sha256": "06d97973fcec14cc113b7c3468d768e1e0a6d9b3d27998fd6aa14cf07c13dc90",
+  "head_sha256": "9429dacae36969948eddd5f4551c3fed9567a1acfee6526164fe1839bc3b568f",
+  "split_sha256": "bdd7d7a89237c96305f0ad404a5c9ae1254ed8cbc0b6e0e4fcc7b514bd323c68",
+  "gates": {
+    "HG1": {
+      "passed": true,
+      "training_count": 2322,
+      "heldout_count": 200,
+      "intersection_count": 0,
+      "heldout_ids": {
+        "Urban": [
+          "Train/Urban/1368",
+          "Train/Urban/1371",
+          "Train/Urban/1375",
+          "Train/Urban/1383",
+          "Train/Urban/1390",
+          "Train/Urban/1397",
+          "Train/Urban/1402",
+          "Train/Urban/1409",
+          "Train/Urban/1421",
+          "Train/Urban/1445",
+          "Train/Urban/1448",
+          "Train/Urban/1453",
+          "Train/Urban/1462",
+          "Train/Urban/1463",
+          "Train/Urban/1502",
+          "Train/Urban/1517",
+          "Train/Urban/1552",
+          "Train/Urban/1557",
+          "Train/Urban/1627",
+          "Train/Urban/1650",
+          "Train/Urban/1651",
+          "Train/Urban/1655",
+          "Train/Urban/1664",
+          "Train/Urban/1669",
+          "Train/Urban/1692",
+          "Train/Urban/1693",
+          "Train/Urban/1715",
+          "Train/Urban/1732",
+          "Train/Urban/1742",
+          "Train/Urban/1752",
+          "Train/Urban/1772",
+          "Train/Urban/1788",
+          "Train/Urban/1789",
+          "Train/Urban/1791",
+          "Train/Urban/1792",
+          "Train/Urban/1801",
+          "Train/Urban/1808",
+          "Train/Urban/1814",
+          "Train/Urban/1829",
+          "Train/Urban/1843",
+          "Train/Urban/1877",
+          "Train/Urban/1892",
+          "Train/Urban/1904",
+          "Train/Urban/1907",
+          "Train/Urban/1914",
+          "Train/Urban/1942",
+          "Train/Urban/1945",
+          "Train/Urban/1949",
+          "Train/Urban/1957",
+          "Train/Urban/1966",
+          "Train/Urban/1967",
+          "Train/Urban/1969",
+          "Train/Urban/2015",
+          "Train/Urban/2016",
+          "Train/Urban/2039",
+          "Train/Urban/2044",
+          "Train/Urban/2046",
+          "Train/Urban/2058",
+          "Train/Urban/2080",
+          "Train/Urban/2083",
+          "Train/Urban/2089",
+          "Train/Urban/2091",
+          "Train/Urban/2105",
+          "Train/Urban/2129",
+          "Train/Urban/2130",
+          "Train/Urban/2135",
+          "Train/Urban/2148",
+          "Train/Urban/2153",
+          "Train/Urban/2158",
+          "Train/Urban/2176",
+          "Train/Urban/2178",
+          "Train/Urban/2186",
+          "Train/Urban/2188",
+          "Train/Urban/2195",
+          "Train/Urban/2211",
+          "Train/Urban/2232",
+          "Train/Urban/2236",
+          "Train/Urban/2245",
+          "Train/Urban/2260",
+          "Train/Urban/2265",
+          "Train/Urban/2286",
+          "Train/Urban/2293",
+          "Train/Urban/2304",
+          "Train/Urban/2306",
+          "Train/Urban/2317",
+          "Train/Urban/2328",
+          "Train/Urban/2340",
+          "Train/Urban/2347",
+          "Train/Urban/2372",
+          "Train/Urban/2388",
+          "Train/Urban/2405",
+          "Train/Urban/2425",
+          "Train/Urban/2456",
+          "Train/Urban/2472",
+          "Train/Urban/2491",
+          "Train/Urban/2497",
+          "Train/Urban/2499",
+          "Train/Urban/2503",
+          "Train/Urban/2507",
+          "Train/Urban/2520"
+        ],
+        "Rural": [
+          "Train/Rural/100",
+          "Train/Rural/1003",
+          "Train/Rural/1006",
+          "Train/Rural/1016",
+          "Train/Rural/1022",
+          "Train/Rural/1030",
+          "Train/Rural/1036",
+          "Train/Rural/1044",
+          "Train/Rural/1057",
+          "Train/Rural/1083",
+          "Train/Rural/1085",
+          "Train/Rural/1091",
+          "Train/Rural/110",
+          "Train/Rural/1100",
+          "Train/Rural/1143",
+          "Train/Rural/1159",
+          "Train/Rural/1199",
+          "Train/Rural/1202",
+          "Train/Rural/1275",
+          "Train/Rural/1301",
+          "Train/Rural/1305",
+          "Train/Rural/1306",
+          "Train/Rural/1318",
+          "Train/Rural/132",
+          "Train/Rural/1349",
+          "Train/Rural/135",
+          "Train/Rural/142",
+          "Train/Rural/16",
+          "Train/Rural/17",
+          "Train/Rural/180",
+          "Train/Rural/201",
+          "Train/Rural/22",
+          "Train/Rural/220",
+          "Train/Rural/223",
+          "Train/Rural/226",
+          "Train/Rural/231",
+          "Train/Rural/234",
+          "Train/Rural/243",
+          "Train/Rural/247",
+          "Train/Rural/266",
+          "Train/Rural/279",
+          "Train/Rural/315",
+          "Train/Rural/333",
+          "Train/Rural/349",
+          "Train/Rural/352",
+          "Train/Rural/355",
+          "Train/Rural/383",
+          "Train/Rural/390",
+          "Train/Rural/398",
+          "Train/Rural/40",
+          "Train/Rural/402",
+          "Train/Rural/411",
+          "Train/Rural/413",
+          "Train/Rural/416",
+          "Train/Rural/462",
+          "Train/Rural/463",
+          "Train/Rural/468",
+          "Train/Rural/492",
+          "Train/Rural/496",
+          "Train/Rural/498",
+          "Train/Rural/5",
+          "Train/Rural/515",
+          "Train/Rural/532",
+          "Train/Rural/534",
+          "Train/Rural/545",
+          "Train/Rural/547",
+          "Train/Rural/560",
+          "Train/Rural/585",
+          "Train/Rural/586",
+          "Train/Rural/592",
+          "Train/Rural/610",
+          "Train/Rural/62",
+          "Train/Rural/635",
+          "Train/Rural/636",
+          "Train/Rural/643",
+          "Train/Rural/644",
+          "Train/Rural/660",
+          "Train/Rural/675",
+          "Train/Rural/697",
+          "Train/Rural/702",
+          "Train/Rural/714",
+          "Train/Rural/726",
+          "Train/Rural/739",
+          "Train/Rural/758",
+          "Train/Rural/766",
+          "Train/Rural/773",
+          "Train/Rural/78",
+          "Train/Rural/785",
+          "Train/Rural/793",
+          "Train/Rural/817",
+          "Train/Rural/819",
+          "Train/Rural/843",
+          "Train/Rural/851",
+          "Train/Rural/857",
+          "Train/Rural/889",
+          "Train/Rural/9",
+          "Train/Rural/901",
+          "Train/Rural/936",
+          "Train/Rural/954",
+          "Train/Rural/965"
+        ]
+      },
+      "id_list_source": "runs/refiner_r5/HO_s0/report/metrics.json:holdout.holdout_ids"
+    },
+    "KG": {
+      "passed": true,
+      "checked_endpoints": 4175,
+      "image_trajectories": 1670,
+      "core_invocations": 10020
+    }
+  },
+  "jobs": [
+    {
+      "job_id": 8821489,
+      "run": "HO_s0",
+      "gpu": "NVIDIA L40S",
+      "compute_mode": "Exclusive_Process",
+      "start_epoch": 1795243166,
+      "end_epoch": 1795246675,
+      "failed": 0,
+      "exit_status": 0,
+      "wall_seconds": 3509.0,
+      "normal_end": true,
+      "completion_line": 7528,
+      "log": "runs/logs/ec523-refiner-r5.o8821489",
+      "peak_cuda_bytes": 6678470656,
+      "training_peak_cuda_bytes": 6678470656,
+      "best_epoch": 1
+    }
+  ],
+  "run": {
+    "seed": 0,
+    "arm": "HO",
+    "best_epoch": 1,
+    "Val_sel_L": {
+      "Overall": 0.5480623797187926,
+      "Urban": 0.5602442993625324,
+      "Rural": 0.5230033837332695
+    },
+    "Val_rep_L": {
+      "Overall": 0.5445366767629438,
+      "Urban": 0.5715020551674286,
+      "Rural": 0.4920129901897785
+    },
+    "Val_rep_LB": {
+      "Overall": 0.5441321332393346,
+      "Urban": 0.5711194558438312,
+      "Rural": 0.49167426756518356
+    },
+    "climb": 0.00033792635685925276,
+    "K8_minus_K4": -0.0021230778339483836,
+    "K4_cldice": 0.7003464712748749,
+    "evaluation_groups": {
+      "Overall": {
+        "1": {
+          "road_iou": 0.6301938762873149,
+          "cldice": 0.7008924432218119,
+          "boundary_iou": 0.0945393209444535,
+          "quality": 0.5442725352990917
+        },
+        "2": {
+          "road_iou": 0.630733279875645,
+          "cldice": 0.7006573846869458,
+          "boundary_iou": 0.09507804101934036,
+          "quality": 0.5445794635477743
+        },
+        "4": {
+          "road_iou": 0.6307675766801735,
+          "cldice": 0.7003464712748749,
+          "boundary_iou": 0.09561365966700887,
+          "quality": 0.544610461655951
+        },
+        "8": {
+          "road_iou": 0.627657336660793,
+          "cldice": 0.6993207352827311,
+          "boundary_iou": 0.09431247453393368,
+          "quality": 0.5424873838220026
+        }
+      },
+      "Urban": {
+        "1": {
+          "road_iou": 0.6727093945472821,
+          "cldice": 0.724343346927559,
+          "boundary_iou": 0.08661717273499525,
+          "quality": 0.5709811358989078
+        },
+        "2": {
+          "road_iou": 0.6732569379552847,
+          "cldice": 0.7243518766690873,
+          "boundary_iou": 0.08729922506611694,
+          "quality": 0.5713938769915919
+        },
+        "4": {
+          "road_iou": 0.6733155410718074,
+          "cldice": 0.7246399386417212,
+          "boundary_iou": 0.08831001093563894,
+          "quality": 0.5717117543155478
+        },
+        "8": {
+          "road_iou": 0.6700579231738029,
+          "cldice": 0.72526774039651,
+          "boundary_iou": 0.0880467347031576,
+          "quality": 0.5702186306464859
+        }
+      },
+      "Rural": {
+        "1": {
+          "road_iou": 0.5397942616446241,
+          "cldice": 0.6715122369700505,
+          "boundary_iou": 0.10408731664862486,
+          "quality": 0.4921682652430521
+        },
+        "2": {
+          "road_iou": 0.5401246258512901,
+          "cldice": 0.6711073440843335,
+          "boundary_iou": 0.10445488819022886,
+          "quality": 0.49228549378899084
+        },
+        "4": {
+          "road_iou": 0.5397723262143979,
+          "cldice": 0.6703346954882197,
+          "boundary_iou": 0.10441912775975903,
+          "quality": 0.4918703973056166
+        },
+        "8": {
+          "road_iou": 0.5363928455834828,
+          "cldice": 0.6680363581064503,
+          "boundary_iou": 0.10188282105498088,
+          "quality": 0.4889838944346727
+        }
+      }
+    },
+    "stress_groups": {
+      "Overall": {
+        "4": {
+          "road_iou": 0.6287611163368692,
+          "cldice": 0.6973584164905299,
+          "boundary_iou": 0.09499830461155769,
+          "quality": 0.5425877440379051
+        }
+      },
+      "Urban": {
+        "4": {
+          "road_iou": 0.671289889561396,
+          "cldice": 0.7220171165196351,
+          "boundary_iou": 0.08774338980485988,
+          "quality": 0.5697987576975605
+        }
+      },
+      "Rural": {
+        "4": {
+          "road_iou": 0.5386365027881812,
+          "cldice": 0.6670723590704548,
+          "boundary_iou": 0.10368412533707211,
+          "quality": 0.4901767841826415
+        }
+      }
+    },
+    "selection_curve": [
+      {
+        "epoch": 1,
+        "score": 0.5480623797187926,
+        "L_by_domain": {
+          "Urban": 0.5602442993625324,
+          "Rural": 0.5230033837332695,
+          "Overall": 0.5480623797187926
+        },
+        "new_best": true
+      },
+      {
+        "epoch": 2,
+        "score": 0.5453705024038711,
+        "L_by_domain": {
+          "Urban": 0.5578542181107773,
+          "Rural": 0.5197401729188413,
+          "Overall": 0.5453705024038711
+        },
+        "new_best": false
+      },
+      {
+        "epoch": 3,
+        "score": 0.5455846411725517,
+        "L_by_domain": {
+          "Urban": 0.5587423237147648,
+          "Rural": 0.5187472790991536,
+          "Overall": 0.5455846411725517
+        },
+        "new_best": false
+      },
+      {
+        "epoch": 4,
+        "score": 0.5434164521070357,
+        "L_by_domain": {
+          "Urban": 0.5568501453706496,
+          "Rural": 0.5160442458024754,
+          "Overall": 0.5434164521070357
+        },
+        "new_best": false
+      },
+      {
+        "epoch": 5,
+        "score": 0.5350319350399803,
+        "L_by_domain": {
+          "Urban": 0.5534034295512543,
+          "Rural": 0.49914959101195094,
+          "Overall": 0.5350319350399803
+        },
+        "new_best": false
+      },
+      {
+        "epoch": 6,
+        "score": 0.5348959426001485,
+        "L_by_domain": {
+          "Urban": 0.5527853701016401,
+          "Rural": 0.49971903579262533,
+          "Overall": 0.5348959426001485
+        },
+        "new_best": false
+      },
+      {
+        "epoch": 7,
+        "score": 0.5296229817600709,
+        "L_by_domain": {
+          "Urban": 0.5497335446538734,
+          "Rural": 0.4900252508476203,
+          "Overall": 0.5296229817600709
+        },
+        "new_best": false
+      },
+      {
+        "epoch": 8,
+        "score": 0.5232423817377965,
+        "L_by_domain": {
+          "Urban": 0.5420649133472537,
+          "Rural": 0.4854379663022097,
+          "Overall": 0.5232423817377965
+        },
+        "new_best": false
+      },
+      {
+        "epoch": 9,
+        "score": 0.5221181231842469,
+        "L_by_domain": {
+          "Urban": 0.5393856041335033,
+          "Rural": 0.487217204113926,
+          "Overall": 0.5221181231842469
+        },
+        "new_best": false
+      },
+      {
+        "epoch": 10,
+        "score": 0.5226498708158311,
+        "L_by_domain": {
+          "Urban": 0.5414807602452424,
+          "Rural": 0.48494184132961504,
+          "Overall": 0.5226498708158311
+        },
+        "new_best": false
+      }
+    ],
+    "selection_best_epoch_by_domain": {
+      "Overall": 1,
+      "Urban": 1,
+      "Rural": 1
+    },
+    "configuration": {
+      "epochs": 10,
+      "batch_size": 4,
+      "lr": 0.0003,
+      "draft_cache": "runs/cache/tta_draft_a1i_s0",
+      "d4_aug": true,
+      "train_holdout_per_domain": 100,
+      "record_selection_domains": true,
+      "warmup_steps": 500,
+      "pos_weight": 4.0,
+      "loss": "bce",
+      "aux_weight": 0.1,
+      "skeleton_iterations": 20,
+      "false_add_gradient_ratio": 0.1,
+      "false_add_warmup_steps": 500,
+      "false_add_calibration_batches": 8,
+      "augmentation": "none",
+      "k_train": 4,
+      "eval_k": [
+        1,
+        2,
+        4,
+        8
+      ],
+      "limit_per_domain": null,
+      "device": "cuda",
+      "seed": 0,
+      "probe_ckpt": "runs/draft_head/A1-i/best.pt",
+      "eval_only": false,
+      "resume": false,
+      "ckpt": null,
+      "monitor_every": 5,
+      "monitor_per_domain": 50,
+      "loader_workers": 7,
+      "eval_loader_workers": 1,
+      "metric_workers": 6,
+      "dimension": 256,
+      "layers": 1,
+      "heads": 8,
+      "mlp_ratio": 4.0,
+      "patch": 16,
+      "no_mask_feedback": false,
+      "reset_state": false,
+      "untied_steps": 0,
+      "noadd_lambda": 0.0,
+      "head_type": "conv_upsample",
+      "select_every": 1,
+      "select_per_domain": null,
+      "val_split": "configs/val_split_seed0.json",
+      "selection_ks": {
+        "1": 0.2,
+        "2": 0.2,
+        "4": 0.6
+      },
+      "eval_extra": false,
+      "weight_decay": 0.01,
+      "clip_grad_norm": 1.0,
+      "refiner_dtype": "float32",
+      "encoder": "dinov3_vitl16_web",
+      "probe_head": "conv_up",
+      "loss_implementation_version": 1,
+      "objective_state": {},
+      "val_split_sha256": "bdd7d7a89237c96305f0ad404a5c9ae1254ed8cbc0b6e0e4fcc7b514bd323c68",
+      "scheduler_total_steps": 5810
+    },
+    "manifest_sha256": "06d97973fcec14cc113b7c3468d768e1e0a6d9b3d27998fd6aa14cf07c13dc90",
+    "checkpoint_sizes": {
+      "best.pt": 18816994,
+      "last.pt": 20410914
+    },
+    "holdout_curve": [
+      {
+        "epoch": 1,
+        "seconds": 26.313826323021203,
+        "L_by_domain": {
+          "Urban": 0.5501181496830752,
+          "Rural": 0.562761451772747,
+          "Overall": 0.5566819539694784
+        }
+      },
+      {
+        "epoch": 2,
+        "seconds": 25.57137637399137,
+        "L_by_domain": {
+          "Urban": 0.5507091098668769,
+          "Rural": 0.5652052470279345,
+          "Overall": 0.5577721751679059
+        }
+      },
+      {
+        "epoch": 3,
+        "seconds": 24.498521951958537,
+        "L_by_domain": {
+          "Urban": 0.5524025819325633,
+          "Rural": 0.5585396534669973,
+          "Overall": 0.5574143176553441
+        }
+      },
+      {
+        "epoch": 4,
+        "seconds": 23.241271584003698,
+        "L_by_domain": {
+          "Urban": 0.5527556115523471,
+          "Rural": 0.5617853349907102,
+          "Overall": 0.5585094952724794
+        }
+      },
+      {
+        "epoch": 5,
+        "seconds": 22.844708838965744,
+        "L_by_domain": {
+          "Urban": 0.5631350816354329,
+          "Rural": 0.5575957934654979,
+          "Overall": 0.5653533671607396
+        }
+      },
+      {
+        "epoch": 6,
+        "seconds": 23.483850513002835,
+        "L_by_domain": {
+          "Urban": 0.5629246359391935,
+          "Rural": 0.5534272557945027,
+          "Overall": 0.564101517018493
+        }
+      },
+      {
+        "epoch": 7,
+        "seconds": 22.994770783989225,
+        "L_by_domain": {
+          "Urban": 0.5632595760681869,
+          "Rural": 0.5661565961479867,
+          "Overall": 0.567667330446936
+        }
+      },
+      {
+        "epoch": 8,
+        "seconds": 23.893687058996875,
+        "L_by_domain": {
+          "Urban": 0.5573431229778277,
+          "Rural": 0.5555662033453876,
+          "Overall": 0.5604543310852572
+        }
+      },
+      {
+        "epoch": 9,
+        "seconds": 23.051341051992495,
+        "L_by_domain": {
+          "Urban": 0.556168460907955,
+          "Rural": 0.5497360921353648,
+          "Overall": 0.5580340475564379
+        }
+      },
+      {
+        "epoch": 10,
+        "seconds": 23.416743026988115,
+        "L_by_domain": {
+          "Urban": 0.5590717339494313,
+          "Rural": 0.5541190178455533,
+          "Overall": 0.5613463339831576
+        }
+      }
+    ],
+    "holdout_best_epoch": 7,
+    "holdout_best_score": 0.567667330446936,
+    "holdout_best_epoch_by_domain": {
+      "Overall": 7,
+      "Urban": 7,
+      "Rural": 7
+    }
+  },
+  "decisions": {
+    "HO-P1": {
+      "status": "holds",
+      "passed": true,
+      "holdout_best_epoch": 7,
+      "Val_sel_best_epoch": 1
+    },
+    "HO-R1": {
+      "status": "Train/Val distribution difference",
+      "holdout_best_epoch": 7,
+      "Val_sel_best_epoch": 1,
+      "best_epoch_difference": 6
+    }
+  },
+  "outcome": "Train/Val distribution difference",
+  "limitations": [
+    "HO-R1 is the preregistered descriptive interpretation, not an independent causal test."
+  ],
+  "configuration_validation": {
+    "passed": true,
+    "seed": 0,
+    "epochs": 10,
+    "batch_size": 4,
+    "lr": 0.0003,
+    "warmup_steps": 500,
+    "d4_aug": true,
+    "detail_head": false,
+    "train_holdout_per_domain": 100,
+    "selection_images": 834,
+    "common_manifest": true
+  },
+  "resources_scope": "wall_seconds is the local SGE accounting ru_wallclock; CUDA peaks are maximum saved training/final-evaluation allocated peaks. No host maxvmem is presented as GPU memory.",
+  "numerical_scope": "Official saved aggregate scores are copied; L/LB, arithmetic contrasts and sample standard deviations (ddof=1) are computed from them. No masks, metric geometry or Counts are recomputed. Markdown values are rounded from this JSON."
+}
