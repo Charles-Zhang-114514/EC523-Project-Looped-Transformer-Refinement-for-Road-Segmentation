@@ -1388,3 +1388,115 @@ R6-R3：如果有多组通过，取 Val-rep LB 最高的那组（如实注明选
 - Related verification passed22 tests (10 wave6 and12 wave5-control tests) in12.449 s. Default main-entry regression against68d1641 compares a synthetic small batch's losses, weights, normalized config, Python/NumPy/Torch RNG exactly. The synthetic TVS main-entry test trains three epochs, confirms all per-epoch saves, verifies epoch3 weights differ, and verifies final evaluation uses epoch2 weights even when training continues; its real official scoring code runs on small synthetic masks. Tests cover TG1 leak rejection, unchanged default permissions, retained Val/... cache identities, invalid fixed-epoch parameters, all formal command settings, failed-stage independence, passed-smoke gating and importing/scheduling without torch/CUDA.
 - Ran the full unittest suite exactly once, with a175 s timeout and single-threaded Python:255 tests in160.337 s,254 passed and the known1 skipped. Log: runs/wave6_verify.lv9TIc/unittest.log. bash -n passes both new qsub files. No GPU smoke was executed locally; real-image TG1/KG/CG1 and hardware runtime checks remain for manual wave6_smoke submission. No effect prediction is judged from synthetic validation.
 - Confirmed no result changes relative to68d1641, no new tracked images/weights and no modified existing job file. Only the new sources/jobs/tests and this appended worklog are included in the implementation commit. The local predictions commit precedes this qsub implementation commit; nothing is pushed.
+
+## 2026-11-21 - Wave 6 smoke acceptance and resource-budget check
+
+- Re-read AGENTS.md and confirmed clean charles/refiner-focus at 3a59ca6 before work. Read only saved logs/JSON and checkpoint file metadata for job8833378; no source code, qsub, tests, results, checkpoint or cache was changed. No training, inference, unit test, metric recomputation, network, package installation, scheduler submission/status query, polling or push occurred. Only this appended worklog is committed locally.
+- Observed NVIDIA L40S / Exclusive_Process in main log lines1-5, source3a59ca660afee575f6d5d09a5124b8b502195084 at line13. All six independent stages P8/score-P8/W/score-W/TVS/score-TVS have exit_code=0 and passed=true at lines14-19. Main log line20 prints WAVE6_SMOKE_COMPLETE. Child logs contain no Traceback/OOM/out-of-memory/killed/timeout; each scorer prints FOCUS_EVAL_COMPLETE. All requested smoke checks pass; step2 is cleared.
+- Observed P8 completes20 updates with finite loss range [0.18153785169124603,0.18155118823051453]. Saved config draft_corrupt=0.8. Actual selected and modified presentations are both80/80=100%, not80%: the four unique image/view identities all happen to be selected, and the one-epoch four-image loader repeats them20 times. The same per-seed/epoch/image corruption decisions recur; these are not80 independent Bernoulli trials. This small smoke sample does not establish the full training corruption rate and is not a probability-config failure.
+- Observed W completes20 updates with finite loss range [0.1821451336145401,0.18492253124713898]. It selects40/80 presentations for corruption and records lr1e-4, warmup100, init_refiner=e6 s0. Observed TVS completes20 updates, split10+10 across two partial epochs, with finite loss range [0.01844220608472824,0.22104895114898682]; corruption selects25/80 presentations. All three training allocation peaks are6628442112 bytes (6.173218 GiB).
+- TG1 PASS on the smoke pool: four Train plus four Val-sel identities produce exactly eight unique training identities; intersection with all835 Val-rep identities is0. Lists are saved in TVS/report/metrics.json:training_protocol. This is deliberately a smoke-size union, not a claim that all3356 formal training images were processed.
+- Fixed-epoch/checkpoint PASS: epoch_001.pt and epoch_002.pt exist, with18600250 and18613754 bytes; best.pt and last.pt also exist. TVS report evaluated_epoch=2, checkpoint_source=epoch_002.pt, selection_curve=[], selection_files={}. The scorer records checkpoint=epoch_002.pt. Both descriptive epochs have descriptive_only=true and evaluation_corruption_applied=false. No weights were loaded during this read-only audit; the epoch identity evidence is the successful production load check and saved report/scorer metadata.
+- KG PASS: each scorer records20 cumulative core-call endpoints (four clean images at K1/2/4/8 and four stress images at K4); all60 endpoints equal K. Summing maximum K once per trajectory gives144 actual core invocations across the three scorers. CG1 PASS: all training/final reports and both TVS descriptive epochs record evaluation_corruption_applied=false; TVS selection is disabled.
+- Official scoring PASS: each scorer completes four clean and four seed523 stress images, two/domain, with finite official IoU/clDice/BIoU/quality in Overall/Urban/Rural. Observed Overall clean A(K4) is P8=0.2815340825649096, W=0.27628228835859786, TVS=0.28136315551297103; stress A(K4) is0.6607778050270988/0.6456442757075534/0.6608550177943369. These values confirm the pipeline only; no effect prediction is judged from smoke.
+- Observed P8 CPU corruption time excludes cache reads:80 presentations, mean0.11456126267494256 s, median0.10937967549944005 s, range0.030110091000096872..0.2130115529980685 s. The table below retains every requested per-presentation time. Each of the four unique image/view identities has20 observations.
+- P8 budget comparison: the previous P0.5 smoke mean was0.058771465166501 s, giving the registered planning estimate0.058771465166501*(0.8/0.5)=0.09403434426640161 s/presentation. The new raw0.114561263 s mean is21.83% higher, but its sample has100% selection. Reweighting its selected-sample mean to target P0.8, with observed W unselected cost0.00031301192511818955 s, gives0.8*0.11456126267494256+0.2*0.00031301192511818955=0.09171161252497768 s, 2.47% below the planning assumption. This is a resource comparison on only four unique images, not a new experiment or a precise full-dataset timing claim. Keeping the original conservative h_rt is reasonable; no budget is reduced.
+- Observed TVS update_seconds across20 steps: min0.31809903400062467, mean0.3346460920003665, median0.31933492200005276, max0.6223231809999561 s. Step1 is0.622323181 s; steps2-20 mean0.31950519257933546 s. Epoch training wall times are27.781415606998053 and27.294228598999325 s, total55.07564420599738 s (2.7537822103 s/update including data/iteration overhead). Recorded update intervals sum6.69292184000733 s, leaving48.38272236599005 s outside the update timer. Tiny repeated loader cycles/startup are included in epoch wall time; do not extrapolate that2.754 s/update as the formal GPU compute rate.
+- TVS timing comparison: the prior full CD s0 training wall rate is2205.9781244069454/6310=0.34960033667304996 s/update. TVS steady update0.319505193 s is8.61% lower (the timer excludes data waits); its encoder/refiner compute is of the same order as the prior full run. Formal8390 updates at that steady update timer are2680.6485657406247 s, excluding loader/CPU/evaluation. The previous TVS budget already assigns4870.325138778747 s to the scaled entire CD job, adds4909.8 s for ten descriptive passes, then applies1.3 margin+300 s. There is no evidence here requiring an h_rt increase.
+- The previous nine formal commands and h_rt remain unchanged: P8 seeds0/1/2 use01:44:00; W seeds0/1/2 use00:48:00; TVS seeds0/1/2 use03:37:00. All request gpu_type=L40S and jobs/refiner_r6.qsub. Fill SMOKE_DIR=runs/wave6/smoke_8833378; all six required passed smoke entries are present. The three TVS budgets still exceed3 hours. No job was submitted here.
+
+### P8 CPU corruption time by unique image/view
+
+| Image/view ID | Presentations | Mean ms | Minimum ms | Maximum ms |
+| --- | --- | --- | --- | --- |
+| Train/Rural/35\|d4=3 | 20 | 31.172269 | 30.290007 | 32.671671 |
+| Train/Rural/399\|d4=7 | 20 | 188.999587 | 186.087680 | 194.801839 |
+| Train/Urban/2102\|d4=6 | 20 | 207.648217 | 204.418241 | 213.011553 |
+| Train/Urban/2348\|d4=7 | 20 | 30.424979 | 30.110091 | 31.246405 |
+
+### P8 CPU corruption time per presentation
+
+Observed timings are corruption_seconds in milliseconds, excluding cache reads; rows retain training presentation order.
+
+| Presentation | Image/view ID | Selected | Modified pixels | CPU corruption ms |
+| --- | --- | --- | --- | --- |
+| 1 | Train/Urban/2348\|d4=7 | Yes | 1262 | 31.246405 |
+| 2 | Train/Urban/2102\|d4=6 | Yes | 4949 | 213.011553 |
+| 3 | Train/Rural/399\|d4=7 | Yes | 3087 | 189.424656 |
+| 4 | Train/Rural/35\|d4=3 | Yes | 315 | 30.728656 |
+| 5 | Train/Urban/2348\|d4=7 | Yes | 1262 | 30.460728 |
+| 6 | Train/Rural/399\|d4=7 | Yes | 3087 | 190.322434 |
+| 7 | Train/Rural/35\|d4=3 | Yes | 315 | 30.467204 |
+| 8 | Train/Urban/2102\|d4=6 | Yes | 4949 | 205.905471 |
+| 9 | Train/Rural/35\|d4=3 | Yes | 315 | 32.623624 |
+| 10 | Train/Urban/2348\|d4=7 | Yes | 1262 | 30.110091 |
+| 11 | Train/Urban/2102\|d4=6 | Yes | 4949 | 204.903900 |
+| 12 | Train/Rural/399\|d4=7 | Yes | 3087 | 186.087680 |
+| 13 | Train/Urban/2348\|d4=7 | Yes | 1262 | 30.376126 |
+| 14 | Train/Rural/399\|d4=7 | Yes | 3087 | 187.530854 |
+| 15 | Train/Urban/2102\|d4=6 | Yes | 4949 | 206.215088 |
+| 16 | Train/Rural/35\|d4=3 | Yes | 315 | 30.646128 |
+| 17 | Train/Rural/399\|d4=7 | Yes | 3087 | 188.540504 |
+| 18 | Train/Urban/2348\|d4=7 | Yes | 1262 | 30.230958 |
+| 19 | Train/Rural/35\|d4=3 | Yes | 315 | 30.290007 |
+| 20 | Train/Urban/2102\|d4=6 | Yes | 4949 | 205.050519 |
+| 21 | Train/Urban/2102\|d4=6 | Yes | 4949 | 209.205827 |
+| 22 | Train/Rural/35\|d4=3 | Yes | 315 | 30.831978 |
+| 23 | Train/Rural/399\|d4=7 | Yes | 3087 | 187.937823 |
+| 24 | Train/Urban/2348\|d4=7 | Yes | 1262 | 30.339828 |
+| 25 | Train/Urban/2102\|d4=6 | Yes | 4949 | 208.702602 |
+| 26 | Train/Rural/399\|d4=7 | Yes | 3087 | 189.195714 |
+| 27 | Train/Urban/2348\|d4=7 | Yes | 1262 | 30.449575 |
+| 28 | Train/Rural/35\|d4=3 | Yes | 315 | 30.807831 |
+| 29 | Train/Urban/2102\|d4=6 | Yes | 4949 | 208.391108 |
+| 30 | Train/Rural/399\|d4=7 | Yes | 3087 | 188.587209 |
+| 31 | Train/Urban/2348\|d4=7 | Yes | 1262 | 30.315577 |
+| 32 | Train/Rural/35\|d4=3 | Yes | 315 | 30.489416 |
+| 33 | Train/Rural/35\|d4=3 | Yes | 315 | 32.603770 |
+| 34 | Train/Urban/2102\|d4=6 | Yes | 4949 | 207.006358 |
+| 35 | Train/Urban/2348\|d4=7 | Yes | 1262 | 30.424250 |
+| 36 | Train/Rural/399\|d4=7 | Yes | 3087 | 188.245166 |
+| 37 | Train/Urban/2102\|d4=6 | Yes | 4949 | 212.200122 |
+| 38 | Train/Rural/399\|d4=7 | Yes | 3087 | 189.768317 |
+| 39 | Train/Urban/2348\|d4=7 | Yes | 1262 | 30.724637 |
+| 40 | Train/Rural/35\|d4=3 | Yes | 315 | 30.979124 |
+| 41 | Train/Urban/2102\|d4=6 | Yes | 4949 | 210.087745 |
+| 42 | Train/Rural/35\|d4=3 | Yes | 315 | 31.025897 |
+| 43 | Train/Rural/399\|d4=7 | Yes | 3087 | 189.735461 |
+| 44 | Train/Urban/2348\|d4=7 | Yes | 1262 | 30.465020 |
+| 45 | Train/Rural/399\|d4=7 | Yes | 3087 | 191.452598 |
+| 46 | Train/Rural/35\|d4=3 | Yes | 315 | 30.723497 |
+| 47 | Train/Urban/2348\|d4=7 | Yes | 1262 | 30.452799 |
+| 48 | Train/Urban/2102\|d4=6 | Yes | 4949 | 206.114956 |
+| 49 | Train/Urban/2348\|d4=7 | Yes | 1262 | 30.418610 |
+| 50 | Train/Rural/35\|d4=3 | Yes | 315 | 31.873514 |
+| 51 | Train/Rural/399\|d4=7 | Yes | 3087 | 188.954049 |
+| 52 | Train/Urban/2102\|d4=6 | Yes | 4949 | 206.302176 |
+| 53 | Train/Urban/2102\|d4=6 | Yes | 4949 | 209.388128 |
+| 54 | Train/Rural/399\|d4=7 | Yes | 3087 | 189.692709 |
+| 55 | Train/Urban/2348\|d4=7 | Yes | 1262 | 30.369327 |
+| 56 | Train/Rural/35\|d4=3 | Yes | 315 | 30.609930 |
+| 57 | Train/Urban/2102\|d4=6 | Yes | 4949 | 209.970963 |
+| 58 | Train/Urban/2348\|d4=7 | Yes | 1262 | 30.384443 |
+| 59 | Train/Rural/399\|d4=7 | Yes | 3087 | 188.772390 |
+| 60 | Train/Rural/35\|d4=3 | Yes | 315 | 30.881719 |
+| 61 | Train/Urban/2348\|d4=7 | Yes | 1262 | 30.515663 |
+| 62 | Train/Rural/35\|d4=3 | Yes | 315 | 31.487015 |
+| 63 | Train/Rural/399\|d4=7 | Yes | 3087 | 189.687111 |
+| 64 | Train/Urban/2102\|d4=6 | Yes | 4949 | 205.544491 |
+| 65 | Train/Urban/2102\|d4=6 | Yes | 4949 | 206.492496 |
+| 66 | Train/Rural/35\|d4=3 | Yes | 315 | 30.302229 |
+| 67 | Train/Rural/399\|d4=7 | Yes | 3087 | 188.075129 |
+| 68 | Train/Urban/2348\|d4=7 | Yes | 1262 | 30.330739 |
+| 69 | Train/Rural/35\|d4=3 | Yes | 315 | 32.263733 |
+| 70 | Train/Urban/2102\|d4=6 | Yes | 4949 | 206.437468 |
+| 71 | Train/Rural/399\|d4=7 | Yes | 3087 | 187.029790 |
+| 72 | Train/Urban/2348\|d4=7 | Yes | 1262 | 30.267331 |
+| 73 | Train/Rural/399\|d4=7 | Yes | 3087 | 194.801839 |
+| 74 | Train/Urban/2102\|d4=6 | Yes | 4949 | 207.615120 |
+| 75 | Train/Urban/2348\|d4=7 | Yes | 1262 | 30.307080 |
+| 76 | Train/Rural/35\|d4=3 | Yes | 315 | 31.138428 |
+| 77 | Train/Rural/35\|d4=3 | Yes | 315 | 32.671671 |
+| 78 | Train/Urban/2102\|d4=6 | Yes | 4949 | 204.418241 |
+| 79 | Train/Rural/399\|d4=7 | Yes | 3087 | 186.150306 |
+| 80 | Train/Urban/2348\|d4=7 | Yes | 1262 | 30.310385 |
