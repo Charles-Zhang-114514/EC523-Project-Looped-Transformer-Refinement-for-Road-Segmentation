@@ -1,0 +1,3208 @@
+{
+  "preregistration": "633c03c",
+  "gates": {
+    "DRG1": {
+      "status": "PASS",
+      "passed": true,
+      "comparisons": 48,
+      "maximum_difference": 0.0,
+      "tolerance": 1e-05,
+      "images": 835,
+      "basis": "Full Val-rep official-score comparison with archived E0",
+      "source": "runs/detail_refiner/DR_W_s0/pretraining_DRG1/metrics.json",
+      "reference": "fe10d7b E0 (same archived wave1 ensemble_bias scores)",
+      "reference_file_matches_fe10d7b": true,
+      "job_id": 8815012,
+      "gate_log_line": 849,
+      "first_update_log_line": 853
+    },
+    "DRG2": {
+      "status": "PASS",
+      "method": "Check each saved clean/stress image/K cumulative core hook count; sum maximum K once per trajectory for actual calls.",
+      "endpoint_checks": 25050,
+      "actual_core_calls": 60120,
+      "mismatches": 0,
+      "runs": {
+        "DR_W_s0": {
+          "Val-rep": {
+            "images": 835,
+            "endpoint_checks": 3340,
+            "actual_core_calls": 6680,
+            "mismatches": 0
+          },
+          "stress": {
+            "images": 835,
+            "endpoint_checks": 835,
+            "actual_core_calls": 3340,
+            "mismatches": 0
+          }
+        },
+        "DR_S_s0": {
+          "Val-rep": {
+            "images": 835,
+            "endpoint_checks": 3340,
+            "actual_core_calls": 6680,
+            "mismatches": 0
+          },
+          "stress": {
+            "images": 835,
+            "endpoint_checks": 835,
+            "actual_core_calls": 3340,
+            "mismatches": 0
+          }
+        },
+        "DR_S_s1": {
+          "Val-rep": {
+            "images": 835,
+            "endpoint_checks": 3340,
+            "actual_core_calls": 6680,
+            "mismatches": 0
+          },
+          "stress": {
+            "images": 835,
+            "endpoint_checks": 835,
+            "actual_core_calls": 3340,
+            "mismatches": 0
+          }
+        },
+        "DR_S_s2": {
+          "Val-rep": {
+            "images": 835,
+            "endpoint_checks": 3340,
+            "actual_core_calls": 6680,
+            "mismatches": 0
+          },
+          "stress": {
+            "images": 835,
+            "endpoint_checks": 835,
+            "actual_core_calls": 3340,
+            "mismatches": 0
+          }
+        },
+        "DR_W_s1": {
+          "Val-rep": {
+            "images": 835,
+            "endpoint_checks": 3340,
+            "actual_core_calls": 6680,
+            "mismatches": 0
+          },
+          "stress": {
+            "images": 835,
+            "endpoint_checks": 835,
+            "actual_core_calls": 3340,
+            "mismatches": 0
+          }
+        },
+        "DR_W_s2": {
+          "Val-rep": {
+            "images": 835,
+            "endpoint_checks": 3340,
+            "actual_core_calls": 6680,
+            "mismatches": 0
+          },
+          "stress": {
+            "images": 835,
+            "endpoint_checks": 835,
+            "actual_core_calls": 3340,
+            "mismatches": 0
+          }
+        }
+      }
+    },
+    "DRG3": {
+      "status": "PASS",
+      "definition": "L2/Frobenius norm of the 16x16x1x1 gate weight at each selected best.pt, CPU double precision; no model forward performed.",
+      "checkpoints": {
+        "DR_W_s0": {
+          "checkpoint": "runs/detail_refiner/DR_W_s0/checkpoints/best.pt",
+          "epoch": 1,
+          "weight_L2": 0.056756777296836376,
+          "weight_nonzero_elements": 256,
+          "weight_elements": 256,
+          "bias_L2": 0.011217890420329597
+        },
+        "DR_S_s0": {
+          "checkpoint": "runs/detail_refiner/DR_S_s0/checkpoints/best.pt",
+          "epoch": 1,
+          "weight_L2": 0.058635480531445176,
+          "weight_nonzero_elements": 256,
+          "weight_elements": 256,
+          "bias_L2": 0.03075329347536496
+        },
+        "DR_S_s1": {
+          "checkpoint": "runs/detail_refiner/DR_S_s1/checkpoints/best.pt",
+          "epoch": 1,
+          "weight_L2": 0.06196899876342198,
+          "weight_nonzero_elements": 256,
+          "weight_elements": 256,
+          "bias_L2": 0.030802714968466403
+        },
+        "DR_S_s2": {
+          "checkpoint": "runs/detail_refiner/DR_S_s2/checkpoints/best.pt",
+          "epoch": 1,
+          "weight_L2": 0.04594457131371226,
+          "weight_nonzero_elements": 256,
+          "weight_elements": 256,
+          "bias_L2": 0.01826775784720607
+        },
+        "DR_W_s1": {
+          "checkpoint": "runs/detail_refiner/DR_W_s1/checkpoints/best.pt",
+          "epoch": 1,
+          "weight_L2": 0.06667356585272398,
+          "weight_nonzero_elements": 256,
+          "weight_elements": 256,
+          "bias_L2": 0.010494950676538713
+        },
+        "DR_W_s2": {
+          "checkpoint": "runs/detail_refiner/DR_W_s2/checkpoints/best.pt",
+          "epoch": 1,
+          "weight_L2": 0.0717167764945662,
+          "weight_nonzero_elements": 256,
+          "weight_elements": 256,
+          "bias_L2": 0.011821052947448249
+        }
+      },
+      "limitation": "Nonzero gates and the enabled forward path establish the specified trained-branch check. No gate-zero ablation or causal effect attribution was run."
+    }
+  },
+  "jobs": [
+    {
+      "job_id": 8815009,
+      "run": "DR_S_s0",
+      "host": "scc-510.scc.bu.edu",
+      "start_epoch": 1795211630,
+      "end_epoch": 1795215198,
+      "failed": 0,
+      "exit_status": 0,
+      "wall_seconds": 3568,
+      "gpu": "NVIDIA L40S",
+      "compute_mode": "Exclusive_Process",
+      "normal_end": true,
+      "peak_cuda_bytes": 8012528128,
+      "best_epoch": 1,
+      "epochs_completed": 10,
+      "log": "runs/logs/ec523-refiner-dr.o8815009",
+      "completion_line": 8018,
+      "best_and_last_exist": true
+    },
+    {
+      "job_id": 8815010,
+      "run": "DR_S_s1",
+      "host": "scc-512.scc.bu.edu",
+      "start_epoch": 1795211630,
+      "end_epoch": 1795216204,
+      "failed": 0,
+      "exit_status": 0,
+      "wall_seconds": 4574,
+      "gpu": "NVIDIA L40S",
+      "compute_mode": "Exclusive_Process",
+      "normal_end": true,
+      "peak_cuda_bytes": 8012528128,
+      "best_epoch": 1,
+      "epochs_completed": 10,
+      "log": "runs/logs/ec523-refiner-dr.o8815010",
+      "completion_line": 8018,
+      "best_and_last_exist": true
+    },
+    {
+      "job_id": 8815011,
+      "run": "DR_S_s2",
+      "host": "scc-j02.scc.bu.edu",
+      "start_epoch": 1795213066,
+      "end_epoch": 1795216705,
+      "failed": 0,
+      "exit_status": 0,
+      "wall_seconds": 3639,
+      "gpu": "NVIDIA L40S",
+      "compute_mode": "Exclusive_Process",
+      "normal_end": true,
+      "peak_cuda_bytes": 8012528128,
+      "best_epoch": 1,
+      "epochs_completed": 10,
+      "log": "runs/logs/ec523-refiner-dr.o8815011",
+      "completion_line": 8018,
+      "best_and_last_exist": true
+    },
+    {
+      "job_id": 8815012,
+      "run": "DR_W_s0",
+      "host": "scc-j05.scc.bu.edu",
+      "start_epoch": 1795213619,
+      "end_epoch": 1795215197,
+      "failed": 0,
+      "exit_status": 0,
+      "wall_seconds": 1578,
+      "gpu": "NVIDIA L40S",
+      "compute_mode": "Exclusive_Process",
+      "normal_end": true,
+      "peak_cuda_bytes": 8012397056,
+      "best_epoch": 1,
+      "epochs_completed": 3,
+      "log": "runs/logs/ec523-refiner-dr.o8815012",
+      "completion_line": 4424,
+      "best_and_last_exist": true
+    },
+    {
+      "job_id": 8815013,
+      "run": "DR_W_s1",
+      "host": "scc-j05.scc.bu.edu",
+      "start_epoch": 1795215268,
+      "end_epoch": 1795216741,
+      "failed": 0,
+      "exit_status": 0,
+      "wall_seconds": 1473,
+      "gpu": "NVIDIA L40S",
+      "compute_mode": "Exclusive_Process",
+      "normal_end": true,
+      "peak_cuda_bytes": 8012528128,
+      "best_epoch": 1,
+      "epochs_completed": 3,
+      "log": "runs/logs/ec523-refiner-dr.o8815013",
+      "completion_line": 3587,
+      "best_and_last_exist": true
+    },
+    {
+      "job_id": 8815014,
+      "run": "DR_W_s2",
+      "host": "scc-510.scc.bu.edu",
+      "start_epoch": 1795215268,
+      "end_epoch": 1795216773,
+      "failed": 0,
+      "exit_status": 0,
+      "wall_seconds": 1505,
+      "gpu": "NVIDIA L40S",
+      "compute_mode": "Exclusive_Process",
+      "normal_end": true,
+      "peak_cuda_bytes": 8012528128,
+      "best_epoch": 1,
+      "epochs_completed": 3,
+      "log": "runs/logs/ec523-refiner-dr.o8815014",
+      "completion_line": 3587,
+      "best_and_last_exist": true
+    }
+  ],
+  "configuration_validation": {
+    "DR_W_s0": {
+      "passed": true,
+      "config": {
+        "detail_head": true,
+        "d4_aug": true,
+        "epochs": 3,
+        "lr": 0.0001,
+        "warmup_steps": 100,
+        "batch_size": 4,
+        "k_train": 4,
+        "pos_weight": 4.0,
+        "weight_decay": 0.01,
+        "clip_grad_norm": 1.0,
+        "seed": 0,
+        "select_per_domain": null,
+        "selection_ks": {
+          "1": 0.2,
+          "2": 0.2,
+          "4": 0.6
+        },
+        "draft_cache": "runs/cache/tta_draft_a1i_s0",
+        "probe_ckpt": "runs/draft_head/A1-i/best.pt",
+        "init_refiner": "runs/exp/e6_convdraft_s0/best.pt"
+      },
+      "selection_images": 834,
+      "report_images": 835
+    },
+    "DR_S_s0": {
+      "passed": true,
+      "config": {
+        "detail_head": true,
+        "d4_aug": true,
+        "epochs": 10,
+        "lr": 0.0003,
+        "warmup_steps": 500,
+        "batch_size": 4,
+        "k_train": 4,
+        "pos_weight": 4.0,
+        "weight_decay": 0.01,
+        "clip_grad_norm": 1.0,
+        "seed": 0,
+        "select_per_domain": null,
+        "selection_ks": {
+          "1": 0.2,
+          "2": 0.2,
+          "4": 0.6
+        },
+        "draft_cache": "runs/cache/tta_draft_a1i_s0",
+        "probe_ckpt": "runs/draft_head/A1-i/best.pt",
+        "init_refiner": null
+      },
+      "selection_images": 834,
+      "report_images": 835
+    },
+    "DR_S_s1": {
+      "passed": true,
+      "config": {
+        "detail_head": true,
+        "d4_aug": true,
+        "epochs": 10,
+        "lr": 0.0003,
+        "warmup_steps": 500,
+        "batch_size": 4,
+        "k_train": 4,
+        "pos_weight": 4.0,
+        "weight_decay": 0.01,
+        "clip_grad_norm": 1.0,
+        "seed": 1,
+        "select_per_domain": null,
+        "selection_ks": {
+          "1": 0.2,
+          "2": 0.2,
+          "4": 0.6
+        },
+        "draft_cache": "runs/cache/tta_draft_a1i_s0",
+        "probe_ckpt": "runs/draft_head/A1-i/best.pt",
+        "init_refiner": null
+      },
+      "selection_images": 834,
+      "report_images": 835
+    },
+    "DR_S_s2": {
+      "passed": true,
+      "config": {
+        "detail_head": true,
+        "d4_aug": true,
+        "epochs": 10,
+        "lr": 0.0003,
+        "warmup_steps": 500,
+        "batch_size": 4,
+        "k_train": 4,
+        "pos_weight": 4.0,
+        "weight_decay": 0.01,
+        "clip_grad_norm": 1.0,
+        "seed": 2,
+        "select_per_domain": null,
+        "selection_ks": {
+          "1": 0.2,
+          "2": 0.2,
+          "4": 0.6
+        },
+        "draft_cache": "runs/cache/tta_draft_a1i_s0",
+        "probe_ckpt": "runs/draft_head/A1-i/best.pt",
+        "init_refiner": null
+      },
+      "selection_images": 834,
+      "report_images": 835
+    },
+    "DR_W_s1": {
+      "passed": true,
+      "config": {
+        "detail_head": true,
+        "d4_aug": true,
+        "epochs": 3,
+        "lr": 0.0001,
+        "warmup_steps": 100,
+        "batch_size": 4,
+        "k_train": 4,
+        "pos_weight": 4.0,
+        "weight_decay": 0.01,
+        "clip_grad_norm": 1.0,
+        "seed": 1,
+        "select_per_domain": null,
+        "selection_ks": {
+          "1": 0.2,
+          "2": 0.2,
+          "4": 0.6
+        },
+        "draft_cache": "runs/cache/tta_draft_a1i_s0",
+        "probe_ckpt": "runs/draft_head/A1-i/best.pt",
+        "init_refiner": "runs/exp/e6_convdraft_s0/best.pt"
+      },
+      "selection_images": 834,
+      "report_images": 835
+    },
+    "DR_W_s2": {
+      "passed": true,
+      "config": {
+        "detail_head": true,
+        "d4_aug": true,
+        "epochs": 3,
+        "lr": 0.0001,
+        "warmup_steps": 100,
+        "batch_size": 4,
+        "k_train": 4,
+        "pos_weight": 4.0,
+        "weight_decay": 0.01,
+        "clip_grad_norm": 1.0,
+        "seed": 2,
+        "select_per_domain": null,
+        "selection_ks": {
+          "1": 0.2,
+          "2": 0.2,
+          "4": 0.6
+        },
+        "draft_cache": "runs/cache/tta_draft_a1i_s0",
+        "probe_ckpt": "runs/draft_head/A1-i/best.pt",
+        "init_refiner": "runs/exp/e6_convdraft_s0/best.pt"
+      },
+      "selection_images": 834,
+      "report_images": 835
+    }
+  },
+  "manifest_sha256": "06d97973fcec14cc113b7c3468d768e1e0a6d9b3d27998fd6aa14cf07c13dc90",
+  "head_sha256": "9429dacae36969948eddd5f4551c3fed9567a1acfee6526164fe1839bc3b568f",
+  "runs": {
+    "DR_W_s0": {
+      "arm": "W",
+      "seed": 0,
+      "best_epoch": 1,
+      "Val_sel_L": 0.5491848076896312,
+      "Val_rep_L": {
+        "Overall": 0.5464627892174546,
+        "Urban": 0.5738009140064794,
+        "Rural": 0.49394535969620246
+      },
+      "Val_rep_LB": {
+        "Overall": 0.5459592694066634,
+        "Urban": 0.5732676412205883,
+        "Rural": 0.4935872662327924
+      },
+      "evaluation_groups": {
+        "Overall": {
+          "1": {
+            "road_iou": 0.6337126323355442,
+            "cldice": 0.7017356254814051,
+            "boundary_iou": 0.09645412946817492,
+            "quality": 0.5466678297058286
+          },
+          "2": {
+            "road_iou": 0.6326607972018637,
+            "cldice": 0.703204821756033,
+            "boundary_iou": 0.09679193961290825,
+            "quality": 0.5466502330503233
+          },
+          "4": {
+            "road_iou": 0.6309105471745324,
+            "cldice": 0.7054958896782139,
+            "boundary_iou": 0.09613960309821715,
+            "quality": 0.5463319611103737
+          },
+          "8": {
+            "road_iou": 0.6275697532891129,
+            "cldice": 0.7091822353363723,
+            "boundary_iou": 0.09559869664143428,
+            "quality": 0.545659286573755
+          }
+        },
+        "Urban": {
+          "1": {
+            "road_iou": 0.6777792126799372,
+            "cldice": 0.7266957466678695,
+            "boundary_iou": 0.08823145264142751,
+            "quality": 0.5745446208686149
+          },
+          "2": {
+            "road_iou": 0.6759894349327766,
+            "cldice": 0.7281999000783812,
+            "boundary_iou": 0.08882049150275349,
+            "quality": 0.5742187857904534
+          },
+          "4": {
+            "road_iou": 0.6741484017715245,
+            "cldice": 0.7288673925402027,
+            "boundary_iou": 0.08839651238309938,
+            "quality": 0.5734137211244429
+          },
+          "8": {
+            "road_iou": 0.670513565522207,
+            "cldice": 0.7293674281438964,
+            "boundary_iou": 0.08699207121033235,
+            "quality": 0.5714654254463388
+          }
+        },
+        "Rural": {
+          "1": {
+            "road_iou": 0.5407818759554222,
+            "cldice": 0.6711045717050872,
+            "boundary_iou": 0.10632277775396665,
+            "quality": 0.49298686504003053
+          },
+          "2": {
+            "road_iou": 0.54107503839816,
+            "cldice": 0.6730491221419197,
+            "boundary_iou": 0.10633306249673333,
+            "quality": 0.49371886834100254
+          },
+          "4": {
+            "road_iou": 0.5398005707779141,
+            "cldice": 0.6779064672408203,
+            "boundary_iou": 0.10534064736061668,
+            "quality": 0.49434035503332646
+          },
+          "8": {
+            "road_iou": 0.5381550540678306,
+            "cldice": 0.6860241845978741,
+            "boundary_iou": 0.10568669423466365,
+            "quality": 0.4960221212602102
+          }
+        }
+      },
+      "stress_groups": {
+        "Overall": {
+          "4": {
+            "road_iou": 0.6279556832092991,
+            "cldice": 0.7019589585006857,
+            "boundary_iou": 0.09624416450781068,
+            "quality": 0.5438143620564173
+          }
+        },
+        "Urban": {
+          "4": {
+            "road_iou": 0.670858440718516,
+            "cldice": 0.7255854328156947,
+            "boundary_iou": 0.08821253495510507,
+            "quality": 0.5707473571949874
+          }
+        },
+        "Rural": {
+          "4": {
+            "road_iou": 0.5383549860671555,
+            "cldice": 0.6740924198493061,
+            "boundary_iou": 0.10572334363953176,
+            "quality": 0.49254988771627595
+          }
+        }
+      },
+      "selection_curve": [
+        {
+          "epoch": 1,
+          "seconds": 69.65497629996389,
+          "y0_draft": 0.547184972431232,
+          "1": 0.5502745399228346,
+          "2": 0.5496188139814266,
+          "4": 0.5486768948479649,
+          "score": 0.5491848076896312,
+          "new_best": true
+        },
+        {
+          "epoch": 2,
+          "seconds": 67.18703104299493,
+          "y0_draft": 0.547184972431232,
+          "1": 0.5479074191001831,
+          "2": 0.5474945849764097,
+          "4": 0.5465979841092523,
+          "score": 0.54703919128087,
+          "new_best": false
+        },
+        {
+          "epoch": 3,
+          "seconds": 66.59411663899664,
+          "y0_draft": 0.547184972431232,
+          "1": 0.54725585841168,
+          "2": 0.5463890661613869,
+          "4": 0.5450783953303362,
+          "score": 0.5457760221128152,
+          "new_best": false
+        }
+      ],
+      "baseline_run": "RW_D4_s0",
+      "baseline_best_epoch": 1,
+      "baseline_L": {
+        "Overall": 0.5464518405057427,
+        "Urban": 0.5737918941973121,
+        "Rural": 0.4939323283081307
+      },
+      "baseline_LB": {
+        "Overall": 0.5459535703255507,
+        "Urban": 0.5732665474984976,
+        "Rural": 0.493576610309723
+      },
+      "baseline_K4": {
+        "Overall": {
+          "road_iou": 0.6308731962482707,
+          "cldice": 0.7054963891285703,
+          "boundary_iou": 0.09612855574896526,
+          "quality": 0.5463112260124995
+        },
+        "Urban": {
+          "road_iou": 0.674099494910462,
+          "cldice": 0.7288828941670854,
+          "boundary_iou": 0.08838362670351234,
+          "quality": 0.573391341046059
+        },
+        "Rural": {
+          "road_iou": 0.5397819583823081,
+          "cldice": 0.6778977932623865,
+          "boundary_iou": 0.1053331425551198,
+          "quality": 0.494326945680894
+        }
+      },
+      "paired_differences": {
+        "Overall": {
+          "L": 1.0948711711922243e-05,
+          "LB": 5.69908111269779e-06,
+          "K4": {
+            "road_iou": 3.735092626178105e-05,
+            "cldice": -4.994503564059727e-07,
+            "boundary_iou": 1.1047349251891436e-05,
+            "quality": 2.07350978742582e-05
+          }
+        },
+        "Urban": {
+          "L": 9.019809167232218e-06,
+          "LB": 1.0937220906725997e-06,
+          "K4": {
+            "road_iou": 4.8906861062514295e-05,
+            "cldice": -1.550162688268575e-05,
+            "boundary_iou": 1.2885679587043564e-05,
+            "quality": 2.2380078383843482e-05
+          }
+        },
+        "Rural": {
+          "L": 1.3031388071738093e-05,
+          "LB": 1.0655923069424755e-05,
+          "K4": {
+            "road_iou": 1.8612395605965837e-05,
+            "cldice": 8.673978433737517e-06,
+            "boundary_iou": 7.504805496882927e-06,
+            "quality": 1.340935243243635e-05
+          }
+        }
+      },
+      "L_component_contributions": {
+        "Overall": {
+          "road_iou": 9.936769249496712e-06,
+          "cldice": -3.405006731771464e-07,
+          "boundary_iou": 1.3524431356631839e-06
+        },
+        "Urban": {
+          "road_iou": 1.0890652593842364e-05,
+          "cldice": -3.8577285940166735e-06,
+          "boundary_iou": 1.986885167405972e-06
+        },
+        "Rural": {
+          "road_iou": 8.5849858320719e-06,
+          "cldice": 4.050960554902172e-06,
+          "boundary_iou": 3.9544168480398765e-07
+        }
+      }
+    },
+    "DR_S_s0": {
+      "arm": "S",
+      "seed": 0,
+      "best_epoch": 1,
+      "Val_sel_L": 0.5513074256396867,
+      "Val_rep_L": {
+        "Overall": 0.5471459220599102,
+        "Urban": 0.5769244761300553,
+        "Rural": 0.49084971707325414
+      },
+      "Val_rep_LB": {
+        "Overall": 0.5466357896656778,
+        "Urban": 0.5763976310618397,
+        "Rural": 0.4904851600457585
+      },
+      "evaluation_groups": {
+        "Overall": {
+          "1": {
+            "road_iou": 0.6350007121850889,
+            "cldice": 0.7015446617333895,
+            "boundary_iou": 0.09603248595086708,
+            "quality": 0.5471702518027347
+          },
+          "2": {
+            "road_iou": 0.6354489867260803,
+            "cldice": 0.7018168820696693,
+            "boundary_iou": 0.09640090824228703,
+            "quality": 0.5475497396323983
+          },
+          "4": {
+            "road_iou": 0.6344049877600494,
+            "cldice": 0.7019218754182734,
+            "boundary_iou": 0.09612074891316272,
+            "quality": 0.5470032062881393
+          },
+          "8": {
+            "road_iou": 0.6274426695131587,
+            "cldice": 0.7004081560001464,
+            "boundary_iou": 0.09380550036801508,
+            "quality": 0.5426048816302262
+          }
+        },
+        "Urban": {
+          "1": {
+            "road_iou": 0.680400768954127,
+            "cldice": 0.7279333201276984,
+            "boundary_iou": 0.08847799714716116,
+            "quality": 0.5762759799448053
+          },
+          "2": {
+            "road_iou": 0.6810777666452338,
+            "cldice": 0.7292839121938403,
+            "boundary_iou": 0.08898006650898897,
+            "quality": 0.5771200702825667
+          },
+          "4": {
+            "road_iou": 0.6799894522196422,
+            "cldice": 0.7308241589610822,
+            "boundary_iou": 0.08916734838077892,
+            "quality": 0.5770754434743015
+          },
+          "8": {
+            "road_iou": 0.6730170098167988,
+            "cldice": 0.7332568832759417,
+            "boundary_iou": 0.08788364511520838,
+            "quality": 0.5740622989142236
+          }
+        },
+        "Rural": {
+          "1": {
+            "road_iou": 0.5398219370152622,
+            "cldice": 0.6688369396253648,
+            "boundary_iou": 0.1050858929430358,
+            "quality": 0.49157922898384765
+          },
+          "2": {
+            "road_iou": 0.5398473684585818,
+            "cldice": 0.6681940429810601,
+            "boundary_iou": 0.10529858603897582,
+            "quality": 0.4914416143314041
+          },
+          "4": {
+            "road_iou": 0.5388370920093337,
+            "cldice": 0.6669815429526573,
+            "boundary_iou": 0.10448119229937805,
+            "quality": 0.49040924735033964
+          },
+          "8": {
+            "road_iou": 0.53173332306646,
+            "cldice": 0.6612276136626162,
+            "boundary_iou": 0.10096044380017495,
+            "quality": 0.4844270343920498
+          }
+        }
+      },
+      "stress_groups": {
+        "Overall": {
+          "4": {
+            "road_iou": 0.6314741768076916,
+            "cldice": 0.6985659646332923,
+            "boundary_iou": 0.09572833261572163,
+            "quality": 0.5444525443169778
+          }
+        },
+        "Urban": {
+          "4": {
+            "road_iou": 0.6766467477516538,
+            "cldice": 0.7276874772364018,
+            "boundary_iou": 0.0890580054323793,
+            "quality": 0.5744412181332232
+          }
+        },
+        "Rural": {
+          "4": {
+            "road_iou": 0.5375487572701106,
+            "cldice": 0.6635785422031247,
+            "boundary_iou": 0.1036926045843429,
+            "quality": 0.4885864622128613
+          }
+        }
+      },
+      "selection_curve": [
+        {
+          "epoch": 1,
+          "seconds": 81.34831523598405,
+          "y0_draft": 0.547184972431232,
+          "1": 0.5512399817685121,
+          "2": 0.5517304121674744,
+          "4": 0.5511889114208156,
+          "score": 0.5513074256396867,
+          "new_best": true
+        },
+        {
+          "epoch": 2,
+          "seconds": 68.82846649602288,
+          "y0_draft": 0.547184972431232,
+          "1": 0.5477012604946657,
+          "2": 0.5476405579396252,
+          "4": 0.5474410739713931,
+          "score": 0.5475330080696941,
+          "new_best": false
+        },
+        {
+          "epoch": 3,
+          "seconds": 65.69608501100447,
+          "y0_draft": 0.547184972431232,
+          "1": 0.543311729254019,
+          "2": 0.5425831382171976,
+          "4": 0.5417573752621885,
+          "score": 0.5422333986515564,
+          "new_best": false
+        },
+        {
+          "epoch": 4,
+          "seconds": 68.81619670102373,
+          "y0_draft": 0.547184972431232,
+          "1": 0.5420195777896406,
+          "2": 0.5419866394817365,
+          "4": 0.5421149379427915,
+          "score": 0.5420702062199504,
+          "new_best": false
+        },
+        {
+          "epoch": 5,
+          "seconds": 69.512065523013,
+          "y0_draft": 0.547184972431232,
+          "1": 0.5414627671938451,
+          "2": 0.5398254561314748,
+          "4": 0.5382751962949789,
+          "score": 0.5392227624420514,
+          "new_best": false
+        },
+        {
+          "epoch": 6,
+          "seconds": 68.76389130199095,
+          "y0_draft": 0.547184972431232,
+          "1": 0.5422932907572622,
+          "2": 0.5420417126026407,
+          "4": 0.5418263463123537,
+          "score": 0.5419628084593928,
+          "new_best": false
+        },
+        {
+          "epoch": 7,
+          "seconds": 66.72518701001536,
+          "y0_draft": 0.547184972431232,
+          "1": 0.5370734385934455,
+          "2": 0.5370968564553146,
+          "4": 0.5380658275203383,
+          "score": 0.537673555521955,
+          "new_best": false
+        },
+        {
+          "epoch": 8,
+          "seconds": 66.05413398204837,
+          "y0_draft": 0.547184972431232,
+          "1": 0.5337221049816337,
+          "2": 0.533422615441949,
+          "4": 0.5336148074642784,
+          "score": 0.5335978285632835,
+          "new_best": false
+        },
+        {
+          "epoch": 9,
+          "seconds": 68.23974689800525,
+          "y0_draft": 0.547184972431232,
+          "1": 0.5328119522509134,
+          "2": 0.5322130525252045,
+          "4": 0.5323580491824528,
+          "score": 0.5324198304646952,
+          "new_best": false
+        },
+        {
+          "epoch": 10,
+          "seconds": 68.27129567303928,
+          "y0_draft": 0.547184972431232,
+          "1": 0.5324681354847604,
+          "2": 0.5318266729651046,
+          "4": 0.5319235895288938,
+          "score": 0.5320131154073093,
+          "new_best": false
+        }
+      ],
+      "baseline_run": "RS_D4_s0",
+      "baseline_best_epoch": 1,
+      "baseline_L": {
+        "Overall": 0.5459188573753158,
+        "Urban": 0.5753191191795332,
+        "Rural": 0.4900724378495793
+      },
+      "baseline_LB": {
+        "Overall": 0.5453871553760654,
+        "Urban": 0.5747531897334358,
+        "Rural": 0.48970506635771227
+      },
+      "baseline_K4": {
+        "Overall": {
+          "road_iou": 0.6329781460721996,
+          "cldice": 0.6994958378686723,
+          "boundary_iou": 0.09606413664734892,
+          "quality": 0.5455506517261713
+        },
+        "Urban": {
+          "road_iou": 0.6775766745916346,
+          "cldice": 0.7288721401402626,
+          "boundary_iou": 0.0894090166022659,
+          "quality": 0.5753317826583493
+        },
+        "Rural": {
+          "road_iou": 0.5385898846817577,
+          "cldice": 0.6638360738562601,
+          "boundary_iou": 0.10410923459369528,
+          "quality": 0.48926761141649594
+        }
+      },
+      "paired_differences": {
+        "Overall": {
+          "L": 0.0012270646845944366,
+          "LB": 0.0012486342896124158,
+          "K4": {
+            "road_iou": 0.0014268416878497892,
+            "cldice": 0.0024260375496011344,
+            "boundary_iou": 5.661226581379908e-05,
+            "quality": 0.0014525545619679114
+          }
+        },
+        "Urban": {
+          "L": 0.0016053569505221077,
+          "LB": 0.0016444413284039117,
+          "K4": {
+            "road_iou": 0.002412777628007623,
+            "cldice": 0.0019520188208196343,
+            "boundary_iou": -0.00024166822148698197,
+            "quality": 0.0017436608159522304
+          }
+        },
+        "Rural": {
+          "L": 0.0007772792236748205,
+          "LB": 0.0007800936880462128,
+          "K4": {
+            "road_iou": 0.0002472073275759934,
+            "cldice": 0.0031454690963972354,
+            "boundary_iou": 0.0003719577056827683,
+            "quality": 0.0011416359338436988
+          }
+        }
+      },
+      "L_component_contributions": {
+        "Overall": {
+          "road_iou": 0.000584372286481638,
+          "cldice": 0.000639614152736363,
+          "boundary_iou": 3.0782453764943702e-06
+        },
+        "Urban": {
+          "road_iou": 0.0010271078310979064,
+          "cldice": 0.000602957109968314,
+          "boundary_iou": -2.4707990544017285e-05
+        },
+        "Rural": {
+          "road_iou": 3.3582104844032115e-05,
+          "cldice": 0.0007160634432333813,
+          "boundary_iou": 2.7633675597435456e-05
+        }
+      }
+    },
+    "DR_S_s1": {
+      "arm": "S",
+      "seed": 1,
+      "best_epoch": 1,
+      "Val_sel_L": 0.5465425515605866,
+      "Val_rep_L": {
+        "Overall": 0.5432558360728417,
+        "Urban": 0.5722001283988656,
+        "Rural": 0.48772328337123455
+      },
+      "Val_rep_LB": {
+        "Overall": 0.5428093349839206,
+        "Urban": 0.5717202549576315,
+        "Rural": 0.48743599938957827
+      },
+      "evaluation_groups": {
+        "Overall": {
+          "1": {
+            "road_iou": 0.631002428500875,
+            "cldice": 0.6993741460670604,
+            "boundary_iou": 0.0946497546118916,
+            "quality": 0.544243408992934
+          },
+          "2": {
+            "road_iou": 0.6309389082628147,
+            "cldice": 0.6979021280070415,
+            "boundary_iou": 0.09507380349750036,
+            "quality": 0.5438548532330199
+          },
+          "4": {
+            "road_iou": 0.6291955159485338,
+            "cldice": 0.6971059316010344,
+            "boundary_iou": 0.0949871762908716,
+            "quality": 0.5427269727127515
+          },
+          "8": {
+            "road_iou": 0.6241603319613647,
+            "cldice": 0.696145358878286,
+            "boundary_iou": 0.09305203624401424,
+            "quality": 0.5395341808929709
+          }
+        },
+        "Urban": {
+          "1": {
+            "road_iou": 0.6747834550392702,
+            "cldice": 0.7250124197078591,
+            "boundary_iou": 0.08729679491143426,
+            "quality": 0.5723548124142797
+          },
+          "2": {
+            "road_iou": 0.6751256267185394,
+            "cldice": 0.7248280349645726,
+            "boundary_iou": 0.0881681884413923,
+            "quality": 0.5726448615369198
+          },
+          "4": {
+            "road_iou": 0.6732726472163582,
+            "cldice": 0.7252490152029688,
+            "boundary_iou": 0.08894647255986467,
+            "quality": 0.5720003226810427
+          },
+          "8": {
+            "road_iou": 0.6674356558590719,
+            "cldice": 0.7247277779617876,
+            "boundary_iou": 0.08788430276284122,
+            "quality": 0.5687130218706404
+          }
+        },
+        "Rural": {
+          "1": {
+            "road_iou": 0.5380378845447819,
+            "cldice": 0.6673323759857537,
+            "boundary_iou": 0.10352323867726936,
+            "quality": 0.4899233028035709
+          },
+          "2": {
+            "road_iou": 0.5368908261977211,
+            "cldice": 0.6644618159163118,
+            "boundary_iou": 0.10342356354438181,
+            "quality": 0.48846867058263044
+          },
+          "4": {
+            "road_iou": 0.5349906099221976,
+            "cldice": 0.6626184612306292,
+            "boundary_iou": 0.10230318913184783,
+            "quality": 0.4867414811566571
+          },
+          "8": {
+            "road_iou": 0.5310120167694518,
+            "cldice": 0.6617004338000322,
+            "boundary_iou": 0.09932999691666317,
+            "quality": 0.48388213790806817
+          }
+        }
+      },
+      "stress_groups": {
+        "Overall": {
+          "4": {
+            "road_iou": 0.6268003216108509,
+            "cldice": 0.6939979055009641,
+            "boundary_iou": 0.09447467406215611,
+            "quality": 0.5404944672681459
+          }
+        },
+        "Urban": {
+          "4": {
+            "road_iou": 0.6705667881178087,
+            "cldice": 0.7220644246796577,
+            "boundary_iou": 0.08849117006035515,
+            "quality": 0.5696009554748727
+          }
+        },
+        "Rural": {
+          "4": {
+            "road_iou": 0.5340226435292937,
+            "cldice": 0.6598621473953484,
+            "boundary_iou": 0.10167547632562039,
+            "quality": 0.4853050612483754
+          }
+        }
+      },
+      "selection_curve": [
+        {
+          "epoch": 1,
+          "seconds": 118.57281496596988,
+          "y0_draft": 0.547184972431232,
+          "1": 0.5478690077914916,
+          "2": 0.5473759748340699,
+          "4": 0.5458225917257905,
+          "score": 0.5465425515605866,
+          "new_best": true
+        },
+        {
+          "epoch": 2,
+          "seconds": 119.89658444997622,
+          "y0_draft": 0.547184972431232,
+          "1": 0.5485801124128219,
+          "2": 0.5452323536355065,
+          "4": 0.5439865311221987,
+          "score": 0.545154411882985,
+          "new_best": false
+        },
+        {
+          "epoch": 3,
+          "seconds": 112.78819961403497,
+          "y0_draft": 0.547184972431232,
+          "1": 0.542233755891972,
+          "2": 0.5408411349533276,
+          "4": 0.5403342039414877,
+          "score": 0.5408155005339526,
+          "new_best": false
+        },
+        {
+          "epoch": 4,
+          "seconds": 116.95308009302244,
+          "y0_draft": 0.547184972431232,
+          "1": 0.5423656094579854,
+          "2": 0.5417294355822275,
+          "4": 0.5408602536871278,
+          "score": 0.5413351612203192,
+          "new_best": false
+        },
+        {
+          "epoch": 5,
+          "seconds": 134.27020047599217,
+          "y0_draft": 0.547184972431232,
+          "1": 0.5386576663665007,
+          "2": 0.536951123929174,
+          "4": 0.5358198274258223,
+          "score": 0.5366136545146284,
+          "new_best": false
+        },
+        {
+          "epoch": 6,
+          "seconds": 107.8459567889804,
+          "y0_draft": 0.547184972431232,
+          "1": 0.5372154689078553,
+          "2": 0.5362956484314697,
+          "4": 0.5354244046446911,
+          "score": 0.5359568662546796,
+          "new_best": false
+        },
+        {
+          "epoch": 7,
+          "seconds": 118.66190376295708,
+          "y0_draft": 0.547184972431232,
+          "1": 0.5382940649709395,
+          "2": 0.5373385590326587,
+          "4": 0.5366415594960068,
+          "score": 0.5371114604983237,
+          "new_best": false
+        },
+        {
+          "epoch": 8,
+          "seconds": 111.08592936600326,
+          "y0_draft": 0.547184972431232,
+          "1": 0.5355767613164717,
+          "2": 0.5341697782332576,
+          "4": 0.5329017965290362,
+          "score": 0.5336903858273676,
+          "new_best": false
+        },
+        {
+          "epoch": 9,
+          "seconds": 124.85575826303102,
+          "y0_draft": 0.547184972431232,
+          "1": 0.5356643580223535,
+          "2": 0.5341748273321343,
+          "4": 0.5327839426937482,
+          "score": 0.5336382026871465,
+          "new_best": false
+        },
+        {
+          "epoch": 10,
+          "seconds": 72.29409358801786,
+          "y0_draft": 0.547184972431232,
+          "1": 0.5349619458410266,
+          "2": 0.5334282587891956,
+          "4": 0.5320509295926914,
+          "score": 0.5329085986816593,
+          "new_best": false
+        }
+      ],
+      "baseline_run": "RS_D4_s1",
+      "baseline_best_epoch": 1,
+      "baseline_L": {
+        "Overall": 0.5439827656082521,
+        "Urban": 0.5755323235555898,
+        "Rural": 0.4845233314329362
+      },
+      "baseline_LB": {
+        "Overall": 0.5434182211914363,
+        "Urban": 0.5749307412159848,
+        "Rural": 0.4841392312363398
+      },
+      "baseline_K4": {
+        "Overall": {
+          "road_iou": 0.6319314534995555,
+          "cldice": 0.6950499383809448,
+          "boundary_iou": 0.09575673983741567,
+          "quality": 0.5436320562315442
+        },
+        "Urban": {
+          "road_iou": 0.680375117961274,
+          "cldice": 0.7303457293219753,
+          "boundary_iou": 0.09005082335560613,
+          "quality": 0.5773014424483509
+        },
+        "Rural": {
+          "road_iou": 0.5298832499689534,
+          "cldice": 0.6517581731107227,
+          "boundary_iou": 0.10269005611035713,
+          "quality": 0.48100708813976495
+        }
+      },
+      "paired_differences": {
+        "Overall": {
+          "L": -0.0007269295354104255,
+          "LB": -0.0006088862075157575,
+          "K4": {
+            "road_iou": -0.002735937551021639,
+            "cldice": 0.002055993220089647,
+            "boundary_iou": -0.0007695635465440748,
+            "quality": -0.0009050835187927042
+          }
+        },
+        "Urban": {
+          "L": -0.003332195156724227,
+          "LB": -0.0032104862583532956,
+          "K4": {
+            "road_iou": -0.007102470744915879,
+            "cldice": -0.0050967141190064735,
+            "boundary_iou": -0.0011043507957414628,
+            "quality": -0.005301119767308182
+          }
+        },
+        "Rural": {
+          "L": 0.003199951938298362,
+          "LB": 0.003296768153238483,
+          "K4": {
+            "road_iou": 0.005107359953244184,
+            "cldice": 0.01086028811990647,
+            "boundary_iou": -0.00038686697850930096,
+            "quality": 0.005734393016892159
+          }
+        }
+      },
+      "L_component_contributions": {
+        "Overall": {
+          "road_iou": -0.0009614816511943736,
+          "cldice": 0.0003488600630401017,
+          "boundary_iou": -0.00011430794725616144
+        },
+        "Urban": {
+          "road_iou": -0.0023160402523944358,
+          "cldice": -0.0008894533243195179,
+          "boundary_iou": -0.0001267015800103222
+        },
+        "Rural": {
+          "road_iou": 0.001442031180797998,
+          "cldice": 0.0018602208685145859,
+          "boundary_iou": -0.00010230011101424297
+        }
+      }
+    },
+    "DR_S_s2": {
+      "arm": "S",
+      "seed": 2,
+      "best_epoch": 1,
+      "Val_sel_L": 0.5503764989256434,
+      "Val_rep_L": {
+        "Overall": 0.5455993527868941,
+        "Urban": 0.5792977319328558,
+        "Rural": 0.48277733576088383
+      },
+      "Val_rep_LB": {
+        "Overall": 0.5450944866464446,
+        "Urban": 0.5787170330671761,
+        "Rural": 0.4825244583602781
+      },
+      "evaluation_groups": {
+        "Overall": {
+          "1": {
+            "road_iou": 0.6322460685306172,
+            "cldice": 0.6999164812032871,
+            "boundary_iou": 0.09490373415981893,
+            "quality": 0.5450787254582585
+          },
+          "2": {
+            "road_iou": 0.6349645733441942,
+            "cldice": 0.6974789145519062,
+            "boundary_iou": 0.09571070017189841,
+            "quality": 0.5458681010720486
+          },
+          "4": {
+            "road_iou": 0.6377724313743628,
+            "cldice": 0.6918208884773351,
+            "boundary_iou": 0.09625415118836228,
+            "quality": 0.5456833124680545
+          },
+          "8": {
+            "road_iou": 0.6282505310653653,
+            "cldice": 0.675866116292488,
+            "boundary_iou": 0.09302909093154715,
+            "quality": 0.5354909186067386
+          }
+        },
+        "Urban": {
+          "1": {
+            "road_iou": 0.6764690719587841,
+            "cldice": 0.7258148282282242,
+            "boundary_iou": 0.08746820185137001,
+            "quality": 0.5734726248181333
+          },
+          "2": {
+            "road_iou": 0.6813667194190797,
+            "cldice": 0.7274533436721662,
+            "boundary_iou": 0.08898134464995708,
+            "quality": 0.5767156317411811
+          },
+          "4": {
+            "road_iou": 0.688752733704204,
+            "cldice": 0.7317998022296486,
+            "boundary_iou": 0.09091913423662519,
+            "quality": 0.5821001343683215
+          },
+          "8": {
+            "road_iou": 0.6855646523282618,
+            "cldice": 0.7363714662659623,
+            "boundary_iou": 0.0913780959915481,
+            "quality": 0.5819693852422293
+          }
+        },
+        "Rural": {
+          "1": {
+            "road_iou": 0.538737723928935,
+            "cldice": 0.667345306887196,
+            "boundary_iou": 0.10385912122626134,
+            "quality": 0.49034427827587856
+          },
+          "2": {
+            "road_iou": 0.5372546052276173,
+            "cldice": 0.6597919589731696,
+            "boundary_iou": 0.10381421034183873,
+            "quality": 0.48732773237412724
+          },
+          "4": {
+            "road_iou": 0.5314397970000773,
+            "cldice": 0.6416049706626155,
+            "boundary_iou": 0.1026841650965724,
+            "quality": 0.47873822271813776
+          },
+          "8": {
+            "road_iou": 0.5107541280539423,
+            "cldice": 0.6004018783182613,
+            "boundary_iou": 0.09501283290259006,
+            "quality": 0.45450019410296755
+          }
+        }
+      },
+      "stress_groups": {
+        "Overall": {
+          "4": {
+            "road_iou": 0.6347954174392484,
+            "cldice": 0.6889237923303136,
+            "boundary_iou": 0.09542067673544144,
+            "quality": 0.5431589817658066
+          }
+        },
+        "Urban": {
+          "4": {
+            "road_iou": 0.6851422854825605,
+            "cldice": 0.7286209815325497,
+            "boundary_iou": 0.09019601419438807,
+            "quality": 0.5791966400399228
+          }
+        },
+        "Rural": {
+          "4": {
+            "road_iou": 0.5305846742576104,
+            "cldice": 0.6394941262735265,
+            "boundary_iou": 0.10166630352122906,
+            "quality": 0.47747383571510893
+          }
+        }
+      },
+      "selection_curve": [
+        {
+          "epoch": 1,
+          "seconds": 81.65111371100647,
+          "y0_draft": 0.547184972431232,
+          "1": 0.5490116519856673,
+          "2": 0.5503570590093282,
+          "4": 0.5508379278777406,
+          "score": 0.5503764989256434,
+          "new_best": true
+        },
+        {
+          "epoch": 2,
+          "seconds": 71.44146504398668,
+          "y0_draft": 0.547184972431232,
+          "1": 0.549407358313721,
+          "2": 0.5508244125474356,
+          "4": 0.5497921763292101,
+          "score": 0.5499216599697574,
+          "new_best": false
+        },
+        {
+          "epoch": 3,
+          "seconds": 65.73253155796556,
+          "y0_draft": 0.547184972431232,
+          "1": 0.5483229481662637,
+          "2": 0.547866114524401,
+          "4": 0.5426672216874459,
+          "score": 0.5448381455506004,
+          "new_best": false
+        },
+        {
+          "epoch": 4,
+          "seconds": 73.30558445700444,
+          "y0_draft": 0.547184972431232,
+          "1": 0.5460443145671372,
+          "2": 0.5439527157942029,
+          "4": 0.5403893195873167,
+          "score": 0.5422329978246581,
+          "new_best": false
+        },
+        {
+          "epoch": 5,
+          "seconds": 67.93854341696715,
+          "y0_draft": 0.547184972431232,
+          "1": 0.5451718311133633,
+          "2": 0.5436021883068441,
+          "4": 0.5404275932216395,
+          "score": 0.5420113598170252,
+          "new_best": false
+        },
+        {
+          "epoch": 6,
+          "seconds": 68.72141149698291,
+          "y0_draft": 0.547184972431232,
+          "1": 0.5449830466949411,
+          "2": 0.5438603904610808,
+          "4": 0.5420281052596174,
+          "score": 0.5429855505869748,
+          "new_best": false
+        },
+        {
+          "epoch": 7,
+          "seconds": 67.01815046399133,
+          "y0_draft": 0.547184972431232,
+          "1": 0.5441452337658471,
+          "2": 0.5430913810323809,
+          "4": 0.5417130646434304,
+          "score": 0.5424751617457039,
+          "new_best": false
+        },
+        {
+          "epoch": 8,
+          "seconds": 66.84662972099613,
+          "y0_draft": 0.547184972431232,
+          "1": 0.5411889244266397,
+          "2": 0.539229697818905,
+          "4": 0.537178702515251,
+          "score": 0.5383909459582595,
+          "new_best": false
+        },
+        {
+          "epoch": 9,
+          "seconds": 70.60864753002534,
+          "y0_draft": 0.547184972431232,
+          "1": 0.5418891066532647,
+          "2": 0.5401597427105608,
+          "4": 0.5383608649919044,
+          "score": 0.5394262888679078,
+          "new_best": false
+        },
+        {
+          "epoch": 10,
+          "seconds": 68.66345027199714,
+          "y0_draft": 0.547184972431232,
+          "1": 0.5418358495763994,
+          "2": 0.539945534994823,
+          "4": 0.5380094322176812,
+          "score": 0.5391619362448532,
+          "new_best": false
+        }
+      ],
+      "baseline_run": "RS_D4_s2",
+      "baseline_best_epoch": 2,
+      "baseline_L": {
+        "Overall": 0.5473540023220766,
+        "Urban": 0.5796639187677778,
+        "Rural": 0.4870335085044081
+      },
+      "baseline_LB": {
+        "Overall": 0.546840222123375,
+        "Urban": 0.5790837369660687,
+        "Rural": 0.4867583540707741
+      },
+      "baseline_K4": {
+        "Overall": {
+          "road_iou": 0.638555378518213,
+          "cldice": 0.6980111370962859,
+          "boundary_iou": 0.09683397600658111,
+          "quality": 0.5480478255893085
+        },
+        "Urban": {
+          "road_iou": 0.6881299463325141,
+          "cldice": 0.7341946900768324,
+          "boundary_iou": 0.090548794209452,
+          "quality": 0.5824331390311971
+        },
+        "Rural": {
+          "road_iou": 0.5357830835204214,
+          "cldice": 0.6532512653683508,
+          "boundary_iou": 0.10432152347737594,
+          "quality": 0.4847312260661911
+        }
+      },
+      "paired_differences": {
+        "Overall": {
+          "L": -0.001754649535182562,
+          "LB": -0.0017457354769304656,
+          "K4": {
+            "road_iou": -0.0007829471438501878,
+            "cldice": -0.006190248618950789,
+            "boundary_iou": -0.0005798248182188326,
+            "quality": -0.002364513121254075
+          }
+        },
+        "Urban": {
+          "L": -0.0003661868349219555,
+          "LB": -0.00036670389889259525,
+          "K4": {
+            "road_iou": 0.0006227873716898591,
+            "cldice": -0.00239488784718378,
+            "boundary_iou": 0.00037034002717319103,
+            "quality": -0.00033300466287555786
+          }
+        },
+        "Rural": {
+          "L": -0.004256172743524245,
+          "LB": -0.004233895710496038,
+          "K4": {
+            "road_iou": -0.004343286520344103,
+            "cldice": -0.011646294705735305,
+            "boundary_iou": -0.001637358380803547,
+            "quality": -0.005993003348053361
+          }
+        }
+      },
+      "L_component_contributions": {
+        "Overall": {
+          "road_iou": -0.0003453770330032246,
+          "cldice": -0.0013232564435486504,
+          "boundary_iou": -8.601605863064245e-05
+        },
+        "Urban": {
+          "road_iou": 0.00011190260785780558,
+          "cldice": -0.0005290325989876043,
+          "boundary_iou": 5.094315620777501e-05
+        },
+        "Rural": {
+          "road_iou": -0.001545288159202729,
+          "cldice": -0.0024733753661767954,
+          "boundary_iou": -0.0002375092181446836
+        }
+      }
+    },
+    "DR_W_s1": {
+      "arm": "W",
+      "seed": 1,
+      "best_epoch": 1,
+      "Val_sel_L": 0.5488707702342542,
+      "Val_rep_L": {
+        "Overall": 0.5454904283279427,
+        "Urban": 0.5761570084491863,
+        "Rural": 0.4874359200688595
+      },
+      "Val_rep_LB": {
+        "Overall": 0.5449907974726357,
+        "Urban": 0.5755717229027252,
+        "Rural": 0.4871791224866969
+      },
+      "evaluation_groups": {
+        "Overall": {
+          "1": {
+            "road_iou": 0.6348045436374422,
+            "cldice": 0.6978131619742766,
+            "boundary_iou": 0.09634695787654661,
+            "quality": 0.5460156119863133
+          },
+          "2": {
+            "road_iou": 0.6337130361228611,
+            "cldice": 0.6983141542481927,
+            "boundary_iou": 0.09647342773699066,
+            "quality": 0.5456454498832864
+          },
+          "4": {
+            "road_iou": 0.6320670037991992,
+            "cldice": 0.7000572200385784,
+            "boundary_iou": 0.09606512672765734,
+            "quality": 0.5452636932567047
+          },
+          "8": {
+            "road_iou": 0.6287599021540322,
+            "cldice": 0.7033387323539466,
+            "boundary_iou": 0.09561578251615345,
+            "quality": 0.5445047272864308
+          }
+        },
+        "Urban": {
+          "1": {
+            "road_iou": 0.6815502010787956,
+            "cldice": 0.7282969041561753,
+            "boundary_iou": 0.08934307854346532,
+            "quality": 0.5771327874949435
+          },
+          "2": {
+            "road_iou": 0.679892803205952,
+            "cldice": 0.7290954479953962,
+            "boundary_iou": 0.08984320396387949,
+            "quality": 0.5766436767943708
+          },
+          "4": {
+            "road_iou": 0.6778240878845252,
+            "cldice": 0.7294210728894411,
+            "boundary_iou": 0.08965580088222064,
+            "quality": 0.5756695259855391
+          },
+          "8": {
+            "road_iou": 0.6731258077111898,
+            "cldice": 0.7284263670226178,
+            "boundary_iou": 0.08846205398767838,
+            "quality": 0.5727832247599159
+          }
+        },
+        "Rural": {
+          "1": {
+            "road_iou": 0.5363553443226953,
+            "cldice": 0.659798050848497,
+            "boundary_iou": 0.1048160975553763,
+            "quality": 0.487080306926972
+          },
+          "2": {
+            "road_iou": 0.536037982046059,
+            "cldice": 0.6603007850508623,
+            "boundary_iou": 0.10449692190221464,
+            "quality": 0.48700861091873116
+          },
+          "4": {
+            "road_iou": 0.5353067918520256,
+            "cldice": 0.6642770128358837,
+            "boundary_iou": 0.10380197194710127,
+            "quality": 0.4876968941661981
+          },
+          "8": {
+            "road_iou": 0.5352095435093293,
+            "cldice": 0.673433088954274,
+            "boundary_iou": 0.10421003738651002,
+            "quality": 0.4904767059182489
+          }
+        }
+      },
+      "stress_groups": {
+        "Overall": {
+          "4": {
+            "road_iou": 0.6290422665062754,
+            "cldice": 0.696709418974277,
+            "boundary_iou": 0.09615790017374216,
+            "quality": 0.5427655389801692
+          }
+        },
+        "Urban": {
+          "4": {
+            "road_iou": 0.6741845418574821,
+            "cldice": 0.7256780243496154,
+            "boundary_iou": 0.08973710009803726,
+            "quality": 0.5727430982532331
+          }
+        },
+        "Rural": {
+          "4": {
+            "road_iou": 0.5343503764293998,
+            "cldice": 0.6615573531652783,
+            "boundary_iou": 0.10385256045550874,
+            "quality": 0.4864129062553851
+          }
+        }
+      },
+      "selection_curve": [
+        {
+          "epoch": 1,
+          "seconds": 65.60669629299082,
+          "y0_draft": 0.547184972431232,
+          "1": 0.5501317992292313,
+          "2": 0.549199459770626,
+          "4": 0.548340864057138,
+          "score": 0.5488707702342542,
+          "new_best": true
+        },
+        {
+          "epoch": 2,
+          "seconds": 69.81865996494889,
+          "y0_draft": 0.547184972431232,
+          "1": 0.5460480743617379,
+          "2": 0.5439937426881623,
+          "4": 0.5406217594368082,
+          "score": 0.5423814190720649,
+          "new_best": false
+        },
+        {
+          "epoch": 3,
+          "seconds": 68.19328062498244,
+          "y0_draft": 0.547184972431232,
+          "1": 0.5458581599856671,
+          "2": 0.5447963986676455,
+          "4": 0.5430377381452107,
+          "score": 0.5439535546177889,
+          "new_best": false
+        }
+      ],
+      "baseline_run": "RW_D4_s1",
+      "baseline_best_epoch": 1,
+      "baseline_L": {
+        "Overall": 0.5455199995999623,
+        "Urban": 0.5760706051270793,
+        "Rural": 0.4876374333424149
+      },
+      "baseline_LB": {
+        "Overall": 0.5450230625403533,
+        "Urban": 0.5754883028490403,
+        "Rural": 0.4873825491174678
+      },
+      "baseline_K4": {
+        "Overall": {
+          "road_iou": 0.6320675766610655,
+          "cldice": 0.700131610134914,
+          "boundary_iou": 0.0960600084468584,
+          "quality": 0.5452852730603786
+        },
+        "Urban": {
+          "road_iou": 0.6777212166945621,
+          "cldice": 0.7292279749622458,
+          "boundary_iou": 0.08961743570708071,
+          "quality": 0.5755524879773709
+        },
+        "Rural": {
+          "road_iou": 0.5355072167907613,
+          "cldice": 0.6646654074425424,
+          "boundary_iou": 0.10383676664932968,
+          "quality": 0.48792058395800936
+        }
+      },
+      "paired_differences": {
+        "Overall": {
+          "L": -2.9571272019635053e-05,
+          "LB": -3.226506771758508e-05,
+          "K4": {
+            "road_iou": -5.728618662770302e-07,
+            "cldice": -7.439009633558591e-05,
+            "boundary_iou": 5.1182807989380574e-06,
+            "quality": -2.1579803673899e-05
+          }
+        },
+        "Urban": {
+          "L": 8.640332210696489e-05,
+          "LB": 8.342005368489058e-05,
+          "K4": {
+            "road_iou": 0.00010287118996310518,
+            "cldice": 0.00019309792719535146,
+            "boundary_iou": 3.8365175139928875e-05,
+            "quality": 0.00011703800816820209
+          }
+        },
+        "Rural": {
+          "L": -0.00020151327355538706,
+          "LB": -0.00020342663077088652,
+          "K4": {
+            "road_iou": -0.00020042493873573264,
+            "cldice": -0.0003883946066587374,
+            "boundary_iou": -3.479470222841896e-05,
+            "quality": -0.0002236897918112546
+          }
+        }
+      },
+      "L_component_contributions": {
+        "Overall": {
+          "road_iou": -8.397759311273849e-08,
+          "cldice": -3.061374976121689e-05,
+          "boundary_iou": 1.126455334692911e-06
+        },
+        "Urban": {
+          "road_iou": 4.4593806834158924e-05,
+          "cldice": 3.4273875074382065e-05,
+          "boundary_iou": 7.535640198451099e-06
+        },
+        "Rural": {
+          "road_iou": -8.74426843229581e-05,
+          "cldice": -0.0001075135018344353,
+          "boundary_iou": -6.557087397956462e-06
+        }
+      }
+    },
+    "DR_W_s2": {
+      "arm": "W",
+      "seed": 2,
+      "best_epoch": 1,
+      "Val_sel_L": 0.5456950634081928,
+      "Val_rep_L": {
+        "Overall": 0.5446119650534692,
+        "Urban": 0.5683290346694755,
+        "Rural": 0.49805780910298914
+      },
+      "Val_rep_LB": {
+        "Overall": 0.544119317529401,
+        "Urban": 0.5678518339030093,
+        "Rural": 0.49763868917489634
+      },
+      "evaluation_groups": {
+        "Overall": {
+          "1": {
+            "road_iou": 0.6323497674120035,
+            "cldice": 0.7037024992236869,
+            "boundary_iou": 0.09656648666461119,
+            "quality": 0.5465989308060301
+          },
+          "2": {
+            "road_iou": 0.6297516352288494,
+            "cldice": 0.7061061045861924,
+            "boundary_iou": 0.09657918954082442,
+            "quality": 0.5460234868984474
+          },
+          "4": {
+            "road_iou": 0.6233497097721543,
+            "cldice": 0.709487669913654,
+            "boundary_iou": 0.09478989997058024,
+            "quality": 0.5434791358542894
+          },
+          "8": {
+            "road_iou": 0.6099345181331609,
+            "cldice": 0.7121904429744724,
+            "boundary_iou": 0.09118488933443869,
+            "quality": 0.5368613698258099
+          }
+        },
+        "Urban": {
+          "1": {
+            "road_iou": 0.6745907885095418,
+            "cldice": 0.7254807486146675,
+            "boundary_iou": 0.08772868420648257,
+            "quality": 0.5724853556804677
+          },
+          "2": {
+            "road_iou": 0.6703010000574878,
+            "cldice": 0.7261569872796285,
+            "boundary_iou": 0.087687514649582,
+            "quality": 0.5705350991425489
+          },
+          "4": {
+            "road_iou": 0.6626501543921266,
+            "cldice": 0.7259373261839883,
+            "boundary_iou": 0.08550982228430237,
+            "quality": 0.5662082395081203
+          },
+          "8": {
+            "road_iou": 0.6508107885924053,
+            "cldice": 0.7230150646029934,
+            "boundary_iou": 0.08150122689076969,
+            "quality": 0.5586101590552545
+          }
+        },
+        "Rural": {
+          "1": {
+            "road_iou": 0.5430347355666062,
+            "cldice": 0.6773594256644727,
+            "boundary_iou": 0.10715793574673217,
+            "quality": 0.49615678263199137
+          },
+          "2": {
+            "road_iou": 0.5438341616661121,
+            "cldice": 0.6826938250936215,
+            "boundary_iou": 0.10719211376397712,
+            "quality": 0.49816365111393796
+          },
+          "4": {
+            "road_iou": 0.5402977038474956,
+            "cldice": 0.6912039103656985,
+            "boundary_iou": 0.10573089444774023,
+            "quality": 0.49865620392300547
+          },
+          "8": {
+            "road_iou": 0.5250764752103831,
+            "cldice": 0.7009862689705002,
+            "boundary_iou": 0.10230371664497116,
+            "quality": 0.4932948616253358
+          }
+        }
+      },
+      "stress_groups": {
+        "Overall": {
+          "4": {
+            "road_iou": 0.6204494662637767,
+            "cldice": 0.7061009486510119,
+            "boundary_iou": 0.09480440253378478,
+            "quality": 0.5410158982339488
+          }
+        },
+        "Urban": {
+          "4": {
+            "road_iou": 0.6596795775011928,
+            "cldice": 0.7232335361382127,
+            "boundary_iou": 0.08506193041864508,
+            "quality": 0.5638222356757892
+          }
+        },
+        "Rural": {
+          "4": {
+            "road_iou": 0.5384000641154115,
+            "cldice": 0.6870592421788237,
+            "boundary_iou": 0.10621399785594213,
+            "quality": 0.4965606042825413
+          }
+        }
+      },
+      "selection_curve": [
+        {
+          "epoch": 1,
+          "seconds": 68.08393416198669,
+          "y0_draft": 0.547184972431232,
+          "1": 0.5496581735857002,
+          "2": 0.5480845722234218,
+          "4": 0.5435775237439475,
+          "score": 0.5456950634081928,
+          "new_best": true
+        },
+        {
+          "epoch": 2,
+          "seconds": 69.73565919400426,
+          "y0_draft": 0.547184972431232,
+          "1": 0.547745408011651,
+          "2": 0.5456510838218486,
+          "4": 0.5446936321344237,
+          "score": 0.5454954776473542,
+          "new_best": false
+        },
+        {
+          "epoch": 3,
+          "seconds": 67.55256972298957,
+          "y0_draft": 0.547184972431232,
+          "1": 0.5470522446371756,
+          "2": 0.5458918246097901,
+          "4": 0.5449728487267614,
+          "score": 0.54557252308545,
+          "new_best": false
+        }
+      ],
+      "baseline_run": "RW_D4_s2",
+      "baseline_best_epoch": 1,
+      "baseline_L": {
+        "Overall": 0.5445735653637012,
+        "Urban": 0.5682352504365238,
+        "Rural": 0.49810485386399317
+      },
+      "baseline_LB": {
+        "Overall": 0.5440736054610562,
+        "Urban": 0.5677498283712379,
+        "Rural": 0.4976799946792782
+      },
+      "baseline_K4": {
+        "Overall": {
+          "road_iou": 0.6232753920486339,
+          "cldice": 0.7093997480734858,
+          "boundary_iou": 0.09477557800589154,
+          "quality": 0.543412736047541
+        },
+        "Urban": {
+          "road_iou": 0.6624673159180982,
+          "cldice": 0.7257588157853333,
+          "boundary_iou": 0.08545858644345455,
+          "quality": 0.56605301998334
+        },
+        "Rural": {
+          "road_iou": 0.5404193985907652,
+          "cldice": 0.6912217617240842,
+          "boundary_iou": 0.10576646417048646,
+          "quality": 0.4987295206467051
+        }
+      },
+      "paired_differences": {
+        "Overall": {
+          "L": 3.8399689768042755e-05,
+          "LB": 4.5712068344805346e-05,
+          "K4": {
+            "road_iou": 7.431772352040067e-05,
+            "cldice": 8.792184016814808e-05,
+            "boundary_iou": 1.4321964688701616e-05,
+            "quality": 6.639980674838508e-05
+          }
+        },
+        "Urban": {
+          "L": 9.378423295169913e-05,
+          "LB": 0.0001020055317714208,
+          "K4": {
+            "road_iou": 0.0001828384740284461,
+            "cldice": 0.0001785103986550185,
+            "boundary_iou": 5.1235840847818626e-05,
+            "quality": 0.00015521952478025902
+          }
+        },
+        "Rural": {
+          "L": -4.704476100403365e-05,
+          "LB": -4.130550438186109e-05,
+          "K4": {
+            "road_iou": -0.00012169474326950702,
+            "cldice": -1.785135838572316e-05,
+            "boundary_iou": -3.556972274623704e-05,
+            "quality": -7.33167236996457e-05
+          }
+        }
+      },
+      "L_component_contributions": {
+        "Overall": {
+          "road_iou": 2.1448056430617424e-05,
+          "cldice": 1.537223304984181e-05,
+          "boundary_iou": 1.5794002875757498e-06
+        },
+        "Urban": {
+          "road_iou": 5.4474263320436474e-05,
+          "cldice": 3.227978967062839e-05,
+          "boundary_iou": 7.030179960648697e-06
+        },
+        "Rural": {
+          "road_iou": -3.784121121064298e-05,
+          "cldice": -3.4132257460806064e-06,
+          "boundary_iou": -5.790324047392771e-06
+        }
+      }
+    }
+  },
+  "group_statistics": {
+    "S": {
+      "selected_run": "DR_S_s0",
+      "positive_L_pairs": 1,
+      "Val_sel_L": {
+        "mean": 0.5494088253753056,
+        "sample_std": 0.0025255297112561515
+      },
+      "Val_rep_L": {
+        "Overall": {
+          "mean": 0.545333703639882,
+          "sample_std": 0.0019586013756448554
+        },
+        "Urban": {
+          "mean": 0.5761407788205922,
+          "sample_std": 0.003613119163004788
+        },
+        "Rural": {
+          "mean": 0.48711677873512416,
+          "sample_std": 0.004070223693888814
+        }
+      },
+      "Val_rep_LB": {
+        "Overall": {
+          "mean": 0.544846537098681,
+          "sample_std": 0.0019252397491124563
+        },
+        "Urban": {
+          "mean": 0.5756116396955491,
+          "sample_std": 0.003563995342233695
+        },
+        "Rural": {
+          "mean": 0.4868152059318716,
+          "sample_std": 0.004016494892210272
+        }
+      },
+      "K4": {
+        "Overall": {
+          "road_iou": {
+            "mean": 0.633790978360982,
+            "sample_std": 0.004321299019052366
+          },
+          "cldice": {
+            "mean": 0.6969495651655476,
+            "sample_std": 0.005052308595272232
+          },
+          "boundary_iou": {
+            "mean": 0.09578735879746553,
+            "sample_std": 0.0006961810645595864
+          },
+          "quality": {
+            "mean": 0.5451378304896484,
+            "sample_std": 0.002189681789528498
+          }
+        },
+        "Urban": {
+          "road_iou": {
+            "mean": 0.6806716110467348,
+            "sample_std": 0.007762555952573348
+          },
+          "cldice": {
+            "mean": 0.7292909921312332,
+            "sample_std": 0.003534282538697347
+          },
+          "boundary_iou": {
+            "mean": 0.08967765172575626,
+            "sample_std": 0.0010808124956074518
+          },
+          "quality": {
+            "mean": 0.5770586335078886,
+            "sample_std": 0.005049926827276954
+          }
+        },
+        "Rural": {
+          "road_iou": {
+            "mean": 0.5350891663105362,
+            "sample_std": 0.0036996321958749326
+          },
+          "cldice": {
+            "mean": 0.657068324948634,
+            "sample_std": 0.013568183918987451
+          },
+          "boundary_iou": {
+            "mean": 0.10315618217593275,
+            "sample_std": 0.001163195831254925
+          },
+          "quality": {
+            "mean": 0.48529631707504484,
+            "sample_std": 0.005968214004914068
+          }
+        }
+      },
+      "paired_means": {
+        "Overall": {
+          "L": -0.00041817146199951694,
+          "LB": -0.0003686624649446024,
+          "K4": {
+            "road_iou": -0.0006973476690073458,
+            "cldice": -0.0005694059497533358,
+            "boundary_iou": -0.0004309253663163694,
+            "quality": -0.0006056806926929559
+          }
+        },
+        "Urban": {
+          "L": -0.0006976750137080249,
+          "LB": -0.000644249609613993,
+          "K4": {
+            "road_iou": -0.0013556352484061323,
+            "cldice": -0.0018465277151235397,
+            "boundary_iou": -0.0003252263300184179,
+            "quality": -0.0012968212047438366
+          }
+        },
+        "Rural": {
+          "L": -9.298052718368736e-05,
+          "LB": -5.234462307044755e-05,
+          "K4": {
+            "road_iou": 0.0003370935868253581,
+            "cldice": 0.0007864875035228,
+            "boundary_iou": -0.0005507558845433599,
+            "quality": 0.00029434186756083225
+          }
+        }
+      },
+      "mean_L_component_contributions": {
+        "Overall": {
+          "road_iou": -0.00024082879923865343,
+          "cldice": -0.00011159407592406188,
+          "boundary_iou": -6.574858683676985e-05
+        },
+        "Urban": {
+          "road_iou": -0.0003923432711462413,
+          "cldice": -0.00027184293777960273,
+          "boundary_iou": -3.348880478218816e-05
+        },
+        "Rural": {
+          "road_iou": -2.3224957853566317e-05,
+          "cldice": 3.4302981857057265e-05,
+          "boundary_iou": -0.00010405855118716371
+        }
+      },
+      "paired_sample_std": {
+        "Overall": {
+          "L": 0.0015146463557634173,
+          "LB": 0.0015115697666888178,
+          "K4": {
+            "road_iou": 0.002082709341330368,
+            "cldice": 0.004871307569365125,
+            "boundary_iou": 0.0004327469275615237,
+            "quality": 0.001926066708030073
+          }
+        },
+        "Urban": {
+          "L": 0.0024854111354963705,
+          "LB": 0.0024393347831568597,
+          "K4": {
+            "road_iou": 0.005056738568226209,
+            "cldice": 0.003556217532726625,
+            "boundary_iou": 0.0007408877944217924,
+            "quality": 0.0036199364789116016
+          }
+        },
+        "Rural": {
+          "L": 0.003803480359249184,
+          "LB": 0.003833724000694404,
+          "K4": {
+            "road_iou": 0.004725964382735873,
+            "cldice": 0.011437227078208627,
+            "boundary_iou": 0.0010146341527831353,
+            "quality": 0.005909432020186285
+          }
+        }
+      }
+    },
+    "W": {
+      "selected_run": "DR_W_s0",
+      "positive_L_pairs": 2,
+      "Val_sel_L": {
+        "mean": 0.5479168804440261,
+        "sample_std": 0.0019305460591200643
+      },
+      "Val_rep_L": {
+        "Overall": {
+          "mean": 0.5455217275329555,
+          "sample_std": 0.000925808971480563
+        },
+        "Urban": {
+          "mean": 0.5727623190417137,
+          "sample_std": 0.004016005851537983
+        },
+        "Rural": {
+          "mean": 0.49314636295601705,
+          "sample_std": 0.0053558312619481465
+        }
+      },
+      "Val_rep_LB": {
+        "Overall": {
+          "mean": 0.5450231281362333,
+          "sample_std": 0.0009204019130341044
+        },
+        "Urban": {
+          "mean": 0.5722303993421076,
+          "sample_std": 0.003963089019671288
+        },
+        "Rural": {
+          "mean": 0.4928016926314619,
+          "sample_std": 0.005273848522526343
+        }
+      },
+      "K4": {
+        "Overall": {
+          "road_iou": {
+            "mean": 0.628775753581962,
+            "sample_std": 0.004734533931724227
+          },
+          "cldice": {
+            "mean": 0.7050135932101488,
+            "sample_std": 0.004733688162934827
+          },
+          "boundary_iou": {
+            "mean": 0.09566487659881824,
+            "sample_std": 0.000758666433562866
+          },
+          "quality": {
+            "mean": 0.5450249300737893,
+            "sample_std": 0.0014413219205212482
+          }
+        },
+        "Urban": {
+          "road_iou": {
+            "mean": 0.671540881349392,
+            "sample_std": 0.007915897704733938
+          },
+          "cldice": {
+            "mean": 0.7280752638712107,
+            "sample_std": 0.00187209071578212
+          },
+          "boundary_iou": {
+            "mean": 0.08785404518320747,
+            "sample_std": 0.00212555584043751
+          },
+          "quality": {
+            "mean": 0.5717638288727007,
+            "sample_std": 0.004941719719259298
+          }
+        },
+        "Rural": {
+          "road_iou": {
+            "mean": 0.5384683554924784,
+            "sample_std": 0.0027492542282759355
+          },
+          "cldice": {
+            "mean": 0.6777957968141342,
+            "sample_std": 0.013463789904881682
+          },
+          "boundary_iou": {
+            "mean": 0.10495783791848606,
+            "sample_std": 0.0010198494031503308
+          },
+          "quality": {
+            "mean": 0.49356448437417666,
+            "sample_std": 0.005520697333327596
+          }
+        }
+      },
+      "paired_means": {
+        "Overall": {
+          "L": 6.592376486776648e-06,
+          "LB": 6.382027246639351e-06,
+          "K4": {
+            "road_iou": 3.703192930530156e-05,
+            "cldice": 4.3440978253854e-06,
+            "boundary_iou": 1.0162531579843703e-05,
+            "quality": 2.1851700316248095e-05
+          }
+        },
+        "Urban": {
+          "L": 6.306912140863208e-05,
+          "LB": 6.217310251566133e-05,
+          "K4": {
+            "road_iou": 0.00011153884168468853,
+            "cldice": 0.00011870223298922807,
+            "boundary_iou": 3.416223185826369e-05,
+            "quality": 9.82125371107682e-05
+          }
+        },
+        "Rural": {
+          "L": -7.850888216256087e-05,
+          "LB": -7.802540402777429e-05,
+          "K4": {
+            "road_iou": -0.00010116909546642461,
+            "cldice": -0.00013252399553690766,
+            "boundary_iou": -2.0953206492591026e-05,
+            "quality": -9.453238769282131e-05
+          }
+        }
+      },
+      "mean_L_component_contributions": {
+        "Overall": {
+          "road_iou": 1.0433616029000465e-05,
+          "cldice": -5.194005794850742e-06,
+          "boundary_iou": 1.3527662526439483e-06
+        },
+        "Urban": {
+          "road_iou": 3.665290758281259e-05,
+          "cldice": 2.0898645383664593e-05,
+          "boundary_iou": 5.517568442168589e-06
+        },
+        "Rural": {
+          "road_iou": -3.889963656717639e-05,
+          "cldice": -3.562525567520458e-05,
+          "boundary_iou": -3.983989920181748e-06
+        }
+      },
+      "paired_sample_std": {
+        "Overall": {
+          "L": 3.4194241533200766e-05,
+          "LB": 3.899305385180208e-05,
+          "K4": {
+            "road_iou": 3.744631175674713e-05,
+            "cldice": 8.126429813971227e-05,
+            "boundary_iou": 4.665203749060624e-06,
+            "quality": 4.400043253508212e-05
+          }
+        },
+        "Urban": {
+          "L": 4.695333403019142e-05,
+          "LB": 5.370635934180976e-05,
+          "K4": {
+            "road_iou": 6.738520147398121e-05,
+            "cldice": 0.00011645259121470405,
+            "boundary_iou": 1.9517486168908482e-05,
+            "quality": 6.839136202860161e-05
+          }
+        },
+        "Rural": {
+          "L": 0.00011067902307295303,
+          "LB": 0.00011166511647422348,
+          "K4": {
+            "road_iou": 0.00011095185948050347,
+            "cldice": 0.00022198699421416653,
+            "boundary_iou": 2.4648407636103842e-05,
+            "quality": 0.00011996490882452309
+          }
+        }
+      }
+    }
+  },
+  "decisions": {
+    "DR-P1": {
+      "status": "NOT_MET",
+      "mean_L_delta": -0.00041817146199951694,
+      "interval": [
+        0.002,
+        0.008
+      ],
+      "positive_pairs": 1,
+      "required_positive_pairs": 2
+    },
+    "DR-P2": {
+      "status": "NOT_MET",
+      "mean_K4_BIoU_delta": -0.0004309253663163694,
+      "minimum_BIoU_delta": 0.005,
+      "mean_K4_IoU_delta": -0.0006973476690073458
+    },
+    "DR-P3": {
+      "status": "MET by the specified mean-difference comparison",
+      "Urban_mean_L_delta": -0.0006976750137080249,
+      "Rural_mean_L_delta": -9.298052718368736e-05,
+      "comparison_met": true,
+      "interpretation": "Both domain deltas are reported with their signs; a larger difference does not imply positive improvement."
+    },
+    "DR-P4": {
+      "status": "NOT_MET",
+      "mean_L_delta": 6.592376486776648e-06,
+      "interval": [
+        0.001,
+        0.006
+      ]
+    },
+    "DR-P5": {
+      "status": "NOT_MET",
+      "candidates": {
+        "S": {
+          "run": "DR_S_s0",
+          "Val_sel_L": 0.5513074256396867,
+          "Val_rep_LB": {
+            "Overall": 0.5466357896656778,
+            "Urban": 0.5763976310618397,
+            "Rural": 0.4904851600457585
+          },
+          "LB_deltas": {
+            "Overall": -1.8360857367838435e-07,
+            "Urban": -0.0015780247147798576,
+            "Rural": 0.0026636345582926046
+          },
+          "overall_pass": false,
+          "registered_absolute_threshold_pass": false,
+          "domain_pass": {
+            "Urban": true,
+            "Rural": true
+          },
+          "passed": false
+        },
+        "W": {
+          "run": "DR_W_s0",
+          "Val_sel_L": 0.5491848076896312,
+          "Val_rep_LB": {
+            "Overall": 0.5459592694066634,
+            "Urban": 0.5732676412205883,
+            "Rural": 0.4935872662327924
+          },
+          "LB_deltas": {
+            "Overall": -0.0006767038675881132,
+            "Urban": -0.004708014556031315,
+            "Rural": 0.005765740745326542
+          },
+          "overall_pass": false,
+          "registered_absolute_threshold_pass": false,
+          "domain_pass": {
+            "Urban": false,
+            "Rural": true
+          },
+          "passed": false
+        }
+      },
+      "minimum_LB_gain": 0.002
+    },
+    "DR-R1": {
+      "status": "Neither group passes",
+      "candidates": {
+        "S": {
+          "run": "DR_S_s0",
+          "Val_sel_L": 0.5513074256396867,
+          "Val_rep_LB": {
+            "Overall": 0.5466357896656778,
+            "Urban": 0.5763976310618397,
+            "Rural": 0.4904851600457585
+          },
+          "LB_deltas": {
+            "Overall": -1.8360857367838435e-07,
+            "Urban": -0.0015780247147798576,
+            "Rural": 0.0026636345582926046
+          },
+          "overall_pass": false,
+          "registered_absolute_threshold_pass": false,
+          "domain_pass": {
+            "Urban": true,
+            "Rural": true
+          },
+          "passed": false
+        },
+        "W": {
+          "run": "DR_W_s0",
+          "Val_sel_L": 0.5491848076896312,
+          "Val_rep_LB": {
+            "Overall": 0.5459592694066634,
+            "Urban": 0.5732676412205883,
+            "Rural": 0.4935872662327924
+          },
+          "LB_deltas": {
+            "Overall": -0.0006767038675881132,
+            "Urban": -0.004708014556031315,
+            "Rural": 0.005765740745326542
+          },
+          "overall_pass": false,
+          "registered_absolute_threshold_pass": false,
+          "domain_pass": {
+            "Urban": false,
+            "Rural": true
+          },
+          "passed": false
+        }
+      },
+      "outcome": "E0",
+      "minimum_LB_gain": 0.002,
+      "minimum_domain_LB_delta": -0.003
+    },
+    "DR-R2": {
+      "status": "NOT_MET",
+      "mean_L_delta": -0.00041817146199951694,
+      "positive_pairs": 1,
+      "outcome": "Do not add detail heads by default for directions 3/4"
+    }
+  },
+  "E0": {
+    "Val_sel_L": {
+      "Overall": 0.5519079865836032,
+      "Urban": 0.5692106390224501,
+      "Rural": 0.5186695544937351
+    },
+    "Val_rep_L": {
+      "Overall": 0.5471354385318701,
+      "Urban": 0.5784943091269396,
+      "Rural": 0.4881633316534141
+    },
+    "Val_rep_LB": {
+      "Overall": 0.5466359732742515,
+      "Urban": 0.5779756557766196,
+      "Rural": 0.4878215254874659
+    }
+  },
+  "comparison_groups": {
+    "E0": {
+      "Overall": {
+        "1": {
+          "road_iou": 0.6325699595779621,
+          "cldice": 0.701023991247529,
+          "boundary_iou": 0.0947054169101911,
+          "quality": 0.5455332605452781
+        },
+        "2": {
+          "road_iou": 0.6351847772771064,
+          "cldice": 0.7006304831429582,
+          "boundary_iou": 0.09539027740504949,
+          "quality": 0.5468595890624506
+        },
+        "4": {
+          "road_iou": 0.6379340265432353,
+          "cldice": 0.6988184839152519,
+          "boundary_iou": 0.09574444618840312,
+          "quality": 0.5477614476838738
+        },
+        "8": {
+          "road_iou": 0.6355906880457636,
+          "cldice": 0.6949431523342393,
+          "boundary_iou": 0.09471844622035791,
+          "quality": 0.5452219789672252
+        }
+      },
+      "Urban": {
+        "1": {
+          "road_iou": 0.6767596563701479,
+          "cldice": 0.7265425406880038,
+          "boundary_iou": 0.08715565469766207,
+          "quality": 0.5737737213310076
+        },
+        "2": {
+          "road_iou": 0.6809969700553415,
+          "cldice": 0.728770749714494,
+          "boundary_iou": 0.08820260701527628,
+          "quality": 0.5767702313450742
+        },
+        "4": {
+          "road_iou": 0.6863721749772823,
+          "cldice": 0.7321703622108171,
+          "boundary_iou": 0.08902667417159482,
+          "quality": 0.5806425309862053
+        },
+        "8": {
+          "road_iou": 0.6869543694040674,
+          "cldice": 0.7383245786866067,
+          "boundary_iou": 0.08964367533039319,
+          "quality": 0.5829032933740943
+        }
+      },
+      "Rural": {
+        "1": {
+          "road_iou": 0.5393612917976784,
+          "cldice": 0.6690637542982137,
+          "boundary_iou": 0.10376971005984681,
+          "quality": 0.49115371420027265
+        },
+        "2": {
+          "road_iou": 0.5390685708288384,
+          "cldice": 0.6655272056268698,
+          "boundary_iou": 0.10400080099716538,
+          "quality": 0.48999260730191324
+        },
+        "4": {
+          "road_iou": 0.5371987639135847,
+          "cldice": 0.657337471824814,
+          "boundary_iou": 0.10378077708695842,
+          "quality": 0.4865567789216282
+        },
+        "8": {
+          "road_iou": 0.5300214119566119,
+          "cldice": 0.6415890743493124,
+          "boundary_iou": 0.10077501843988508,
+          "quality": 0.4776424319710767
+        }
+      }
+    },
+    "RS_D4_s2": {
+      "Overall": {
+        "1": {
+          "road_iou": 0.632710265662831,
+          "cldice": 0.7008237147015243,
+          "boundary_iou": 0.09501545398973689,
+          "quality": 0.5456053380398201
+        },
+        "2": {
+          "road_iou": 0.6356053051104621,
+          "cldice": 0.7000552092559609,
+          "boundary_iou": 0.09600990735309001,
+          "quality": 0.5470211968026374
+        },
+        "4": {
+          "road_iou": 0.638555378518213,
+          "cldice": 0.6980111370962859,
+          "boundary_iou": 0.09683397600658111,
+          "quality": 0.5480478255893085
+        },
+        "8": {
+          "road_iou": 0.6301341305738979,
+          "cldice": 0.689833943713587,
+          "boundary_iou": 0.09477341667281193,
+          "quality": 0.5409719317355874
+        }
+      },
+      "Urban": {
+        "1": {
+          "road_iou": 0.6769141885618477,
+          "cldice": 0.7263581086823917,
+          "boundary_iou": 0.08744034538935713,
+          "quality": 0.5738525959635128
+        },
+        "2": {
+          "road_iou": 0.6816709388525076,
+          "cldice": 0.7285426096595741,
+          "boundary_iou": 0.08884664228829516,
+          "quality": 0.577167580781785
+        },
+        "4": {
+          "road_iou": 0.6881299463325141,
+          "cldice": 0.7341946900768324,
+          "boundary_iou": 0.090548794209452,
+          "quality": 0.5824331390311971
+        },
+        "8": {
+          "road_iou": 0.6834283550781198,
+          "cldice": 0.7412350038624661,
+          "boundary_iou": 0.09097432309743565,
+          "quality": 0.5822795433172869
+        }
+      },
+      "Rural": {
+        "1": {
+          "road_iou": 0.5394411749724126,
+          "cldice": 0.6688701062097786,
+          "boundary_iou": 0.10411205620335917,
+          "quality": 0.49120403058981177
+        },
+        "2": {
+          "road_iou": 0.5389741762151347,
+          "cldice": 0.6645511983029943,
+          "boundary_iou": 0.10458693067594735,
+          "quality": 0.489769833733655
+        },
+        "4": {
+          "road_iou": 0.5357830835204214,
+          "cldice": 0.6532512653683508,
+          "boundary_iou": 0.10432152347737594,
+          "quality": 0.4847312260661911
+        },
+        "8": {
+          "road_iou": 0.5216387434926812,
+          "cldice": 0.6273470210179963,
+          "boundary_iou": 0.09926069005376702,
+          "quality": 0.4688756160624929
+        }
+      }
+    },
+    "RW_D4_s0": {
+      "Overall": {
+        "1": {
+          "road_iou": 0.6337141205592771,
+          "cldice": 0.7017531528158514,
+          "boundary_iou": 0.09644011638872094,
+          "quality": 0.5466710294021381
+        },
+        "2": {
+          "road_iou": 0.6326719940644212,
+          "cldice": 0.7031914710817372,
+          "boundary_iou": 0.09680528366172632,
+          "quality": 0.546654495089077
+        },
+        "4": {
+          "road_iou": 0.6308731962482707,
+          "cldice": 0.7054963891285703,
+          "boundary_iou": 0.09612855574896526,
+          "quality": 0.5463112260124995
+        },
+        "8": {
+          "road_iou": 0.627465005304329,
+          "cldice": 0.7091477332692355,
+          "boundary_iou": 0.09556484538452344,
+          "quality": 0.5455897917098399
+        }
+      },
+      "Urban": {
+        "1": {
+          "road_iou": 0.6777941156226769,
+          "cldice": 0.72671881291545,
+          "boundary_iou": 0.08821846721965855,
+          "quality": 0.5745563951299051
+        },
+        "2": {
+          "road_iou": 0.6760123460472861,
+          "cldice": 0.7281946244267196,
+          "boundary_iou": 0.08882246183409843,
+          "quality": 0.5742290527184786
+        },
+        "4": {
+          "road_iou": 0.674099494910462,
+          "cldice": 0.7288828941670854,
+          "boundary_iou": 0.08838362670351234,
+          "quality": 0.573391341046059
+        },
+        "8": {
+          "road_iou": 0.6703877508885107,
+          "cldice": 0.729293005282244,
+          "boundary_iou": 0.08694950794052231,
+          "quality": 0.571371678617033
+        }
+      },
+      "Rural": {
+        "1": {
+          "road_iou": 0.5407590659762934,
+          "cldice": 0.671097146477394,
+          "boundary_iou": 0.10630749456506612,
+          "quality": 0.49297017584437813
+        },
+        "2": {
+          "road_iou": 0.5410678357057859,
+          "cldice": 0.6730150532956657,
+          "boundary_iou": 0.1063609740600044,
+          "quality": 0.49371062865359355
+        },
+        "4": {
+          "road_iou": 0.5397819583823081,
+          "cldice": 0.6778977932623865,
+          "boundary_iou": 0.1053331425551198,
+          "quality": 0.494326945680894
+        },
+        "8": {
+          "road_iou": 0.5380857313385398,
+          "cldice": 0.6860310149235064,
+          "boundary_iou": 0.10566384549353718,
+          "quality": 0.4959849392450292
+        }
+      }
+    },
+    "DR_S_s0": {
+      "Overall": {
+        "1": {
+          "road_iou": 0.6350007121850889,
+          "cldice": 0.7015446617333895,
+          "boundary_iou": 0.09603248595086708,
+          "quality": 0.5471702518027347
+        },
+        "2": {
+          "road_iou": 0.6354489867260803,
+          "cldice": 0.7018168820696693,
+          "boundary_iou": 0.09640090824228703,
+          "quality": 0.5475497396323983
+        },
+        "4": {
+          "road_iou": 0.6344049877600494,
+          "cldice": 0.7019218754182734,
+          "boundary_iou": 0.09612074891316272,
+          "quality": 0.5470032062881393
+        },
+        "8": {
+          "road_iou": 0.6274426695131587,
+          "cldice": 0.7004081560001464,
+          "boundary_iou": 0.09380550036801508,
+          "quality": 0.5426048816302262
+        }
+      },
+      "Urban": {
+        "1": {
+          "road_iou": 0.680400768954127,
+          "cldice": 0.7279333201276984,
+          "boundary_iou": 0.08847799714716116,
+          "quality": 0.5762759799448053
+        },
+        "2": {
+          "road_iou": 0.6810777666452338,
+          "cldice": 0.7292839121938403,
+          "boundary_iou": 0.08898006650898897,
+          "quality": 0.5771200702825667
+        },
+        "4": {
+          "road_iou": 0.6799894522196422,
+          "cldice": 0.7308241589610822,
+          "boundary_iou": 0.08916734838077892,
+          "quality": 0.5770754434743015
+        },
+        "8": {
+          "road_iou": 0.6730170098167988,
+          "cldice": 0.7332568832759417,
+          "boundary_iou": 0.08788364511520838,
+          "quality": 0.5740622989142236
+        }
+      },
+      "Rural": {
+        "1": {
+          "road_iou": 0.5398219370152622,
+          "cldice": 0.6688369396253648,
+          "boundary_iou": 0.1050858929430358,
+          "quality": 0.49157922898384765
+        },
+        "2": {
+          "road_iou": 0.5398473684585818,
+          "cldice": 0.6681940429810601,
+          "boundary_iou": 0.10529858603897582,
+          "quality": 0.4914416143314041
+        },
+        "4": {
+          "road_iou": 0.5388370920093337,
+          "cldice": 0.6669815429526573,
+          "boundary_iou": 0.10448119229937805,
+          "quality": 0.49040924735033964
+        },
+        "8": {
+          "road_iou": 0.53173332306646,
+          "cldice": 0.6612276136626162,
+          "boundary_iou": 0.10096044380017495,
+          "quality": 0.4844270343920498
+        }
+      }
+    },
+    "DR_W_s0": {
+      "Overall": {
+        "1": {
+          "road_iou": 0.6337126323355442,
+          "cldice": 0.7017356254814051,
+          "boundary_iou": 0.09645412946817492,
+          "quality": 0.5466678297058286
+        },
+        "2": {
+          "road_iou": 0.6326607972018637,
+          "cldice": 0.703204821756033,
+          "boundary_iou": 0.09679193961290825,
+          "quality": 0.5466502330503233
+        },
+        "4": {
+          "road_iou": 0.6309105471745324,
+          "cldice": 0.7054958896782139,
+          "boundary_iou": 0.09613960309821715,
+          "quality": 0.5463319611103737
+        },
+        "8": {
+          "road_iou": 0.6275697532891129,
+          "cldice": 0.7091822353363723,
+          "boundary_iou": 0.09559869664143428,
+          "quality": 0.545659286573755
+        }
+      },
+      "Urban": {
+        "1": {
+          "road_iou": 0.6777792126799372,
+          "cldice": 0.7266957466678695,
+          "boundary_iou": 0.08823145264142751,
+          "quality": 0.5745446208686149
+        },
+        "2": {
+          "road_iou": 0.6759894349327766,
+          "cldice": 0.7281999000783812,
+          "boundary_iou": 0.08882049150275349,
+          "quality": 0.5742187857904534
+        },
+        "4": {
+          "road_iou": 0.6741484017715245,
+          "cldice": 0.7288673925402027,
+          "boundary_iou": 0.08839651238309938,
+          "quality": 0.5734137211244429
+        },
+        "8": {
+          "road_iou": 0.670513565522207,
+          "cldice": 0.7293674281438964,
+          "boundary_iou": 0.08699207121033235,
+          "quality": 0.5714654254463388
+        }
+      },
+      "Rural": {
+        "1": {
+          "road_iou": 0.5407818759554222,
+          "cldice": 0.6711045717050872,
+          "boundary_iou": 0.10632277775396665,
+          "quality": 0.49298686504003053
+        },
+        "2": {
+          "road_iou": 0.54107503839816,
+          "cldice": 0.6730491221419197,
+          "boundary_iou": 0.10633306249673333,
+          "quality": 0.49371886834100254
+        },
+        "4": {
+          "road_iou": 0.5398005707779141,
+          "cldice": 0.6779064672408203,
+          "boundary_iou": 0.10534064736061668,
+          "quality": 0.49434035503332646
+        },
+        "8": {
+          "road_iou": 0.5381550540678306,
+          "cldice": 0.6860241845978741,
+          "boundary_iou": 0.10568669423466365,
+          "quality": 0.4960221212602102
+        }
+      }
+    }
+  },
+  "K_curves": {
+    "E0": {
+      "Overall": {
+        "A": {
+          "1": 0.5455332605452781,
+          "2": 0.5468595890624506,
+          "4": 0.5477614476838738,
+          "8": 0.5452219789672252
+        },
+        "directions": [
+          "up",
+          "up",
+          "down"
+        ]
+      },
+      "Urban": {
+        "A": {
+          "1": 0.5737737213310076,
+          "2": 0.5767702313450742,
+          "4": 0.5806425309862053,
+          "8": 0.5829032933740943
+        },
+        "directions": [
+          "up",
+          "up",
+          "up"
+        ]
+      },
+      "Rural": {
+        "A": {
+          "1": 0.49115371420027265,
+          "2": 0.48999260730191324,
+          "4": 0.4865567789216282,
+          "8": 0.4776424319710767
+        },
+        "directions": [
+          "down",
+          "down",
+          "down"
+        ]
+      }
+    },
+    "RS_D4_s2": {
+      "Overall": {
+        "A": {
+          "1": 0.5456053380398201,
+          "2": 0.5470211968026374,
+          "4": 0.5480478255893085,
+          "8": 0.5409719317355874
+        },
+        "directions": [
+          "up",
+          "up",
+          "down"
+        ]
+      },
+      "Urban": {
+        "A": {
+          "1": 0.5738525959635128,
+          "2": 0.577167580781785,
+          "4": 0.5824331390311971,
+          "8": 0.5822795433172869
+        },
+        "directions": [
+          "up",
+          "up",
+          "down"
+        ]
+      },
+      "Rural": {
+        "A": {
+          "1": 0.49120403058981177,
+          "2": 0.489769833733655,
+          "4": 0.4847312260661911,
+          "8": 0.4688756160624929
+        },
+        "directions": [
+          "down",
+          "down",
+          "down"
+        ]
+      }
+    },
+    "RW_D4_s0": {
+      "Overall": {
+        "A": {
+          "1": 0.5466710294021381,
+          "2": 0.546654495089077,
+          "4": 0.5463112260124995,
+          "8": 0.5455897917098399
+        },
+        "directions": [
+          "down",
+          "down",
+          "down"
+        ]
+      },
+      "Urban": {
+        "A": {
+          "1": 0.5745563951299051,
+          "2": 0.5742290527184786,
+          "4": 0.573391341046059,
+          "8": 0.571371678617033
+        },
+        "directions": [
+          "down",
+          "down",
+          "down"
+        ]
+      },
+      "Rural": {
+        "A": {
+          "1": 0.49297017584437813,
+          "2": 0.49371062865359355,
+          "4": 0.494326945680894,
+          "8": 0.4959849392450292
+        },
+        "directions": [
+          "up",
+          "up",
+          "up"
+        ]
+      }
+    },
+    "DR_S_s0": {
+      "Overall": {
+        "A": {
+          "1": 0.5471702518027347,
+          "2": 0.5475497396323983,
+          "4": 0.5470032062881393,
+          "8": 0.5426048816302262
+        },
+        "directions": [
+          "up",
+          "down",
+          "down"
+        ]
+      },
+      "Urban": {
+        "A": {
+          "1": 0.5762759799448053,
+          "2": 0.5771200702825667,
+          "4": 0.5770754434743015,
+          "8": 0.5740622989142236
+        },
+        "directions": [
+          "up",
+          "down",
+          "down"
+        ]
+      },
+      "Rural": {
+        "A": {
+          "1": 0.49157922898384765,
+          "2": 0.4914416143314041,
+          "4": 0.49040924735033964,
+          "8": 0.4844270343920498
+        },
+        "directions": [
+          "down",
+          "down",
+          "down"
+        ]
+      }
+    },
+    "DR_W_s0": {
+      "Overall": {
+        "A": {
+          "1": 0.5466678297058286,
+          "2": 0.5466502330503233,
+          "4": 0.5463319611103737,
+          "8": 0.545659286573755
+        },
+        "directions": [
+          "down",
+          "down",
+          "down"
+        ]
+      },
+      "Urban": {
+        "A": {
+          "1": 0.5745446208686149,
+          "2": 0.5742187857904534,
+          "4": 0.5734137211244429,
+          "8": 0.5714654254463388
+        },
+        "directions": [
+          "down",
+          "down",
+          "down"
+        ]
+      },
+      "Rural": {
+        "A": {
+          "1": 0.49298686504003053,
+          "2": 0.49371886834100254,
+          "4": 0.49434035503332646,
+          "8": 0.4960221212602102
+        },
+        "directions": [
+          "up",
+          "up",
+          "up"
+        ]
+      }
+    }
+  },
+  "outcome": "E0",
+  "future_detail_head": false,
+  "limitations": [
+    "Per-domain Val-sel L was not saved; per-seed selection values are Overall only.",
+    "No new inference, gate-zero ablation, or causal component attribution was performed.",
+    "DR-P3 is evaluated using the specified mean-difference comparison, retaining both signs to distinguish smaller decline from positive improvement."
+  ],
+  "component_decomposition": {
+    "source": "$EC523_STARTER_DIR/metrics.py:69",
+    "quality_weights": {
+      "road_iou": 0.5,
+      "cldice": 0.3,
+      "boundary_iou": 0.2
+    },
+    "method": "Apply official linear quality weights to saved per-K component differences and L weights. This is score-difference arithmetic, not a new image metric implementation or causal ablation."
+  },
+  "cache_provenance": {
+    "manifest_sha256": "06d97973fcec14cc113b7c3468d768e1e0a6d9b3d27998fd6aa14cf07c13dc90",
+    "head_sha256": "9429dacae36969948eddd5f4551c3fed9567a1acfee6526164fe1839bc3b568f",
+    "gates_passed": true,
+    "all_reported_manifest_hashes_equal": true,
+    "latest_cache_file_mtime": 1795151745.278569,
+    "earliest_job_start": 1795211630,
+    "files_predate_all_jobs": true
+  }
+}

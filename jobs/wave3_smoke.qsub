@@ -1,0 +1,37 @@
+#!/bin/bash -l
+#$ -N ec523-wave3-smoke
+#$ -P ec523kb
+#$ -cwd
+#$ -pe omp 8
+#$ -l gpus=1
+#$ -l gpu_c=8.0
+#$ -l mem_per_core=8G
+#$ -l h_rt=00:30:00
+#$ -j y
+#$ -m ea
+#$ -o runs/logs/
+
+# GPU smoke only: four clean/stress images and 20 updates per train branch.
+source "${SGE_O_WORKDIR:?Submit from the repository root}/env.sh" || exit 1
+set -euo pipefail
+cd "$SGE_O_WORKDIR"
+export PYTHONPATH="$PWD:$PWD/src"
+export PYTHONDONTWRITEBYTECODE=1 OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1
+export HF_HUB_OFFLINE=1 TRANSFORMERS_OFFLINE=1 HF_HUB_DISABLE_TELEMETRY=1
+nvidia-smi --query-gpu=name,compute_mode --format=csv
+python - <<'PYINFO'
+import sys, torch
+from importlib.metadata import version
+print("Python:",sys.version.split()[0],flush=True)
+for name in ("torch","numpy","scipy","Pillow","transformers","safetensors"):
+    print(name,version(name),flush=True)
+PYINFO
+git rev-parse HEAD
+python - <<'PYCACHE'
+import json
+from pathlib import Path
+m=json.loads(Path('runs/cache/tta_draft_a1i_s0/manifest.json').read_text())
+if m.get('smoke') or not m.get('gates_passed') or m['total_images']!=4191:
+    raise SystemExit('A complete regression-passed full cache is required')
+PYCACHE
+python -u scripts/wave3_smoke.py

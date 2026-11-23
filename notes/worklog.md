@@ -1043,3 +1043,493 @@ LC-R1（只用于解释，不影响选择）：LC-P1 成立 → 报告写"第一
 - Observed R-P3 is not met: Val-sel-selected RS*=seed 2 and RW*=seed 0 have report gains -0.001007843818 and -0.000474155629, neither reaching +0.001. Observed neither group passes R-R1: RS* report L=0.546127594714 and RW* L=0.546661282903 are both below registered 0.548135; both also fail the exact archived E0+0.001 interpretation. RS* Urban/Rural deltas are -0.001659900818/+0.000027450433, both within the domain bound. RW* deltas are -0.003979108866/+0.005145252282, with Urban below -0.003. The registered outcome retains E0 (A1-i s0 + D4 TTA + e6 s0).
 - Added the requested LC descriptive observation without changing its registered verdict: epoch-1 Val-sel A is 0.527155385725 for LC and 0.525868792451 for first LoRA; difference 0.001286593273 (about 0.0013). Observed continuing the head alone without LoRA also produces almost the same first-epoch decline magnitude. With the LC report-A bound already satisfied, the literal LC-R1 branch in this comparison hinges on best epoch being 1; observed that condition poorly represents the intended question. This limitation is recorded alongside the unchanged literal branch rather than changing the preregistered rule.
 - Updated refiner summary/JSON consistently with RG3 PASS, all R predictions not met and E0 retained; added the LC paragraph and matching descriptive JSON metadata. Checked decision arithmetic and Markdown/JSON consistency, absence of stale deferred/unverified verdicts, whitespace and personal-path scans. All result files remain below 10 MB; only the four wave2 report files and this appended worklog are included in the local commit. No images, weights, logs, per-image tables or caches are added.
+
+## 2026-11-20 - Refiner focus preregistration
+
+Recorded before creating or submitting any new job. The following supplied definitions, predictions and rules are preserved verbatim.
+
+定义：
+- S5a：每张图 8 个视角 g ∈ D4，各自有自己的状态 z^g；每一步把 8 个视角打包成一批，只调用一次 core，Δ̄ = mean_g g⁻¹(Δ_g)，所有视角共享同一个答案：y_{t+1} = y_t + Δ̄（每个视角看到的答案是 g·y_t）。
+- S5b：8 个视角各自独立循环（各自的 y^g、z^g），每一步同样打包成一批只调用一次 core；第 t 步的输出取 mean_g g⁻¹(y_t^g)。
+- 两者的视角特征 f_g = E(g·x)，初稿用 g·y₀（TTA 初稿对 D4 是等变的）。
+- RS-D4 / RW-D4：分别是 RS / RW 的设置，加上训练时的 D4 增强，seed 0/1/2；每组按 Val-sel L 选一个 seed，记为 RS-D4*、RW-D4*。
+
+S5-P1：S5a 的 Val-rep L 减去 E0，落在 +0.002 到 +0.006 之间。
+S5-P2：|S5a − S5b| 的 Val-rep L 差 < 0.002。
+S5-P3：S5a 的 refiner 推理时间约为 E0 的 8 倍，峰值显存 ≤ 8 GiB。
+R1-P1：RS-D4 三 seed 的 Val-rep L 均值减去 RS 均值（0.543722），落在 +0.001 到 +0.004；并且至少 2/3 个 seed 的 best epoch ≥ 3。
+R1-P2：RW-D4 均值减去 RW 均值（0.545883），落在 0 到 +0.002 之间。
+R1-P3：RS-D4* 和 RW-D4* 里至少有一个，Val-rep L 比 E0 高 ≥ +0.001。
+
+判定规则：
+S5-R1：S5a、S5b 按 Val-sel L 选一个；如果它的 Val-rep LB ≥ E0 的 LB + 0.002，并且 Urban、Rural 的 L 都不低于 E0 超过 0.003，就采用（同时标注"待 TA 确认是否符合'每步调用一次 core'"）。
+R1-R1：每组选出的 seed 满足 Val-rep L ≥ E0 + 0.001，并且 Urban、Rural 的 L 都不低于 E0 超过 0.003，就算通过；两组都通过时取 Val-sel L 更高的那组；都不通过就保留 e6 s0。
+R1-R2：如果 RS-D4 三 seed 的均值比 RS 均值高 ≥ +0.001，并且按 seed 配对至少 2/3 为正，那么之后的 refiner 训练（方向 2、3、4）一律加 D4 增强；否则不加。
+
+## 2026-11-20 - Refiner focus implementation and offline verification
+
+- Re-read AGENTS.md and verified clean main at 1dd5e1a (PR #29 merging charles/draft-head-v3). Created charles/refiner-focus. Supplied predictions/rules were committed separately in 5fcb5bd before any new qsub file. After the interrupted session, resumed from that commit with a clean working tree; did not rewrite the preregistration. No network, installation, push, qsub/qstat, real-image CPU forward or pretrained CPU loading occurred.
+- Added inference-only d4_refiner.trajectory. Each image owns eight view states; model.init receives the batched features/transformed draft. Each step invokes model.step once on that batch. A forward hook on the shared model.core asserts its call count equals the current step. S5a averages inverse-transformed deltas and broadcasts the updated common answer; S5b retains independent view answers and averages their inverse transforms only for reporting. The identity-view path uses the original returned answer directly, preserving its arithmetic. No refiner model or training loss implementation was changed for S5.
+- Added default-disabled train_refiner.py --d4-aug, requiring a draft cache and no second augmentation. D4CacheDataset uses the existing d4_transform for image/target/valid/raw labels with a local seed/epoch/index RNG and encodes the chosen view in the training identity. D4DraftCache applies that same view to the original cached logit; features are still computed from the transformed input in the ordinary training loop. Evaluation uses the untransformed cache. Unset flag retains the old branch and serialized config, including global RNG behavior.
+- Added evaluate_refiner_focus.py with streaming official image_counts/summarize, summing Counts before scoring. Clean E0/S5a/S5b share eight batch-local view features and use the existing float32 TTA cache; stress drafts are recomputed with the existing logit-average D4 path. Full evaluation covers all 834 selection and 835 report images at K1/2/4/8 and stress K4. Reports retain per-image cumulative refiner timings, allocated CUDA peaks and hook counts, domain component scores, Val-sel/report L and report LB. Full SG1 compares E0 against the wave1 archive at tolerance 1e-5; small SG1 compares logits/masks against production inference. DG1 records all four-image/eight-view logit differences and threshold-mask flips and exits unsuccessfully unless max<=1e-4 and flips=0. These GPU gates have not been run or claimed passed.
+- Observed the existing stress seed523 manifest has 835 unique IDs, exact Val-rep membership, existing images and labels, seed=523 and a generator SHA matching the current official make_stress.py. No stress file was generated or modified. Runtime checks revalidate membership and file existence before scoring.
+- Added a standard-library-only wave3_smoke coordinator: SG1, S5a, S5b, DG1, RS-D4, RW-D4, stress are independent sequential subprocesses with per-stage logs/exit codes. RS/RW reuse production training CLI arguments with twenty updates and two images/domain; no separate training simulation is used. A failed stage does not suppress later diagnostics; only all successful validations print WAVE3_SMOKE_COMPLETE. DG1 failure does not authorize full jobs; wait for smoke acceptance before step 2.
+- Added train_refiner_focus.py to execute the formal D4 training entry then report/stress evaluation in the same CUDA PID. The supervisor/metadata helper never initializes CUDA. Only the active compute child owns CUDA; spawn metric workers import guarded modules and process CPU NumPy masks. All new jobs retain eight slots, one GPU, gpu_c=8.0, mem_per_core=8G, mail ea and runs/logs output, print GPU/compute_mode, versions and git HEAD, and validate the existing full cache manifest.
+- GPU time estimates use only L40S observations. S5 clean: 1669*(0.32+8*0.012*17+12*0.125)=5761.388 seconds; stress: 835*(0.64+4*0.012*17+3*0.125)=1528.885 seconds. Sum 7290.273 seconds, x1.4=10206.3822; request 3 hours. D4 training uses observed RS 51/RW 19 minutes plus duplicate clean reporting 835*(0.04+8*0.012+4*0.125)/60=8.851 minutes and stress 835*(0.32+4*0.012+0.125)/60=6.861 minutes. RS total 66.712 min x1.3=86.726 ->90 min; RW 34.712 min x1.3=45.126 ->60 min by submission override. The smoke request is 30 minutes. Stress compute estimates include its eight encoder forwards; S5 stress additionally includes eight view-feature forwards. CPU test speed was not extrapolated.
+- Observed targeted synthetic tests passed: 15 tests in 7.243 seconds, then the final expanded focus suite 10 tests in 6.833 seconds. Coverage includes identity logits, all eight D4 inverses/matching NumPy transforms, batched K core calls, independent-state and shared-answer reference loops, aligned augmented labels/cache, default synthetic main loss/weights/Torch/NumPy/Python RNG versus 1dd5e1a, CUDA-free dispatch/imports, and failure isolation. The two-image 8x8 integration test exercises inference through official Counts aggregation; it exposed a uint8 metric input, corrected to the official float32 input contract before the passing rerun. An earlier test-only import setup failure was corrected by importing the runner before looproad. No actual GPU gate outcome is inferred from CPU fixtures.
+- Observed the single full unittest discovery passed: 221 tests in 155.917 seconds, 220 passed and one known CUDA-only skip. Log is ignored under runs/refiner_focus_unittest.log; no full-suite rerun occurred. Final input-path review aligned the new evaluator's pixel normalization with the original NumPy float32 dataset division before device transfer; a tiny synthetic PNG comparison is bitwise equal. The post-adjustment focused suite passed all 10 tests in 7.660 seconds. No existing entrypoint default changed in that adjustment.
+- Shell syntax and git diff --check pass. Relative to main, results diff is empty; all new tracked files are Python/qsub text, below 50 MB, with no images, weights, features, caches, logs or personal paths. Existing job files, checkpoint files, stress images and cache files are unchanged. GPU SG1/DG1, peak memory and actual runtime remain pending manual smoke. If DG1 fails, report its exact differences/flips and do not proceed to full D4 training. S5 eligibility remains subject to the requested TA clarification; no claim of compliance is made from batching alone.
+
+## 2026-11-20 - Wave 3 smoke acceptance
+
+- Re-read AGENTS.md and confirmed clean charles/refiner-focus at 5365750. Read only existing logs and small JSON reports for job 8804453, output runs/wave3/smoke_8804453. No source, job, test, checkpoint, cache or result was modified; no training, inference, test run, network, scheduler command, polling or push occurred. Only this appended acceptance record is committed locally.
+- Observed main log lines 1-5 report NVIDIA L40S and Exclusive_Process; line 13 records source 53657501899d18eecab1f91a7419ca71468aba48. All seven stages report passed=true and exit_code=0 at lines 14-20. No Traceback, OOM/out-of-memory, killed, RuntimeError or TypeError was found in the main log or seven stage logs. The main log ends with WAVE3_SMOKE_COMPLETE at line 21.
+- Observed small SG1 PASS on four Val-rep images (two per domain). Per-image identity-view comparisons against the production E0 inference path have maximum absolute logit difference 0 across K=1/2/4/8; the gate also checks identical binary masks. Core-call records are exactly 1/2/4/8. This is a paired small-subset production-path check, not the later full-835-image archived-score regression; the latter remains in s5_eval.
+- Observed S5a and S5b PASS independently on four images each (two per domain). For every image, hook counts at K=1/2/4 are exactly 1/2/4. Both stages finish official metric aggregation and print FOCUS_EVAL_COMPLETE at stage-log line 5. The unrelated identity_regression_max_difference defaults in these two reports are not interpreted as SG1 evidence.
+- Observed DG1 PASS over four images times eight D4 codes, 32 comparisons. Per-code maximum absolute logit differences for codes 0..7 are 0, 1.430511474609375e-6, 1.430511474609375e-6, 1.9073486328125e-6, 1.9073486328125e-6, 1.9073486328125e-6, 1.9073486328125e-6 and 1.9073486328125e-6. Every code has zero flipped pixels across all four images. Overall maximum 1.9073486328125e-6 <= 1e-4 and total flips=0, satisfying the unmodified gate. DG1.log:1 records the complete checks and line 2 prints FOCUS_EVAL_COMPLETE.
+- Observed RS-D4 PASS, exit_code=0, exactly twenty updates with d4_aug=true. All batch losses are finite, first 0.17120349407196045, last/minimum 0.17119097709655762, maximum 0.17120349407196045. The recorded partial training epoch is 12.61361742700683 seconds. Selection and official K1/2/4/8 report scoring complete for four images; stage-log lines 22-25 contain epoch, selection, final scores and report completion.
+- Observed RW-D4 PASS, exit_code=0, exactly twenty updates with d4_aug=true. All batch losses are finite, first/maximum 0.1825568825006485, last/minimum 0.17978252470493317. The recorded partial training epoch is 11.251823048980441 seconds. Selection and official K1/2/4/8 report scoring complete for four images; stage-log lines 22-25 contain epoch, selection, final scores and report completion. These training times are not whole-stage wall times.
+- Observed stress stage PASS, exit_code=0: four perturbed images, two per domain, use live D4 TTA drafts, K4 and exactly four core calls per image. Official Overall/Urban/Rural scores are finite; Overall A(K4)=0.6424690166478366, retained only as a workflow check. stress.log:5 prints FOCUS_EVAL_COMPLETE. Clean SG1/S5a/S5b, RS/RW and stress official scoring all completed. No effect-size prediction is adjudicated from these smoke subsets.
+- All requested smoke acceptance items pass. Step 2 is cleared for the previously prepared s5_eval and six RS-D4/RW-D4 jobs, submitted manually by the user. Full archived SG1, full-set predictions, actual full-job resources and the TA interpretation of S5 eligibility remain pending; no job was submitted here.
+
+## 2026-11-20 - Wave 3 full-run acceptance and registered decisions
+
+- Re-read AGENTS.md and confirmed clean charles/refiner-focus at 1241aad, the wave3 smoke acceptance commit. Read the 5fcb5bd preregistration without modification. Only saved JSON/log/accounting reads, file metadata and short numerical summaries were used. No source, scripts, submission files, jobs, tests, existing results, checkpoints or caches were changed; no scheduler command, training, inference, package installation, network or push occurred. The reconnection message was treated as continuation of this same acceptance task.
+- Observed all seven jobs on NVIDIA L40S / Exclusive_Process with log completion markers, accounting failed=0/exit_status=0 and durations below requested h_rt; no Traceback/OOM/killed/timeout was observed. Job 8804722 s5_eval took 2015 s (33:35), maximum recorded allocated CUDA peak 3334970368 bytes (3.105933 GiB). RS-D4 jobs 8804723/24/25 took 3587/3572/3422 s, best epochs 1/1/2; RW-D4 jobs 8804726/27/28 took 1503/1498/1507 s, best epochs 1/1/1. Every D4 training peak is 6678470656 bytes (6.219810 GiB).
+- Observed SG1 PASS: independently compared E0 Val-rep K1/2/4/8, Overall/Urban/Rural and all four components against fe10d7b:results/wave1/ensemble_bias/metrics.json; all 48 differences are exactly zero, tolerance 1e-5. Observed SG2 PASS: checked all S5a/S5b image/K hook counts, 15022 cumulative endpoint checks over 5008 trajectories, no mismatches. Summing each trajectory's maximum K once gives 33384 actual core invocations, avoiding double counting cumulative K endpoints. Split endpoint totals are 6672 Val-sel, 6680 Val-rep and 1670 stress. Observed SG3 PASS: 835 unique seed523 stress IDs exactly match Val-rep, all files exist, and one shared stress image stream records all three modes.
+- Observed six D4 configurations match the registered definitions, including augmentation, seed, batch 4, LR/warmup/epochs (RS 3e-4/500/10, RW 1e-4/100/3), RW e6 s0 initialization, K4/per-step BCE pos_weight4/wd .01/clip1/L weights .2/.2/.6 and fixed selection/report membership 834/835. Every final evaluation records the same manifest SHA 06d97973fcec14cc113b7c3468d768e1e0a6d9b3d27998fd6aa14cf07c13dc90, matching the passed cache and A1-i head hash. All cache file mtimes predate the earliest D4 job start. All epochs complete with finite losses; best.pt/last.pt exist. Clean report scores agree with each run's separately saved final evaluation. No weights were loaded.
+- Observed E0/S5a/S5b Val-sel Overall L=0.551907986584/0.552063124829/0.552064101030, Val-rep L=0.547135438532/0.547437182730/0.547440248894 and LB=0.546635973274/0.546936299447/0.546939211136. L/LB are computed only from saved official aggregate scores, with domain values retained. Val-sel selects S5b, not the report split. S5-P1 is not met: S5a gain +0.000301744198 is outside [0.002,0.006]. S5-P2 is met: absolute S5a/S5b difference 0.000003066164 <0.002. S5-R1 is not met: selected S5b LB gain +0.000303237861 <0.002, although Urban/Rural L changes +0.000433520989/+0.000090709245 satisfy their lower bounds. Retain E0, do not adopt S5.
+- Observed S5-P3's memory bound is met: S5a peak 3.105933 GiB <=8. The approximately-eightfold time phrase has no registered numeric tolerance or K, so its time assessment remains qualitative, without adding a criterion. Clean report K4 mean refiner times are E0 0.011962092636, S5a 0.090098716470 and S5b 0.088941783888 seconds/image; ratios 7.532020/7.435303. S5a K8 ratio is 7.919207. K4 peak allocation ratios S5a/S5b against E0 are 1.982275/1.959837. Timing excludes encoder/TTA construction; peaks include resident models and shared view features, not isolated incremental memory. All K/split resource summaries are retained without per-image tables.
+- Observed RS-D4 mean report L=0.545751875102, sample SD=0.001691810142, gain against registered old RS 0.543722 is +0.002029875102; exact-archive gain is +0.002030104245. R1-P1 is not met: gain interval is met but best epoch>=3 count is 0/3 rather than >=2/3. RW-D4 mean=0.545515135156, sample SD=0.000939147020, gain against registered 0.545883 is -0.000367864844; R1-P2 is not met. Domain means/SD, LB means/SD and Val-sel mean/SD are saved. Sample SD uses denominator n-1=2; paired changes use exact archived values.
+- Observed Val-sel selects RS-D4 seed2 (L=0.551498866531) and RW-D4 seed0 (L=0.549159833916). Their report L gains versus E0 are +0.000218563790 and -0.000683598026, so R1-P3 is not met and neither group passes R1-R1. RW-D4* Urban delta=-0.004702414930 also fails -0.003; RS-D4* domain bounds pass. Registered outcome retains e6 s0. S5-R1 and R1-R1 do not both pass, so their conditional combination evaluation is not triggered.
+- Observed seed-paired D4-minus-old report L changes: RS seeds0/1/2 +0.001337707734/+0.003526197393/+0.001226407608; RW -0.000209442397/-0.000711043074/-0.000183088622. R1-R2 is met: RS mean gain >=0.001 and 3/3 positive pairs. Subsequent refiner training in directions 2/3/4 uses D4, while the current checkpoint remains E0.
+- Observed Overall A rises through K4 then falls at K8 for E0, S5a, S5b and RS-D4*. Their Rural curves decrease throughout; E0/S5a/S5b Urban curves rise throughout, while RS-D4* Urban falls slightly from K4 to K8. RW-D4* Overall and Urban decrease throughout and Rural increases throughout. Full domain/component/K tables are saved. Per-corruption stress A is not recorded: stress outputs lack per-image Counts, so no shadow/occlusion/blur aggregate is invented. Per-domain Val-sel L was also not saved by the training loop; only Overall selection scores are available for D4 seeds.
+- Wrote results/wave3/s5 and refiner_d4 summary.md/metrics.json with gates, registered verdicts and outcomes first. All rows for L/LB, selected component/K curves, paired changes and finite numeric values were independently checked against JSON; personal-path scans are empty and each file is below 10 MB. No tests were run because no code changed. Only these four small reports and this appended English worklog are committed locally; no image, weight, log, per-image table or cache is included.
+
+## 2026-11-20 - Detail recovery preregistration
+
+Recorded before creating or submitting any new job. The supplied definitions, predictions and rules below are preserved verbatim.
+
+定义：
+- DR-S：RS-D4 的设置 + 细节恢复头，从头训练，seed 0/1/2；
+- DR-W：从 e6 s0 初始化（已有的参数照常加载，细节分支按设计初始化），RW-D4 的设置（lr 1e-4、100 步预热 + 余弦、3 epoch、D4）+ 细节恢复头，seed 0/1/2；
+- 每组按 Val-sel L 选一个 seed，记为 DR-S*、DR-W*。
+
+DR-P1：DR-S 三 seed 的 Val-rep L 均值减去 RS-D4 均值，落在 +0.002 到 +0.008 之间；按 seed 配对至少 2/3 为正。
+DR-P2：DR-S 在 K4 上的 BIoU 均值比 RS-D4 高 ≥ +0.005，IoU 均值也更高。
+DR-P3：DR-S 相对 RS-D4 的提升，乡村大于城市（用 L 的均值比较）。
+DR-P4：DR-W 均值减去 RW-D4 均值，落在 +0.001 到 +0.006 之间。
+DR-P5：DR-S* 和 DR-W* 里至少有一个，Val-rep LB 比 E0 高 ≥ +0.002。
+
+判定规则：
+DR-R1：每组选出的 seed 满足 Val-rep LB ≥ E0 的 LB + 0.002（即 ≥ 0.548636），并且 Urban、Rural 的 LB 都不低于 E0 超过 0.003，就算通过；两组都通过时取 Val-sel L 更高的那组；都不通过就保留 E0。
+DR-R2：如果 DR-S 均值比 RS-D4 均值高 ≥ +0.001，并且配对至少 2/3 为正，那么方向 3、4 默认加上细节恢复头；否则不加。
+
+## 2026-11-20 - Detail recovery implementation and offline verification
+
+- Re-read AGENTS.md and confirmed clean charles/refiner-focus at e238133, the wave3 acceptance commit. Supplied definitions/predictions/rules were committed verbatim in 633c03c before new qsub files. No network, installation, push, qsub/qstat, pretrained CPU loading or real-image CPU inference occurred. Existing results/checkpoints/cache and submission files are unchanged.
+- Audited training feature flow: train_refiner.py frozen_draft uses encoder(images), then head.refiner_features for the original final-layer DINO map; frozen_cached_draft retains this feature computation and reads only y0 from cache. The map is float32 [B,1024,64,64] for the actual setup. Original-resolution float32 RGB in [0,1] is already present as images in each batch. init/step previously receive that map and its projected token tensor; optional DetailFeatures now carries the same map plus RGB through float/clone and passes RGB with the invariant feature tokens. Detail features are recomputed each step, retaining ordinary recurrent gradients without caching a reusable convolution graph in state.
+- Audited submission plan without editing submission/: baseline.py:62-70 computes frozen encoder features and probe logits from images. predict.py:152 normalizes RGB, :261-267 encodes and saves float32 features, :305-312 reloads them and computes probe logits, :316 calls refine_tensor. refine_tensor :90/:97 clones f before initialize/step; model.py:25-34 forwards init and caches projected feature tokens in state. Official CLI README:45-66 and predict.py:53-68 also use clone-based feature passing and do not force f to be a tensor. Therefore a clone-capable feature/RGB carrier is feasible.
+- Future packaging plan if adopted: compute the probe on the original feature tensor, then wrap (feature tensor, normalized RGB); adapt baseline output and the two-phase encode/decode paths, shape checks, architecture metadata and detail weight loading. Save a separate float32 RGB array before deleting each image, reload it after encoder release, and wrap only after the probe has run. Keep feature_channels=1024 for the DINO projection; RGB is separate metadata, not additional coarse channels. Full-resolution RGB adds 3*1024*1024*4=12582912 bytes (12 MiB) per image plus a small array header; existing feature payload is 16 MiB, combined 28 MiB plus headers. The carrier module must accompany the shared model source. This is a feasible plan only; submission and existing packages were not changed or validated for detail inference in this round.
+- Added default-disabled --detail-head to the training CLI and model. The RGB branch is Conv3x3/s2 3->16, GELU, Conv3x3/s2 16->32, GELU, Conv3x3 32->32, GELU, with 15-pixel receptive field and [B,32,256,256] actual-size output. The original 16-channel first-x4 output h concatenates with detail features and avgpool4(sigmoid(current answer)), yielding 49 channels. Conv3x3 49->16/GELU and zero-initialized Conv1x1 16->16 give g; h+g then follows the unchanged legacy decoder. It therefore conditions on both latent-state decoding and current answer; the recurrent core is unchanged and called once per step.
+- Parameter audit: RGB encoder 14336, fusion 7072, zero gate 272, total additional 21680. Core remains 789760; total trainable refiner parameters are 1214705, below 10M. Runtime counts assert the added parameter total and existing budget bounds. With the flag off, no detail modules are constructed or RNG consumed, registration names remain unchanged, and the flag is omitted from the legacy serialized config.
+- Strict DR-W initialization loads every legacy state-dictionary key with exact names/shapes, rejecting missing or unexpected legacy keys; only the explicitly named new detail keys may be absent. The new gate stays zero at initialization. Full detail checkpoints are loaded strictly through the existing evaluation helper with a conditional architecture flag. Existing default loader settings are unchanged. Training/evaluation carry the same augmented RGB as the encoder input; clean/stress report scoring uses the existing official metric workers and includes K1/2/4/8 and stress K4/LB.
+- Added detail_gate.py. GPU smoke compares four images' pre-update DR-W versus production E0 logits/masks at K1/2/4/8 and records exact differences/core-hook counts. Formal DR-W seed0 performs a full 835-image pre-update comparison of 48 domain/component/K scores against archived E0 at tolerance 1e-5, before any training call. A failed gate writes its reason to metrics.json, prints failure and exits before training. Real GPU gate outcomes have not been measured or claimed passed.
+- Added standard-library-only wave4_smoke coordinator with independent serial child stages: DRG1, base RS, detail RS, detail clean/stress RS scoring, base RW, detail RW, detail clean/stress RW scoring. Base and detail use the formal twenty-update D4 training entry with matched settings, not hand-written loops. Bounded runs record per-update time and allocated CUDA peaks; the default unbounded path has no new profiling output. Clean/stress stages validate four scored images and K-matched core-hook counts. All stages must pass for WAVE4_SMOKE_COMPLETE. Only the active child uses CUDA; metric workers remain CPU-only. Formal gate/training/final clean/stress evaluation all run sequentially inside one CUDA PID.
+- Added wave4_smoke.qsub (eight slots, one GPU, gpu_c=8.0, mem_per_core=8G, 30 min) and refiner_dr.qsub with the same resources, mail ea and runs/logs output. Both print GPU compute mode, versions and HEAD and check the full cache manifest. The formal qsub header's two hours is provisional: submission MUST use the h_rt override printed by train_detail_refiner.py --estimate after a passed GPU smoke. No actual detail overhead or final h_rt is invented before GPU measurements.
+- The CPU-only --estimate reads a complete passed smoke report, discards the first warmup update and averages the other nineteen for base/detail RS or RW. Let extra=max(0,detail_mean-base_mean). Baseline cost is measured RS-D4 3600 s or RW-D4 1500 s. Training updates are 6310/1893; inference-step allowances are 50060/33388 (selection, clean final reporting, duplicate clean report, stress, plus the full W gate). Charge extra/4 per inference step conservatively using the batch-four four-step update increment. W reserves 835*(.04+8*.012+4*.125)=531.06 s additional baseline gate time; only seed0 actually executes it, but all W estimates reserve it. Request ceil_to_minute(1.3*(baseline + updates*extra + inference_steps*extra/4 + gate)+300). It prints the measured terms and six qsub commands with ARM=S|W, SEED and SMOKE_DIR. CPU synthetic timings are never extrapolated.
+- Observed scoped suites passed: initial combined 26 tests in 18.634 s, expanded detail/integration 10 tests in 7.811 s, then final detail suite 12 tests in 7.300 s. Tests cover exact zero-gate identity at nonzero legacy output weights, detail shapes, nonzero gradients through state/RGB/current-answer conditioning, strict legacy key loading, parameter bounds, K core counts, constructor/model loss/weights/RNG and full default training config/Torch/NumPy/Python RNG versus e238133. A two-image 32x32 synthetic test invokes the actual detail+D4 training entry through selection/checkpoint saving and official evaluation. Additional tests verify full gate failure is recorded and blocks training, and that coordinator import/dispatch and estimator do not initialize CUDA. After including the full W gate's detail compute in the estimator, its focused two-test estimate/import check passed in 6.174 s. No real image or pretrained encoder was processed on CPU.
+- Submission-plan TTA clarification: the current two-phase package caches only original-orientation f and recomputes y0=probe(f) after encoder release; it does not yet produce the experiment's D4 TTA draft. If this model is adopted, compute the eight-view averaged-logit y0 during the encoder phase and save that single float32 map before releasing the encoder. This adds 4 MiB/image independently of the 12-MiB RGB addition. Relative to an already-TTA-capable cache, detail recovery alone adds 12 MiB; relative to today's f-only package, implementing both TTA y0 and RGB adds 16 MiB for a 32-MiB/image payload plus headers. Preserve original-orientation f for the refiner; do not attempt TTA reconstruction from that single cached f. This is a future design note, not a submission modification.
+- Observed the single final full unittest discovery passed: 233 tests in 150.388 seconds, 232 passed and one known CUDA-only skip. Log is ignored under runs/detail_head_unittest.log; the simulated gate-failure record in unit-test output is intentional and is not a real GPU result. No full-suite rerun occurred. Shell syntax/whitespace checks pass; submission diff and results diff against e238133 are empty. Relative to main, only the pre-existing wave3 result additions remain. All staged additions are code/qsub text and this worklog, below 50 MB, with no images, weights, logs, feature/cache files or personal paths. Real GPU gate/resource acceptance and smoke-derived formal h_rt remain pending manual execution.
+
+## 2026-11-20 - Wave 4 smoke acceptance and measured training budgets
+
+- Re-read AGENTS.md and confirmed clean charles/refiner-focus at ac0a4d1. Read existing logs and small JSON reports for job 8814986, output runs/wave4/smoke_8814986. Only read-only numerical summaries and the authorized existing --estimate were run. No code, job, test, checkpoint, cache or result was changed; no training, inference, unit test, network, scheduler command, polling or push occurred. Only this appended English acceptance record is committed locally.
+- Observed NVIDIA L40S / Exclusive_Process in main log lines 1-5, source ac0a4d1e78bae461c1e7930cf152d4245bf152af at line 13. Seven stages DRG1/base-RS/detail-RS/score-RS/base-RW/detail-RW/score-RW all return exit_code=0 and passed=true (lines 14-20). Main log line 21 prints WAVE4_SMOKE_COMPLETE. No Traceback/OOM/out-of-memory/killed/RuntimeError/TypeError was found in the stage logs; there is no failing stage.
+- Observed small DRG1 PASS: four images (two per domain), sixteen image/K comparisons at K1/2/4/8, maximum absolute pre-update DR-W versus E0 logit difference 0, flipped pixels 0. All corresponding hook counts equal K. DRG1.log:1 records the comparisons and line 2 prints DETAIL_GATE_COMPLETE. This clears only the small gate; the formal W seed0 full-835-image pre-update gate remains part of that future job.
+- Observed all four formal training stages complete exactly twenty updates with D4 enabled; detail_head is enabled only in the detail pair. All losses are finite. Base/detail RS both range from 0.17119097709655762 to 0.17120349407196045 (first/last 0.17120349407196045/0.17119097709655762). Base RW ranges from 0.17978252470493317 to 0.1825568825006485; detail RW from 0.17977812886238098 to 0.1825568825006485, with those extrema also last/first. Each training log completes selection and official clean K1/2/4/8 reporting.
+- Observed GPU per-update means after excluding only the first warmup update (nineteen observations): RS base 0.3211758246240941 s, detail 0.34277245031645226 s, increment 0.02159662569235815 s (+6.7242376407486315%); RW base 0.321679121152939 s, detail 0.34374402037294777 s, increment 0.02206489922000876 s (+6.859288579540168%). Including all twenty updates gives RS base/detail 0.3353588755941018/0.3843442127981689 s and RW 0.33809983149403705/0.3613659216032829 s. These are recorded update timers, not total stage wall times, and exclude the loader/device-transfer work before the update timer starts.
+- Observed base training peak 6628442112 bytes (6.1732177734375 GiB) and detail peak 7962499584 bytes (7.415655612945557 GiB) in both RS/RW comparisons, an increment of 1334057472 bytes (1.2424378395080566 GiB). Per-update peak records agree with these maxima. Resource values describe this smoke, not guaranteed full-run maxima.
+- Observed score-RS and score-RW each complete four clean and four seed523 stress images, two per domain per split. Clean reports include K1/2/4/8 and stress includes K4 with live TTA drafts. Checked all forty saved cumulative core-count endpoints in these two score reports; each equals K, including all K1/2/4 entries. Together with the gate there are fifty-six checked endpoints. All Overall/Urban/Rural official scores are finite; stress Overall A(K4)=0.660828367084072 for detail RS and 0.6456579715977475 for detail RW. Both scoring logs print FOCUS_EVAL_COMPLETE at line 9. These subset scores confirm the workflow only; no preregistered effect-size prediction is adjudicated.
+- After all checks passed, ran exactly the requested single-thread command: OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 python scripts/train_detail_refiner.py --estimate runs/wave4/smoke_8814986. It returns DR-S 5520 s (01:32:00), DR-W 3240 s (00:54:00). Neither exceeds three hours. The estimator uses measured increments above, training updates 6310/1893, inference-step allowances 50060/33388, baseline 3600/1500 s and W gate allowance 531.06 s, then ceil_to_minute(1.3*(baseline+updates*increment+inference_steps*increment/4+gate)+300). W reserves the full gate for all seeds conservatively, although only seed0 executes it. No CPU timing was extrapolated.
+- All smoke acceptance items pass; step 2 is cleared for the six jobs below, to be submitted manually by the user. These commands are preserved exactly as printed by --estimate; no qsub was executed here.
+
+```bash
+qsub -l gpu_type=L40S,h_rt=01:32:00 -v ARM=S,SEED=0,SMOKE_DIR=runs/wave4/smoke_8814986 jobs/refiner_dr.qsub
+qsub -l gpu_type=L40S,h_rt=01:32:00 -v ARM=S,SEED=1,SMOKE_DIR=runs/wave4/smoke_8814986 jobs/refiner_dr.qsub
+qsub -l gpu_type=L40S,h_rt=01:32:00 -v ARM=S,SEED=2,SMOKE_DIR=runs/wave4/smoke_8814986 jobs/refiner_dr.qsub
+qsub -l gpu_type=L40S,h_rt=00:54:00 -v ARM=W,SEED=0,SMOKE_DIR=runs/wave4/smoke_8814986 jobs/refiner_dr.qsub
+qsub -l gpu_type=L40S,h_rt=00:54:00 -v ARM=W,SEED=1,SMOKE_DIR=runs/wave4/smoke_8814986 jobs/refiner_dr.qsub
+qsub -l gpu_type=L40S,h_rt=00:54:00 -v ARM=W,SEED=2,SMOKE_DIR=runs/wave4/smoke_8814986 jobs/refiner_dr.qsub
+```
+
+## 2026-11-20 - Wave 4 detail-head full-run acceptance and registered decisions
+
+- Re-read AGENTS.md and confirmed clean charles/refiner-focus at e768ba3, the wave4 smoke acceptance commit. Read the 633c03c preregistration without editing it. Used only saved JSON/log/accounting reads, filesystem metadata, short arithmetic summaries and mmap CPU reads of the selected checkpoints' small gate tensors. No code, jobs, tests, submission files, prior results, checkpoint or cache was changed; no training, inference, ablation, scheduler command, polling, network, installation or push occurred.
+- Observed all six jobs on NVIDIA L40S / Exclusive_Process with accounting failed=0/exit_status=0, normal FOCUS_EVAL_COMPLETE markers, no Traceback/OOM/killed/timeout and durations below h_rt. DR-S seeds0/1/2, jobs 8815009/10/11: 3568/4574/3639 s (59:28/76:14/60:39). DR-W seeds0/1/2, jobs 8815012/13/14: 1578/1473/1505 s (26:18/24:33/25:05). Maximum saved phase allocation is 8012528128 bytes (7.462248 GiB) except W0 at 8012397056 bytes (7.462126 GiB). Best epoch is 1 for all six runs. These are recorded training/final-evaluation allocation peaks, not an independent job-wide GPU monitor.
+- Observed configurations match detail_head=true, d4_aug=true, assigned seed, batch4/K_train4/per-step BCE pos_weight4, AdamW wd .01, clip1, Val-sel L weights .2/.2/.6 and fixed 834/835 membership. DR-S uses LR3e-4/warmup500/10 epochs from random refiner weights; DR-W uses LR1e-4/warmup100/3 epochs with recorded e6 s0 initialization. All epochs complete with finite losses and both best.pt/last.pt exist. All six evaluations record identical passed cache manifest SHA 06d97973fcec14cc113b7c3468d768e1e0a6d9b3d27998fd6aa14cf07c13dc90, whose head SHA matches A1-i s0. All cache mtimes predate the jobs. Saved final clean scores match their respective training report scores.
+- Observed DRG1 PASS: W seed0 pre-update evaluation has 835 images, 48 domain/component/K comparisons and maximum absolute difference 0 at tolerance 1e-5. Its reference file is byte-identical to fe10d7b's wave1/ensemble_bias archive. Job 8815012 logs the gate at line 849 before first training update at line 853. Observed DRG2 PASS: checked all final six-run clean/stress image/K records, 25050 cumulative endpoint checks with zero mismatches. Summing maximum K once per image trajectory gives 60120 actual core calls; cumulative endpoint counts are not incorrectly added as independent calls.
+- Observed DRG3 PASS: selected best.pt gate weight L2/Frobenius norms (computed in CPU float64) for S0/S1/S2 are 0.058635480531/0.061968998763/0.045944571314; W0/W1/W2 are 0.056756777297/0.066673565853/0.071716776495. All 256 gate weights are nonzero in every selected checkpoint; all checkpoint epochs match selected epoch1. Bias norms are also nonzero and saved. The enabled detail forward path and nonzero trained gates satisfy the requested participation check; no zero-gate ablation or isolated causal effect is claimed.
+- Observed DR-S report L mean=0.545333703640, sample SD=0.001958601376; paired gain against RS-D4=-0.000418171462. Only 1/3 seed pairs is positive: +0.001227064685/-0.000726929535/-0.001754649535. DR-P1 is not met (neither its interval nor paired-count condition). DR-P2 is not met: mean K4 BIoU delta=-0.000430925366 versus required +0.005, and IoU delta=-0.000697347669 is negative. DR-P3 meets the explicitly specified comparison of mean L differences: Rural -0.000092980527 > Urban -0.000697675014. Both are declines; the report calls this smaller Rural decline, not positive improvement, and does not introduce an additional positivity threshold.
+- Observed DR-W report L mean=0.545521727533, sample SD=0.000925808971; paired gain against RW-D4=+0.000006592376. DR-P4 is not met, below its +0.001 lower bound. W seed-paired changes are +0.000010948712/-0.000029571272/+0.000038399690. Reports retain each seed/domain L, LB, K4 IoU/clDice/BIoU, same-seed component changes, three-seed means/sample SD and selection curves. Sample SD uses denominator n-1=2; exact archived same-seed values are used throughout.
+- Observed Val-sel selects DR-S seed0 (L=0.551307425640) and DR-W seed0 (L=0.549184807690). Their report LB is 0.546635789666/0.545959269407; exact E0 LB is 0.546635973274, so gains are -0.000000183609/-0.000676703868. DR-P5 is not met. Neither group passes DR-R1: both fail E0+0.002 and the registered rounded 0.548636 threshold; DR-S* domain deltas Urban/Rural=-0.001578024715/+0.002663634558 pass, while DR-W* Urban=-0.004708014556 fails -0.003. Retain E0. DR-R2 is not met (negative S mean gain and only 1/3 positive pairs); directions 3/4 do not add detail heads by default. The prior decision to use D4 for subsequent refiner training remains unchanged.
+- Observed descriptive decomposition of mean L changes uses only saved official component scores and the official linear quality weights (metrics.py:69), followed by the registered L weights. No image metric or Counts was recomputed. DR-S Overall contributions from IoU/clDice/BIoU are -0.000240828799/-0.000111594076/-0.000065748587; Urban -0.000392343271/-0.000271842938/-0.000033488805; Rural -0.000023224958/+0.000034302982/-0.000104058551. DR-W Overall is +0.000010433616/-0.000005194006/+0.000001352766; Urban +0.000036652908/+0.000020898645/+0.000005517568; Rural -0.000038899637/-0.000035625256/-0.000003983990. Contribution sums match saved mean L differences; these are algebraic descriptions, not causal attributions.
+- Observed E0 and prior RS-D4* Overall rise through K4 then decline; selected DR-S* Overall rises through K2 then declines through K8. DR-S* Urban rises at K2 then declines; Rural declines throughout. Prior RW-D4* and selected DR-W* Overall/Urban decline throughout while Rural rises throughout. Full five-configuration/domain/K A tables and component comparisons are saved. Every DR best epoch is1; prior RS-D4 seed2 was epoch2 and the other prior D4 best epochs were1.
+- Wrote only results/wave4/detail_head/summary.md and metrics.json, opening with gates, decisions and the E0/no-default-detail outcome. Independently checked all seed/domain metric rows, pairings, K curves, gate norms, sample statistics and decision arithmetic against JSON; numeric values are finite, files are below 10 MB, and personal-path scans are empty. No tests were run because no code changed. Only the two reports and this appended English worklog are committed locally, with no images, weights, logs, per-image tables or caches.
+
+## 2026-11-20 - Corrupt drafts, bounded steps and Train holdout preregistration
+
+Recorded before creating or submitting any new job. The supplied definitions, predictions and rules are preserved verbatim below.
+
+定义：
+- CD = RS-D4 的设置 + 初稿扰动（细节见目标 1），seed 0/1/2；
+- BS = RS-D4 的设置 + 修正量上限 c = 1.0 + 各步权重 0.1/0.2/0.3/0.4，seed 0/1/2；
+- HO = RS-D4 的设置，seed 0，从 Train 里每个域留出 100 张不参与训练；
+- 爬升幅度 = A(K4) − A(K1)，用 Val-rep 的 Overall A。
+
+CD-P1：CD 三 seed 的 Val-rep L 均值减去 RS-D4 均值，落在 −0.001 到 +0.003 之间。
+CD-P2：CD 的爬升幅度均值，比 RS-D4 的爬升幅度均值大 ≥ +0.001。
+CD-P3：CD 在 K4 上的 clDice 均值比 RS-D4 高。
+CD-P4：CD 至少 2/3 个 seed 的 best epoch ≥ 2。
+BS-P1：BS 的爬升幅度均值 ≥ +0.003，并且大于 RS-D4 的爬升幅度均值。
+BS-P2：BS 至少 2/3 个 seed 满足 A(K8) ≥ A(K4) − 0.001。
+BS-P3：BS 的 Val-rep LB 均值减去 RS-D4 均值，落在 −0.002 到 +0.002 之间。
+HO-P1：留出 Train 上的 best epoch ≥ 5，同时 Val-sel 上的 best epoch ≤ 2。
+
+判定规则：
+CB-R1（采用）：CD、BS 各自按 Val-sel L 选一个 seed；选出的 seed 满足 Val-rep LB ≥ 0.548636（E0 + 0.002），并且 Urban、Rural 的 LB 都不低于 E0 超过 0.003，就算通过；两组都通过时取 Val-sel L 更高的那组；都不通过就保留 E0。
+CB-R2（爬升，只用于报告，不影响采用）：一组被记为"实现爬升"，需要至少 2/3 个 seed 同时满足：爬升幅度 ≥ +0.003，并且 A(K8) ≥ A(K4) − 0.001。
+HO-R1（解释，只用于报告）：
+- 留出 Train 的 best epoch 减去 Val-sel 的 best epoch ≥ 3 → 报告写"早停主要和 Train/Val 分布差异有关"；
+- 两者的 best epoch 都 ≤ 2 → 写"早停主要来自训练本身"；
+- 其他情况 → 写"不确定"。
+
+## 2026-11-20 - CD/BS/HO implementation and offline verification
+
+- Re-read AGENTS.md and verified clean charles/refiner-focus at 9bcd97d, the wave4 full-run acceptance commit. Supplied definitions/predictions/rules were preserved verbatim in separate commit 7388dcd before creating new qsub files. No network, installation, push, qsub/qstat, pretrained CPU loading or real-image CPU forward occurred. This task adds no results and changes no checkpoint or existing cache.
+- Added default-disabled --draft-corrupt P, --delta-bound C and --train-holdout-per-domain N. Disabled options do not construct corruption/holdout wrappers, consume randomness or apply a tanh; their fields are omitted from legacy serialized configs. Added default-disabled --record-selection-domains for the new runs' per-domain Val-sel curves, preserving earlier scripts' default report shape. The R5 driver enables D4, domain recording and the same RS-D4 optimization settings, with no detail head.
+- CD executes in spawned CPU DataLoader workers after the existing per-sample D4 transform. Each sample reads and orients its cached logit, then uses a private NumPy Generator from SeedSequence([run seed, epoch, domain index, dataset index]). Worker scheduling/count does not select its RNG stream and global Torch/NumPy/Python RNGs are not used for corruption. CUDA training requires positive loader workers; the dataset asserts CUDA is uninitialized in the worker. PreparedDrafts transfers only the batch-local corrupted y0 to the main GPU process. Existing NPZ files are never changed or saved again; no features are persisted.
+- For selected CD samples, float32 scipy.special.expit(y0)>=0.5 defines the predicted mask. skimage.morphology.skeletonize supplies candidate cut centers; choose up to 1-4 distinct available skeleton points and integer sides 8..64 inclusive, clipping squares at image edges and applying min(logit,-4). An empty skeleton produces zero cuts. Independently request 0-2 ellipses with integer target area50..400 and aspect ratio uniform in [0.5,2]. Centers have scipy.ndimage.distance_transform_edt distance>=32 from the original predicted road region; with no roads all centers are eligible. Ellipses must fit in the image, and their actual raster area must remain50..400. Retry up to64 shapes when necessary; absent candidates can produce fewer blocks. Apply max(logit,+4). Only y0 is inspected or changed, never labels. Recorded per-sample fields include selection, changed pixels, gap/block counts, sizes/areas/centers, worker PID, cache-read time and corruption time. The final report separately marks evaluation_corruption_applied=false; evaluation rejects corruption datasets and uses the original cache.
+- BS applies C*tanh(raw_delta/C) immediately before residual addition; C=1.0 is supplied by the driver, alongside existing step-weights0.1,0.2,0.3,0.4. It adds no learned parameters or core calls. Maxima are recorded from the bounded correction itself before addition (avoiding subtraction-rounding artifacts), one value per step, and checked during smoke training and final inference. Checkpoint loading restores delta_bound for inference; new-control resume settings are restored without affecting legacy checkpoint defaults.
+- HO selects from sorted full Train pairs independently in each domain with local default_rng(0), before augmentation or smoke training limits. Held-out datasets are separate shallow copies, unaugmented and uncorrupted; train/holdout IDs are explicitly checked for disjointness and saved in the report/checkpoints. A metadata-only inspection of real Train filenames observed2322 retained/200 held out and zero overlapping IDs for N=100, without reading pixels or running an encoder. Each HO epoch records official pooled L for Overall/Urban/Rural on the held-out Train set and Val-sel; the held-out best epoch is independent, while checkpoint choice remains Val-sel only. All new arms retain per-domain Val-sel L and component scores per epoch. Existing official Counts accumulation/summarize paths are reused.
+- Added train_refiner_r5.py to train then evaluate the selected checkpoint on full Val-rep K1/2/4/8 and seed523 stress K4/LB in the same CUDA PID. Formal CD/BS seeds0/1/2 and HO seed0 all use ten epochs, batch4, LR3e-4, warmup500+cosine, BCE pos_weight4, wd.01, clip1, D4 and834-image Val-sel L selection. CD P=.5; BS bound1.0 and the registered step weights; HO100 held-out images/domain. Existing run directories are refused, rather than overwritten. Final evaluation explicitly records that no draft corruption is applied.
+- Added standard-library-only wave5_smoke coordinator with six independent serial subprocesses: CD/score-CD, BS/score-BS, HO/score-HO. A child failure is recorded and later diagnostic stages still run. Each training child calls the formal entry for twenty updates. CD uses40 Train images/domain (80 presentations in20 batches) so its P=.5 statistics are not repeated draws of only four fixed examples; it records both selected/unselected samples and actual changed pixels. BS/HO use two training images/domain; HO smoke holds out two/domain before applying that training limit. Final scoring uses four clean and four stress images per arm, checks K-matched core counts, and BS correction maxima. All stages must pass before WAVE5_SMOKE_COMPLETE. No GPU smoke was run or claimed passed here.
+- Added jobs/wave5_smoke.qsub (30 min) and jobs/refiner_r5.qsub: eight slots, one GPU, gpu_c=8.0, mem_per_core=8G, mail ea, runs/logs, GPU name/compute_mode, versions and git HEAD. Both check the completed full cache. Only active compute children use CUDA; metadata/supervisors and metric/data workers do not initialize it. Formal qsub's two-hour header is provisional; use --estimate output to override h_rt after GPU smoke succeeds.
+- Time estimation uses measured RS-D4 approximately3600 s for the complete baseline. CD adds2522*10 times mean per-image corruption_seconds measured in the GPU smoke's CPU workers, excluding cache-read time, with no overlap or worker-parallelism discount (a conservative allowance). HO adds10*200*(.04+4*.012+4*.125)=1176 s for held-out evaluation, including draft/K1/K2/K4 official metric groups. Request ceil_to_minute(1.3*(3600+extra_CD_CPU+extra_HO)+300). BS gives4980 s (01:23:00), HO6540 s (01:49:00); CD awaits actual smoke CPU timings. The CPU-only estimator prints all measured terms and seven manual qsub commands with ARM/SEED/SMOKE_DIR. No login-node CPU timings are extrapolated to GPU training speed.
+- Observed initial controls tests passed8 in9.810 s, expanded related suites passed33 in20.329 s, and final controls suite passed12 in8.181 s. Coverage includes corruption reproducibility/label immutability/geometric bounds, true CPU spawn loading, disabled training/model loss/weights/Torch/NumPy/Python RNG versus9bcd97d, zero/bounded corrections, checkpoint-bound restoration, fixed disjoint holdouts, evaluation corruption rejection, failure isolation, estimator arithmetic and CUDA-free supervisor imports. The actual training entries for CD/BS/HO each run on tiny synthetic images through updates, checkpoint selection and official scoring. No pretrained model or real image is loaded on CPU. Synthetic estimator fixtures are not reported as actual resource measurements.
+- Observed the single final full unittest discovery passed245 tests in144.509 s:244 passed and one known CUDA-only skip. Log is ignored under runs/r5_unittest.log; no full-suite rerun occurred. Shell syntax and whitespace checks pass. Relative to9bcd97d, results and submission diffs are empty. Only scoped source, two new qsub files, synthetic tests and this appended worklog are committed, with no new images, weights, logs, features, caches or personal paths. All files are below50 MB. Actual GPU smoke gates and measured CD time budget remain pending manual execution; no scientific prediction is adjudicated from synthetic tests.
+
+## 2026-11-21 - Wave 5 smoke acceptance and measured CD/BS/HO budgets
+
+- Re-read AGENTS.md and confirmed clean charles/refiner-focus at 9fc1f48. Read only saved logs/JSON for job 8821468 and ran the authorized existing --estimate after all acceptance checks passed. Output is runs/wave5/smoke_8821468. No code, jobs, tests, checkpoint, cache or result was changed; no training, inference, unit test, network, scheduler command, polling or push occurred. Only this appended English worklog is committed locally.
+- Observed NVIDIA L40S / Exclusive_Process in main log lines1-5, source 9fc1f48e440de54fd55654a3f3c914865a706e2e at line13. All six stages CD/score-CD/BS/score-BS/HO/score-HO return exit_code=0 and passed=true at lines14-19. Main log line20 prints WAVE5_SMOKE_COMPLETE. Stage logs contain no Traceback/OOM/out-of-memory/killed/RuntimeError/TypeError. Training children finish their reports; each scoring child prints FOCUS_EVAL_COMPLETE at line9.
+- Observed CD completes20 updates with finite loss range [0.03291347250342369,0.2778220474720001]. Eighty presentations have80 unique image/view IDs. Selected for corruption:45/80=56.25%; actually modified:44/80=55%. One selected sample, Train/Urban/2082 with D4 code4, has zero gaps/blocks/changed pixels; distinguish selection probability from actual modification rather than calling both56.25%. There are99 actual gaps and47 actual false blocks. Gap-count frequencies are0:40,1:9,2:13,3:8,4:10; block-count frequencies0:51,1:11,2:18. Actual ellipse raster areas range51..375 pixels.
+- Observed CD changes134356 pixels total; all-sample min/median/mean/max changed pixels=0/667/1679.45/7672, and positive-change range269..7672. Selected-sample median/mean=2810/2985.688888888889; all35 unselected samples have zero changes/gaps/blocks. The small per-sample audit table below retains exactly the requested image-level counts and timing; it is not a copied training log or a pixel array.
+- Observed CPU corruption time across80 samples (excluding cache reads): min0.0003002579906024039, median0.03151731952675618, mean0.058771465166501, max0.3152119379956275, sum4.70171721332008 seconds. Selected45 mean0.10419597438045053 s; unselected35 mean0.0003685247485658952 s. Cache-read mean is separately0.009043578009004705 s and excluded from the resource increment. Two CPU worker PIDs are recorded. The training report and score-CD report both record evaluation_corruption_applied=false; selection/final evaluation use the ordinary cache, not the training-only corruption wrapper.
+- Observed BS completes20 updates, finite loss range [0.17118830978870392,0.17120350897312164]. All20*4=80 recorded pre-addition correction maxima satisfy |delta|<=1.0; maximum is0.00027068902272731066. Clean/stress inference saves48 further step maxima, all<=1.0, maximum0.0003034062101505697. These are maxima of the bounded correction before residual addition, not a reconstructed subtraction that could introduce rounding artifacts.
+- Observed HO completes20 updates, finite loss range [0.12057794630527496,0.120588019490242]. Smoke uses four retained Train and four held-out Train IDs (two/domain for each); their intersection is0. Held-out epoch1 L is Overall0.3975331654165237, Urban0.3350072742513335, Rural0.5963501539848193; Val-sel L is Overall0.5036035694503794, Urban0.6422153896190372, Rural0.12558364879967998. Both curves are recorded and checkpoint selection remains Val-sel. The formal holdout size remains100/domain; no early-stop prediction is adjudicated from this single partial smoke epoch.
+- Observed score-CD/BS/HO each complete four clean and four seed523 stress images, two/domain, with official finite Overall/Urban/Rural scores. Clean uses K1/2/4/8; stress uses K4 and live TTA drafts. Checked60 saved cumulative core-call endpoints across these three scoring reports; all equal K. Summing each trajectory's maximum K once gives144 actual core invocations. Stress Overall A(K4) is CD0.6607965066401883, BS0.6608237143063922, HO0.6607557465905028, retained only as workflow evidence. Every scoring report explicitly records evaluation_corruption_applied=false.
+- All requested smoke acceptance checks pass; step2 is cleared. Ran exactly OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 python scripts/train_refiner_r5.py --estimate runs/wave5/smoke_8821468. Observed h_rt CD6960 s=01:56:00, BS4980 s=01:23:00, HO6540 s=01:49:00; none exceeds3 hours. CD CPU allowance=25220*0.058771465166501=1482.2163514991553 s; HO allowance=1176 s; baseline=3600 s. The estimator uses ceil_to_minute(1.3*(baseline+added_CPU+added_holdout)+300), without a CPU-parallelism/overlap discount. No login-node CPU rate is extrapolated to GPU training.
+- Exact estimator command output follows for manual submission; no qsub was executed here.
+
+```bash
+qsub -l gpu_type=L40S,h_rt=01:56:00 -v ARM=CD,SEED=0,SMOKE_DIR=runs/wave5/smoke_8821468 jobs/refiner_r5.qsub
+qsub -l gpu_type=L40S,h_rt=01:56:00 -v ARM=CD,SEED=1,SMOKE_DIR=runs/wave5/smoke_8821468 jobs/refiner_r5.qsub
+qsub -l gpu_type=L40S,h_rt=01:56:00 -v ARM=CD,SEED=2,SMOKE_DIR=runs/wave5/smoke_8821468 jobs/refiner_r5.qsub
+qsub -l gpu_type=L40S,h_rt=01:23:00 -v ARM=BS,SEED=0,SMOKE_DIR=runs/wave5/smoke_8821468 jobs/refiner_r5.qsub
+qsub -l gpu_type=L40S,h_rt=01:23:00 -v ARM=BS,SEED=1,SMOKE_DIR=runs/wave5/smoke_8821468 jobs/refiner_r5.qsub
+qsub -l gpu_type=L40S,h_rt=01:23:00 -v ARM=BS,SEED=2,SMOKE_DIR=runs/wave5/smoke_8821468 jobs/refiner_r5.qsub
+qsub -l gpu_type=L40S,h_rt=01:49:00 -v ARM=HO,SEED=0,SMOKE_DIR=runs/wave5/smoke_8821468 jobs/refiner_r5.qsub
+```
+
+### Per-sample CD acceptance audit
+
+Observed timings below are corruption_seconds in milliseconds, excluding cache reads; the rows retain presentation order. Selected does not imply a nonzero change when no gap/block was produced.
+
+| Sample | Image/view ID | Selected | Changed pixels | Gaps | False blocks | CPU corruption ms |
+| --- | --- | --- | --- | --- | --- | --- |
+| 1 | Train/Rural/143\|d4=6 | Yes | 4007 | 4 | 2 | 110.450603 |
+| 2 | Train/Urban/1391\|d4=1 | No | 0 | 0 | 0 | 0.353303 |
+| 3 | Train/Urban/2191\|d4=6 | Yes | 4469 | 3 | 2 | 190.519555 |
+| 4 | Train/Rural/380\|d4=0 | No | 0 | 0 | 0 | 0.356196 |
+| 5 | Train/Rural/1247\|d4=0 | Yes | 4713 | 3 | 2 | 123.714975 |
+| 6 | Train/Urban/2337\|d4=4 | Yes | 915 | 1 | 2 | 148.595382 |
+| 7 | Train/Urban/1989\|d4=2 | Yes | 2616 | 2 | 1 | 150.586343 |
+| 8 | Train/Urban/1921\|d4=4 | No | 0 | 0 | 0 | 0.314498 |
+| 9 | Train/Urban/1404\|d4=5 | Yes | 4085 | 3 | 2 | 153.515903 |
+| 10 | Train/Urban/2395\|d4=7 | Yes | 744 | 1 | 2 | 126.589453 |
+| 11 | Train/Rural/1170\|d4=6 | Yes | 3580 | 4 | 0 | 16.512148 |
+| 12 | Train/Urban/1999\|d4=7 | No | 0 | 0 | 0 | 0.420797 |
+| 13 | Train/Rural/17\|d4=4 | No | 0 | 0 | 0 | 0.331379 |
+| 14 | Train/Urban/1815\|d4=2 | Yes | 6806 | 4 | 2 | 128.904757 |
+| 15 | Train/Rural/818\|d4=6 | No | 0 | 0 | 0 | 0.328618 |
+| 16 | Train/Rural/73\|d4=7 | Yes | 2928 | 2 | 0 | 27.096874 |
+| 17 | Train/Urban/1854\|d4=3 | No | 0 | 0 | 0 | 0.374829 |
+| 18 | Train/Urban/1411\|d4=1 | No | 0 | 0 | 0 | 0.381502 |
+| 19 | Train/Urban/1711\|d4=4 | No | 0 | 0 | 0 | 0.416451 |
+| 20 | Train/Urban/1937\|d4=4 | No | 0 | 0 | 0 | 0.397201 |
+| 21 | Train/Urban/2294\|d4=0 | No | 0 | 0 | 0 | 0.408955 |
+| 22 | Train/Rural/995\|d4=7 | No | 0 | 0 | 0 | 0.343183 |
+| 23 | Train/Urban/2082\|d4=4 | Yes | 0 | 0 | 0 | 9.326527 |
+| 24 | Train/Rural/1148\|d4=7 | No | 0 | 0 | 0 | 0.465700 |
+| 25 | Train/Urban/1369\|d4=6 | No | 0 | 0 | 0 | 0.373943 |
+| 26 | Train/Urban/2001\|d4=1 | Yes | 5831 | 4 | 0 | 142.738235 |
+| 27 | Train/Rural/322\|d4=2 | Yes | 6431 | 4 | 0 | 58.415477 |
+| 28 | Train/Rural/768\|d4=2 | No | 0 | 0 | 0 | 0.382001 |
+| 29 | Train/Urban/2241\|d4=4 | Yes | 1766 | 1 | 0 | 77.449526 |
+| 30 | Train/Urban/1468\|d4=7 | No | 0 | 0 | 0 | 0.381621 |
+| 31 | Train/Urban/2078\|d4=6 | Yes | 5130 | 2 | 2 | 157.160261 |
+| 32 | Train/Urban/2281\|d4=1 | Yes | 932 | 2 | 0 | 98.243008 |
+| 33 | Train/Rural/1326\|d4=6 | No | 0 | 0 | 0 | 0.328315 |
+| 34 | Train/Urban/2428\|d4=3 | Yes | 1975 | 3 | 0 | 95.658946 |
+| 35 | Train/Rural/787\|d4=1 | No | 0 | 0 | 0 | 0.480371 |
+| 36 | Train/Urban/2097\|d4=1 | Yes | 3189 | 2 | 1 | 315.211938 |
+| 37 | Train/Urban/2130\|d4=5 | Yes | 3514 | 1 | 1 | 153.791496 |
+| 38 | Train/Rural/238\|d4=0 | Yes | 2303 | 3 | 0 | 92.617115 |
+| 39 | Train/Rural/763\|d4=0 | No | 0 | 0 | 0 | 0.300258 |
+| 40 | Train/Rural/132\|d4=4 | No | 0 | 0 | 0 | 0.353289 |
+| 41 | Train/Rural/263\|d4=3 | No | 0 | 0 | 0 | 0.323721 |
+| 42 | Train/Rural/1100\|d4=4 | Yes | 1740 | 2 | 1 | 98.341356 |
+| 43 | Train/Urban/1681\|d4=4 | No | 0 | 0 | 0 | 0.347360 |
+| 44 | Train/Rural/433\|d4=6 | Yes | 4522 | 2 | 2 | 116.605897 |
+| 45 | Train/Rural/878\|d4=7 | Yes | 1737 | 2 | 2 | 79.520191 |
+| 46 | Train/Urban/2463\|d4=6 | No | 0 | 0 | 0 | 0.328018 |
+| 47 | Train/Rural/907\|d4=7 | No | 0 | 0 | 0 | 0.439320 |
+| 48 | Train/Rural/279\|d4=0 | Yes | 1901 | 2 | 0 | 15.229056 |
+| 49 | Train/Rural/1297\|d4=1 | No | 0 | 0 | 0 | 0.346744 |
+| 50 | Train/Urban/1567\|d4=5 | Yes | 3214 | 2 | 1 | 93.701465 |
+| 51 | Train/Rural/814\|d4=3 | Yes | 4140 | 4 | 2 | 93.853707 |
+| 52 | Train/Urban/1982\|d4=3 | Yes | 978 | 2 | 2 | 165.890996 |
+| 53 | Train/Urban/1450\|d4=6 | Yes | 2902 | 1 | 0 | 31.485664 |
+| 54 | Train/Rural/683\|d4=7 | Yes | 365 | 0 | 1 | 31.786208 |
+| 55 | Train/Rural/1307\|d4=5 | Yes | 345 | 0 | 1 | 32.353144 |
+| 56 | Train/Urban/1563\|d4=4 | Yes | 6702 | 2 | 0 | 61.006200 |
+| 57 | Train/Urban/1668\|d4=2 | No | 0 | 0 | 0 | 0.358634 |
+| 58 | Train/Urban/2519\|d4=3 | No | 0 | 0 | 0 | 0.324879 |
+| 59 | Train/Rural/422\|d4=6 | Yes | 1730 | 1 | 2 | 158.820324 |
+| 60 | Train/Rural/1149\|d4=1 | No | 0 | 0 | 0 | 0.312030 |
+| 61 | Train/Rural/32\|d4=6 | Yes | 7672 | 3 | 1 | 137.345973 |
+| 62 | Train/Urban/2358\|d4=1 | Yes | 1681 | 1 | 0 | 44.577300 |
+| 63 | Train/Urban/2316\|d4=0 | Yes | 2718 | 4 | 2 | 139.528095 |
+| 64 | Train/Rural/547\|d4=6 | Yes | 2810 | 2 | 0 | 83.161455 |
+| 65 | Train/Rural/672\|d4=3 | Yes | 3362 | 4 | 1 | 109.255339 |
+| 66 | Train/Urban/2345\|d4=0 | No | 0 | 0 | 0 | 0.363724 |
+| 67 | Train/Rural/1030\|d4=3 | Yes | 2840 | 1 | 1 | 110.509700 |
+| 68 | Train/Urban/1934\|d4=4 | Yes | 6683 | 4 | 2 | 258.967903 |
+| 69 | Train/Urban/1458\|d4=4 | No | 0 | 0 | 0 | 0.377142 |
+| 70 | Train/Rural/139\|d4=0 | Yes | 269 | 0 | 1 | 31.548975 |
+| 71 | Train/Rural/1161\|d4=1 | Yes | 590 | 0 | 2 | 45.029106 |
+| 72 | Train/Rural/964\|d4=1 | No | 0 | 0 | 0 | 0.467127 |
+| 73 | Train/Rural/1039\|d4=7 | No | 0 | 0 | 0 | 0.339972 |
+| 74 | Train/Urban/1384\|d4=7 | Yes | 1262 | 4 | 0 | 54.311524 |
+| 75 | Train/Rural/908\|d4=4 | Yes | 2659 | 3 | 2 | 79.791784 |
+| 76 | Train/Rural/333\|d4=4 | No | 0 | 0 | 0 | 0.324562 |
+| 77 | Train/Urban/2051\|d4=0 | Yes | 1061 | 3 | 0 | 106.079115 |
+| 78 | Train/Rural/756\|d4=5 | No | 0 | 0 | 0 | 0.356869 |
+| 79 | Train/Urban/2202\|d4=1 | Yes | 4539 | 1 | 2 | 133.019848 |
+| 80 | Train/Rural/386\|d4=7 | No | 0 | 0 | 0 | 0.395854 |
+
+## 2026-11-21 - Wave 5 full-run acceptance and preregistered decisions
+
+- Re-read AGENTS.md and confirmed clean charles/refiner-focus at c09405c before work. Read only saved JSON/logs, checkpoint file metadata and the tail of local SGE accounting, then computed arithmetic summaries. No code, job, test, submission, checkpoint, cache, prior result, prediction or rule was modified; no training, inference, metric recomputation, installation, push, qsub or qstat was run. A read-only qacct attempt failed because its SGE port/service environment was unavailable; the existing local accounting file supplied all seven exact job records instead. This was not a job-status polling loop.
+- Observed all seven jobs at source c09405c on NVIDIA L40S / Exclusive_Process, ten epochs complete, normal FOCUS_EVAL_COMPLETE markers and accounting failed=0/exit_status=0. No Traceback/OOM/killed/timeout was observed. CUDA peaks below are saved maximum allocated-memory peaks, not host maxvmem or an external job-wide GPU monitor.
+- Observed job 8821483 (CD_s0): wall=3653 s, peak=6678470656 bytes (6.219810 GiB), best epoch=1.
+- Observed job 8821484 (CD_s1): wall=3544 s, peak=6678470656 bytes (6.219810 GiB), best epoch=1.
+- Observed job 8821485 (CD_s2): wall=3653 s, peak=6678470656 bytes (6.219810 GiB), best epoch=2.
+- Observed job 8821486 (BS_s0): wall=3652 s, peak=6728804352 bytes (6.266687 GiB), best epoch=1.
+- Observed job 8821487 (BS_s1): wall=3411 s, peak=6728804352 bytes (6.266687 GiB), best epoch=1.
+- Observed job 8821488 (BS_s2): wall=3540 s, peak=6728804352 bytes (6.266687 GiB), best epoch=1.
+- Observed job 8821489 (HO_s0): wall=3509 s, peak=6678470656 bytes (6.219810 GiB), best epoch=1.
+- Observed all recorded configs match the preregistered definitions: D4 on, detail head off, scratch initialization, lr=3e-4, 500-step warmup + cosine, ten epochs, batch 4, K_train=4, pos_weight=4, wd=0.01, clip=1.0, Val-sel=834 and L weights 0.2/0.2/0.6. CD uses corruption probability 0.5; BS uses C=1 and weights 0.1/0.2/0.3/0.4; HO excludes 100 Train IDs/domain. All best.pt and last.pt files exist without loading or committing weights.
+- CG1 PASS: all CD selection/final reports record evaluation_corruption_applied=false. Selected fractions for seeds 0/1/2 are 0.506899286/0.494171293/0.505868358; actually modified fractions are 0.494052339/0.481205393/0.493973037. Both interpretations lie in [0.45,0.55].
+- BG1 PASS: all three BS evaluation reports retain delta_bound=1.0. Each records 10020 step maxima across clean/stress evaluation; ranges are [0.179485664,0.381892353], [0.131273359,0.246462986], [0.060491111,0.209723264].
+- HG1 PASS: 200 held-out IDs, 2322 retained Train IDs, intersection=0. The held-out list is retained in results/wave5/holdout/metrics.json as well as the original run report.
+- KG PASS: 29225 cumulative core-call endpoints across seven full evaluations all equal K; 11690 clean/stress image trajectories, 70140 actual core calls. All seven final evaluation manifest SHAs equal 06d97973fcec14cc113b7c3468d768e1e0a6d9b3d27998fd6aa14cf07c13dc90, matching the previously passed fp32 cache. Training configs record the common cache path rather than separate startup fingerprints.
+- Observed CD group Val-rep L mean=0.547493098, sample std=0.002323097; RS-D4 mean=0.545751875. BS mean=0.545416483, sample std=0.000771204. All reported standard deviations use ddof=1.
+- CD-P1 holds: mean L difference +0.001741223 lies in [-0.001,+0.003]. CD-P2 holds: mean climb 0.002126578 minus RS-D4 0.000273423 = +0.001853154 >=0.001. CD-P3 holds: mean K4 clDice 0.702350481 minus 0.697518971 = +0.004831510. CD-P4 does not hold: best epochs [1,1,2], only 1/3 >=2.
+- BS-P1 does not hold: mean climb 0.000781832 exceeds baseline 0.000273423 but is below 0.003. BS-P2 does not hold: tails [-0.004419960,-0.008526572,-0.009158693], 0/3 >=-0.001. BS-P3 holds: mean LB 0.544899809 minus baseline 0.545215200 = -0.000315391, within [-0.002,+0.002].
+- Observed Val-sel selects CD_s0 (L=0.553449912) and BS_s2 (L=0.550146960). CB-R1 selects CD_s0: Val-rep LB=0.549580012 >=0.548636; LB deltas from E0 are Overall +0.002944039, Urban -0.000977502, Rural +0.009884247. BS_s2 LB=0.545475219 fails the Overall threshold. Selection was based on Val-sel, with adoption evaluated only by the registered Val-rep rule.
+- CB-R2 marks neither group as climbing: each has 0/3 seeds satisfying both conditions. CD_s0 has climb 0.004237166 but tail -0.001036903, missing the tail tolerance by 0.000036903; no tolerance is changed.
+- HO-P1 holds: held-out Train best epoch=7, Val-sel best epoch=1. HO-R1 uses difference 7-1=6 >=3 and returns its preregistered interpretation that early stopping is mainly associated with Train/Val distribution differences. This is the registered descriptive interpretation, not an independently identified causal mechanism. Held-out Train domain best epochs and Val-sel domain curves are retained in the reports.
+- Observed CD_s1 Val-sel domain best epochs Overall/Urban/Rural=1/2/1, CD_s2=2/3/1, BS_s0=1/4/2; the other runs are 1/1/1. Observed CD* Rural A rises throughout K1/2/4/8, while E0/RS-D4*/BS* Rural A declines. CD* Overall rises through K4 then declines at K8. Component changes, same-seed contrasts, all epoch domain curves and finite official scores are retained descriptively in the new reports.
+- Wrote only results/wave5/cd_bs/{summary.md,metrics.json}, results/wave5/holdout/{summary.md,metrics.json} and this worklog. Summary values were checked against JSON, arithmetic and sample standard deviations were cross-checked, files are below 10 MB, and the forbidden personal-path scan is empty. No tests were run because this task changes only acceptance records.
+
+## 2026-11-21 - CD probability, warm-start and Train-plus-Val-sel preregistration
+
+Recorded before creating or submitting any wave 6 job. The supplied definitions, predictions and rules are preserved verbatim below.
+
+定义：
+- CD-P8 = CD 的设置，只把 --draft-corrupt 改成 0.8，seed 0/1/2，按 Val-sel L 选 epoch 和 seed；
+- CD-W = RW-D4 的设置（从 e6 s0 初始化、lr 1e-4、100 步预热 + 余弦、3 epoch）+ --draft-corrupt 0.5，seed 0/1/2，按 Val-sel L 选 epoch 和 seed；
+- CD-TVS = CD 的设置（P = 0.5，10 epoch 的调度），训练集为 Train + Val-sel（2522 + 834 张），seed 0/1/2；预先固定采用第 2 个 epoch 的 checkpoint，不用任何划分来选 epoch。
+- 爬升幅度 = A(K4) − A(K1)，用 Val-rep 的 Overall A；城市爬升 = 同样的差，只看 Urban。
+
+P8-P1：CD-P8 三 seed 的 Val-rep L 均值减去 CD 均值，落在 −0.002 到 +0.002 之间。
+P8-P2：CD-P8 的爬升幅度均值比 CD 的（0.002127）大 ≥ +0.001。
+P8-P3：CD-P8 的城市爬升均值大于 CD 的城市爬升均值。
+W-P1：CD-W 三 seed 的 Val-rep L 均值减去 RW-D4 均值（0.545515），落在 +0.001 到 +0.004 之间；样本标准差小于 CD 的样本标准差。
+TVS-P1：CD-TVS 三 seed 的 Val-rep LB 均值减去 CD 的 LB 均值（0.546994），落在 +0.002 到 +0.008 之间。
+TVS-P2：CD-TVS 相对 CD 的提升，城市大于乡村（用 LB 的均值比较）。
+
+判定规则：
+R6-R1（CD-P8、CD-W）：各自按 Val-sel L 选出的 seed，满足 Val-rep LB ≥ CD s0 的 LB + 0.002（即 ≥ 0.551580），并且 Urban、Rural 的 LB 都不低于 CD s0 对应值超过 0.003，就算通过。
+R6-R2（CD-TVS）：如果三 seed 的 Val-rep LB 均值比 CD 均值高 ≥ +0.002，并且按 seed 配对至少 2/3 为正，就判定"加入 Val-sel 训练有效"；此时取 Val-rep LB 最高的那个 seed 作为候选（在 Val-rep 上做了选择，报告里注明这个分数偏乐观），候选还要满足 Val-rep LB ≥ CD s0 的 LB + 0.002 才能通过。
+R6-R3：如果有多组通过，取 Val-rep LB 最高的那组（如实注明选择方式）；都不通过就保留 CD s0 作为最终的 refiner。
+
+## 2026-11-21 - Wave 6 implementation and offline verification
+
+- Re-read AGENTS.md and confirmed clean charles/refiner-focus at 68d1641, the wave5 acceptance commit. Preserved the supplied wave6 predictions/rules verbatim in separate commit dffd749 before creating any new qsub file. No network, package installation, push, qsub/qstat, pretrained CPU loading or real-image CPU inference occurred. Only synthetic images were used for validation; all existing results, checkpoints, caches and qsub files remain unchanged.
+- Added default-disabled --train-include-valsel and --fixed-epoch. A new metadata-only helper verifies TG1 before CUDA/model loading: the pool is exactly Train union Val-sel, with unique split/domain/image identities and no Val-rep intersection. Full runs assert counts 2522/834/835 and record all identity lists. Val-sel uses its original Val/... cached draft identities. Explicit allow_valsel permissions extend D4/corruption wrappers only for the newly verified training pool; their default Train-only guards and local RNG behavior are preserved.
+- TVS is a fresh-run protocol: all ten epochs retain their original warmup/cosine horizon (8390 updates at batch4), each epoch has an epoch_NNN.pt checkpoint, and the preregistered epoch2 is loaded explicitly for final clean evaluation. best.pt is only a compatibility alias of epoch2; it is never chosen by scores. All ten Val-rep K1/K2/K4 curves are labeled descriptive_only with evaluation_corruption_applied=false. selection_curve and selection_files remain empty, and no best-score comparison is called. The formal scoring entry uses epoch_002.pt directly for K1/K2/K4/K8, stress K4 and LB. TVS resume/eval-only through the training entry is not enabled; the existing separate scoring entry loads its checkpoint normally.
+- Added scripts/train_refiner_r6.py using the established training/evaluation entries. P8 changes only P to0.8; W restores e6 s0 and uses lr1e-4, warmup100 and three epochs; TVS uses P0.5 and the predeclared epoch. All arms use D4, no detail head, BCE pos_weight4, batch4 and per-domain reporting. P8/W retain all834 Val-sel images for epoch selection. The final adoption/seed comparisons remain governed by the unmodified registration, including its explicit optimistic Val-rep seed selection for TVS.
+- Added scripts/wave6_smoke.py: a CUDA-free supervisor starts P8, score-P8, W, score-W, TVS, score-TVS as serial independent production-entry child processes. Each training stage performs20 updates. TVS smoke has two partial epochs of10 updates each, saves both checkpoints and verifies fixed epoch2, TG1 and absence of selection. Each scoring child checks four clean and four stress images, finite official component scores, CG1 and cumulative core-call counts exactly equal to K. A failed child is logged with its exit code while later stages continue; only complete success prints WAVE6_SMOKE_COMPLETE. Formal jobs require all six saved wave6 smoke stages to pass. There is one CUDA PID at a time; metric/loader subprocess imports do not initialize CUDA.
+- Added jobs/wave6_smoke.qsub and jobs/refiner_r6.qsub only. Both request8 CPU slots, one GPU, gpu_c8.0, mem_per_core8G, mail ea and logs under runs/logs; both print GPU/compute_mode, package versions and git HEAD, enable offline local weights, and validate the passed4191-image cache manifest. Smoke h_rt=00:30:00. The formal header is conservatively04:00:00; manual per-arm commands override it with the estimates below and request gpu_type=L40S.
+- Ran the read-only --estimate path with single-threaded Python. Archived L40S smoke mean CPU corruption cost is0.058771465166501 s/image. P8 budget base3660 s +25220*(0.8/0.5-1)*cost=889.3298108994933 s. W budget base1500 s +7566*cost=444.6649054497466 s. TVS budget base3660*(3356/2522)=4870.325138778747 s plus10*835*(0.04+4*0.012+4*0.125)=4909.8 s for descriptive passes (draft plus K1/K2/K4 official metric groups). TVS deliberately retains the former selection allowance and scales the entire baseline rather than only training, giving a conservative budget. Formula ceil_to_minute(1.3*(base+added)+300) produces P8 01:44:00, W 00:48:00, TVS 03:37:00. All three TVS jobs exceed3 hours; these are planning estimates, not wave6 measurements.
+- Related verification passed22 tests (10 wave6 and12 wave5-control tests) in12.449 s. Default main-entry regression against68d1641 compares a synthetic small batch's losses, weights, normalized config, Python/NumPy/Torch RNG exactly. The synthetic TVS main-entry test trains three epochs, confirms all per-epoch saves, verifies epoch3 weights differ, and verifies final evaluation uses epoch2 weights even when training continues; its real official scoring code runs on small synthetic masks. Tests cover TG1 leak rejection, unchanged default permissions, retained Val/... cache identities, invalid fixed-epoch parameters, all formal command settings, failed-stage independence, passed-smoke gating and importing/scheduling without torch/CUDA.
+- Ran the full unittest suite exactly once, with a175 s timeout and single-threaded Python:255 tests in160.337 s,254 passed and the known1 skipped. Log: runs/wave6_verify.lv9TIc/unittest.log. bash -n passes both new qsub files. No GPU smoke was executed locally; real-image TG1/KG/CG1 and hardware runtime checks remain for manual wave6_smoke submission. No effect prediction is judged from synthetic validation.
+- Confirmed no result changes relative to68d1641, no new tracked images/weights and no modified existing job file. Only the new sources/jobs/tests and this appended worklog are included in the implementation commit. The local predictions commit precedes this qsub implementation commit; nothing is pushed.
+
+## 2026-11-21 - Wave 6 smoke acceptance and resource-budget check
+
+- Re-read AGENTS.md and confirmed clean charles/refiner-focus at 3a59ca6 before work. Read only saved logs/JSON and checkpoint file metadata for job8833378; no source code, qsub, tests, results, checkpoint or cache was changed. No training, inference, unit test, metric recomputation, network, package installation, scheduler submission/status query, polling or push occurred. Only this appended worklog is committed locally.
+- Observed NVIDIA L40S / Exclusive_Process in main log lines1-5, source3a59ca660afee575f6d5d09a5124b8b502195084 at line13. All six independent stages P8/score-P8/W/score-W/TVS/score-TVS have exit_code=0 and passed=true at lines14-19. Main log line20 prints WAVE6_SMOKE_COMPLETE. Child logs contain no Traceback/OOM/out-of-memory/killed/timeout; each scorer prints FOCUS_EVAL_COMPLETE. All requested smoke checks pass; step2 is cleared.
+- Observed P8 completes20 updates with finite loss range [0.18153785169124603,0.18155118823051453]. Saved config draft_corrupt=0.8. Actual selected and modified presentations are both80/80=100%, not80%: the four unique image/view identities all happen to be selected, and the one-epoch four-image loader repeats them20 times. The same per-seed/epoch/image corruption decisions recur; these are not80 independent Bernoulli trials. This small smoke sample does not establish the full training corruption rate and is not a probability-config failure.
+- Observed W completes20 updates with finite loss range [0.1821451336145401,0.18492253124713898]. It selects40/80 presentations for corruption and records lr1e-4, warmup100, init_refiner=e6 s0. Observed TVS completes20 updates, split10+10 across two partial epochs, with finite loss range [0.01844220608472824,0.22104895114898682]; corruption selects25/80 presentations. All three training allocation peaks are6628442112 bytes (6.173218 GiB).
+- TG1 PASS on the smoke pool: four Train plus four Val-sel identities produce exactly eight unique training identities; intersection with all835 Val-rep identities is0. Lists are saved in TVS/report/metrics.json:training_protocol. This is deliberately a smoke-size union, not a claim that all3356 formal training images were processed.
+- Fixed-epoch/checkpoint PASS: epoch_001.pt and epoch_002.pt exist, with18600250 and18613754 bytes; best.pt and last.pt also exist. TVS report evaluated_epoch=2, checkpoint_source=epoch_002.pt, selection_curve=[], selection_files={}. The scorer records checkpoint=epoch_002.pt. Both descriptive epochs have descriptive_only=true and evaluation_corruption_applied=false. No weights were loaded during this read-only audit; the epoch identity evidence is the successful production load check and saved report/scorer metadata.
+- KG PASS: each scorer records20 cumulative core-call endpoints (four clean images at K1/2/4/8 and four stress images at K4); all60 endpoints equal K. Summing maximum K once per trajectory gives144 actual core invocations across the three scorers. CG1 PASS: all training/final reports and both TVS descriptive epochs record evaluation_corruption_applied=false; TVS selection is disabled.
+- Official scoring PASS: each scorer completes four clean and four seed523 stress images, two/domain, with finite official IoU/clDice/BIoU/quality in Overall/Urban/Rural. Observed Overall clean A(K4) is P8=0.2815340825649096, W=0.27628228835859786, TVS=0.28136315551297103; stress A(K4) is0.6607778050270988/0.6456442757075534/0.6608550177943369. These values confirm the pipeline only; no effect prediction is judged from smoke.
+- Observed P8 CPU corruption time excludes cache reads:80 presentations, mean0.11456126267494256 s, median0.10937967549944005 s, range0.030110091000096872..0.2130115529980685 s. The table below retains every requested per-presentation time. Each of the four unique image/view identities has20 observations.
+- P8 budget comparison: the previous P0.5 smoke mean was0.058771465166501 s, giving the registered planning estimate0.058771465166501*(0.8/0.5)=0.09403434426640161 s/presentation. The new raw0.114561263 s mean is21.83% higher, but its sample has100% selection. Reweighting its selected-sample mean to target P0.8, with observed W unselected cost0.00031301192511818955 s, gives0.8*0.11456126267494256+0.2*0.00031301192511818955=0.09171161252497768 s, 2.47% below the planning assumption. This is a resource comparison on only four unique images, not a new experiment or a precise full-dataset timing claim. Keeping the original conservative h_rt is reasonable; no budget is reduced.
+- Observed TVS update_seconds across20 steps: min0.31809903400062467, mean0.3346460920003665, median0.31933492200005276, max0.6223231809999561 s. Step1 is0.622323181 s; steps2-20 mean0.31950519257933546 s. Epoch training wall times are27.781415606998053 and27.294228598999325 s, total55.07564420599738 s (2.7537822103 s/update including data/iteration overhead). Recorded update intervals sum6.69292184000733 s, leaving48.38272236599005 s outside the update timer. Tiny repeated loader cycles/startup are included in epoch wall time; do not extrapolate that2.754 s/update as the formal GPU compute rate.
+- TVS timing comparison: the prior full CD s0 training wall rate is2205.9781244069454/6310=0.34960033667304996 s/update. TVS steady update0.319505193 s is8.61% lower (the timer excludes data waits); its encoder/refiner compute is of the same order as the prior full run. Formal8390 updates at that steady update timer are2680.6485657406247 s, excluding loader/CPU/evaluation. The previous TVS budget already assigns4870.325138778747 s to the scaled entire CD job, adds4909.8 s for ten descriptive passes, then applies1.3 margin+300 s. There is no evidence here requiring an h_rt increase.
+- The previous nine formal commands and h_rt remain unchanged: P8 seeds0/1/2 use01:44:00; W seeds0/1/2 use00:48:00; TVS seeds0/1/2 use03:37:00. All request gpu_type=L40S and jobs/refiner_r6.qsub. Fill SMOKE_DIR=runs/wave6/smoke_8833378; all six required passed smoke entries are present. The three TVS budgets still exceed3 hours. No job was submitted here.
+
+### P8 CPU corruption time by unique image/view
+
+| Image/view ID | Presentations | Mean ms | Minimum ms | Maximum ms |
+| --- | --- | --- | --- | --- |
+| Train/Rural/35\|d4=3 | 20 | 31.172269 | 30.290007 | 32.671671 |
+| Train/Rural/399\|d4=7 | 20 | 188.999587 | 186.087680 | 194.801839 |
+| Train/Urban/2102\|d4=6 | 20 | 207.648217 | 204.418241 | 213.011553 |
+| Train/Urban/2348\|d4=7 | 20 | 30.424979 | 30.110091 | 31.246405 |
+
+### P8 CPU corruption time per presentation
+
+Observed timings are corruption_seconds in milliseconds, excluding cache reads; rows retain training presentation order.
+
+| Presentation | Image/view ID | Selected | Modified pixels | CPU corruption ms |
+| --- | --- | --- | --- | --- |
+| 1 | Train/Urban/2348\|d4=7 | Yes | 1262 | 31.246405 |
+| 2 | Train/Urban/2102\|d4=6 | Yes | 4949 | 213.011553 |
+| 3 | Train/Rural/399\|d4=7 | Yes | 3087 | 189.424656 |
+| 4 | Train/Rural/35\|d4=3 | Yes | 315 | 30.728656 |
+| 5 | Train/Urban/2348\|d4=7 | Yes | 1262 | 30.460728 |
+| 6 | Train/Rural/399\|d4=7 | Yes | 3087 | 190.322434 |
+| 7 | Train/Rural/35\|d4=3 | Yes | 315 | 30.467204 |
+| 8 | Train/Urban/2102\|d4=6 | Yes | 4949 | 205.905471 |
+| 9 | Train/Rural/35\|d4=3 | Yes | 315 | 32.623624 |
+| 10 | Train/Urban/2348\|d4=7 | Yes | 1262 | 30.110091 |
+| 11 | Train/Urban/2102\|d4=6 | Yes | 4949 | 204.903900 |
+| 12 | Train/Rural/399\|d4=7 | Yes | 3087 | 186.087680 |
+| 13 | Train/Urban/2348\|d4=7 | Yes | 1262 | 30.376126 |
+| 14 | Train/Rural/399\|d4=7 | Yes | 3087 | 187.530854 |
+| 15 | Train/Urban/2102\|d4=6 | Yes | 4949 | 206.215088 |
+| 16 | Train/Rural/35\|d4=3 | Yes | 315 | 30.646128 |
+| 17 | Train/Rural/399\|d4=7 | Yes | 3087 | 188.540504 |
+| 18 | Train/Urban/2348\|d4=7 | Yes | 1262 | 30.230958 |
+| 19 | Train/Rural/35\|d4=3 | Yes | 315 | 30.290007 |
+| 20 | Train/Urban/2102\|d4=6 | Yes | 4949 | 205.050519 |
+| 21 | Train/Urban/2102\|d4=6 | Yes | 4949 | 209.205827 |
+| 22 | Train/Rural/35\|d4=3 | Yes | 315 | 30.831978 |
+| 23 | Train/Rural/399\|d4=7 | Yes | 3087 | 187.937823 |
+| 24 | Train/Urban/2348\|d4=7 | Yes | 1262 | 30.339828 |
+| 25 | Train/Urban/2102\|d4=6 | Yes | 4949 | 208.702602 |
+| 26 | Train/Rural/399\|d4=7 | Yes | 3087 | 189.195714 |
+| 27 | Train/Urban/2348\|d4=7 | Yes | 1262 | 30.449575 |
+| 28 | Train/Rural/35\|d4=3 | Yes | 315 | 30.807831 |
+| 29 | Train/Urban/2102\|d4=6 | Yes | 4949 | 208.391108 |
+| 30 | Train/Rural/399\|d4=7 | Yes | 3087 | 188.587209 |
+| 31 | Train/Urban/2348\|d4=7 | Yes | 1262 | 30.315577 |
+| 32 | Train/Rural/35\|d4=3 | Yes | 315 | 30.489416 |
+| 33 | Train/Rural/35\|d4=3 | Yes | 315 | 32.603770 |
+| 34 | Train/Urban/2102\|d4=6 | Yes | 4949 | 207.006358 |
+| 35 | Train/Urban/2348\|d4=7 | Yes | 1262 | 30.424250 |
+| 36 | Train/Rural/399\|d4=7 | Yes | 3087 | 188.245166 |
+| 37 | Train/Urban/2102\|d4=6 | Yes | 4949 | 212.200122 |
+| 38 | Train/Rural/399\|d4=7 | Yes | 3087 | 189.768317 |
+| 39 | Train/Urban/2348\|d4=7 | Yes | 1262 | 30.724637 |
+| 40 | Train/Rural/35\|d4=3 | Yes | 315 | 30.979124 |
+| 41 | Train/Urban/2102\|d4=6 | Yes | 4949 | 210.087745 |
+| 42 | Train/Rural/35\|d4=3 | Yes | 315 | 31.025897 |
+| 43 | Train/Rural/399\|d4=7 | Yes | 3087 | 189.735461 |
+| 44 | Train/Urban/2348\|d4=7 | Yes | 1262 | 30.465020 |
+| 45 | Train/Rural/399\|d4=7 | Yes | 3087 | 191.452598 |
+| 46 | Train/Rural/35\|d4=3 | Yes | 315 | 30.723497 |
+| 47 | Train/Urban/2348\|d4=7 | Yes | 1262 | 30.452799 |
+| 48 | Train/Urban/2102\|d4=6 | Yes | 4949 | 206.114956 |
+| 49 | Train/Urban/2348\|d4=7 | Yes | 1262 | 30.418610 |
+| 50 | Train/Rural/35\|d4=3 | Yes | 315 | 31.873514 |
+| 51 | Train/Rural/399\|d4=7 | Yes | 3087 | 188.954049 |
+| 52 | Train/Urban/2102\|d4=6 | Yes | 4949 | 206.302176 |
+| 53 | Train/Urban/2102\|d4=6 | Yes | 4949 | 209.388128 |
+| 54 | Train/Rural/399\|d4=7 | Yes | 3087 | 189.692709 |
+| 55 | Train/Urban/2348\|d4=7 | Yes | 1262 | 30.369327 |
+| 56 | Train/Rural/35\|d4=3 | Yes | 315 | 30.609930 |
+| 57 | Train/Urban/2102\|d4=6 | Yes | 4949 | 209.970963 |
+| 58 | Train/Urban/2348\|d4=7 | Yes | 1262 | 30.384443 |
+| 59 | Train/Rural/399\|d4=7 | Yes | 3087 | 188.772390 |
+| 60 | Train/Rural/35\|d4=3 | Yes | 315 | 30.881719 |
+| 61 | Train/Urban/2348\|d4=7 | Yes | 1262 | 30.515663 |
+| 62 | Train/Rural/35\|d4=3 | Yes | 315 | 31.487015 |
+| 63 | Train/Rural/399\|d4=7 | Yes | 3087 | 189.687111 |
+| 64 | Train/Urban/2102\|d4=6 | Yes | 4949 | 205.544491 |
+| 65 | Train/Urban/2102\|d4=6 | Yes | 4949 | 206.492496 |
+| 66 | Train/Rural/35\|d4=3 | Yes | 315 | 30.302229 |
+| 67 | Train/Rural/399\|d4=7 | Yes | 3087 | 188.075129 |
+| 68 | Train/Urban/2348\|d4=7 | Yes | 1262 | 30.330739 |
+| 69 | Train/Rural/35\|d4=3 | Yes | 315 | 32.263733 |
+| 70 | Train/Urban/2102\|d4=6 | Yes | 4949 | 206.437468 |
+| 71 | Train/Rural/399\|d4=7 | Yes | 3087 | 187.029790 |
+| 72 | Train/Urban/2348\|d4=7 | Yes | 1262 | 30.267331 |
+| 73 | Train/Rural/399\|d4=7 | Yes | 3087 | 194.801839 |
+| 74 | Train/Urban/2102\|d4=6 | Yes | 4949 | 207.615120 |
+| 75 | Train/Urban/2348\|d4=7 | Yes | 1262 | 30.307080 |
+| 76 | Train/Rural/35\|d4=3 | Yes | 315 | 31.138428 |
+| 77 | Train/Rural/35\|d4=3 | Yes | 315 | 32.671671 |
+| 78 | Train/Urban/2102\|d4=6 | Yes | 4949 | 204.418241 |
+| 79 | Train/Rural/399\|d4=7 | Yes | 3087 | 186.150306 |
+| 80 | Train/Urban/2348\|d4=7 | Yes | 1262 | 30.310385 |
+
+## 2026-11-21 - Wave 6 full-run acceptance and preregistered selection
+
+- Re-read AGENTS.md and confirmed clean charles/refiner-focus at529ef6c, the wave6 smoke acceptance commit, before work. Used only existing accounting/log/JSON reads, checkpoint file metadata and arithmetic summaries. No training, inference, metric recomputation, unit test, source change, installation, network, qsub/qstat, polling or push occurred. Existing results, checkpoints, cache and preregistration are unchanged; only results/wave6 and this appended worklog are committed.
+- Confirmed all nine exact jobs8833550-8833558 complete using logs and qacct -f on an exact-ID/job-name snapshot from the tail of the local accounting file. The sandbox qacct attempt failed UID resolution; a bounded host-side read-only qacct call succeeded for all nine records. Every failed/exit_status is0, every log ends FOCUS_EVAL_COMPLETE, no Traceback/OOM/killed/timeout occurs, and all jobs record source529ef6c. Deleted duplicate jobs8833713-8833721 are excluded. There is no deferred group.
+- Observed every GPU log reports NVIDIA L40S / Exclusive_Process, including jobs8833550 and8833551 on ece@scc-j03. Resource peaks below are saved allocated CUDA peaks, not an external job-wide monitor.
+- Observed 8833550 P8_s0: NVIDIA L40S/Exclusive_Process, wall=3575s, peak=6678470656 bytes (6.219810GiB), adopted best epoch=1, queue=ece, accounting exit0.
+- Observed 8833551 P8_s1: NVIDIA L40S/Exclusive_Process, wall=3574s, peak=6678470656 bytes (6.219810GiB), adopted best epoch=2, queue=ece, accounting exit0.
+- Observed 8833552 P8_s2: NVIDIA L40S/Exclusive_Process, wall=3546s, peak=6678470656 bytes (6.219810GiB), adopted best epoch=1, queue=l40s, accounting exit0.
+- Observed 8833553 W_s0: NVIDIA L40S/Exclusive_Process, wall=1553s, peak=6678470656 bytes (6.219810GiB), adopted best epoch=1, queue=l40s, accounting exit0.
+- Observed 8833554 W_s1: NVIDIA L40S/Exclusive_Process, wall=1572s, peak=6678470656 bytes (6.219810GiB), adopted best epoch=1, queue=l40s, accounting exit0.
+- Observed 8833555 W_s2: NVIDIA L40S/Exclusive_Process, wall=1504s, peak=6678470656 bytes (6.219810GiB), adopted best epoch=2, queue=l40s, accounting exit0.
+- Observed 8833556 TVS_s0: NVIDIA L40S/Exclusive_Process, wall=4276s, peak=6678470656 bytes (6.219810GiB), adopted fixed epoch=2, queue=ece, accounting exit0.
+- Observed 8833557 TVS_s1: NVIDIA L40S/Exclusive_Process, wall=4278s, peak=6678470656 bytes (6.219810GiB), adopted fixed epoch=2, queue=ece, accounting exit0.
+- Observed 8833558 TVS_s2: NVIDIA L40S/Exclusive_Process, wall=4541s, peak=6678470656 bytes (6.219810GiB), adopted fixed epoch=2, queue=l40s, accounting exit0.
+- Configuration checks PASS: P8 uses P0.8, ten epochs, lr3e-4/warmup500, scratch and6310 schedule steps; W uses P0.5, three epochs, lr1e-4/warmup100, e6 s0 initialization and1893 steps; TVS uses P0.5, ten epochs, lr3e-4/warmup500, Train+Val-sel and8390 steps. All use D4, no detail head, batch4, K_train4, pos_weight4, wd0.01, clip1.0 and warmup+cosine. P8/W select on all834 Val-sel images with L weights0.2/0.2/0.6; TVS adopts epoch2 without a selection set.
+- TG1 PASS for all TVS seeds: training IDs exactly equal2522 Train union834 Val-sel,3356 unique IDs; intersection with all835 Val-rep IDs is0. Each saved training-ID digest is dc88df0b36b915ea9cba1aa016cf95bf9fbcfbe52e94a09578743491c0c0b3e4. All ten epoch files exist, training selection curves/files are empty, report checkpoint_source and scorer checkpoint are epoch_002.pt. Weights were not loaded during this acceptance task; epoch identity follows successful production load validation and saved metadata.
+- CG1 PASS: all selection/final reports and all30 TVS descriptive evaluations record no evaluation corruption. P8 selected fractions are0.804163362/0.796074544/0.803013481; actually modified fractions are0.784020619/0.775574941/0.784099921. Both readings satisfy[0.75,0.85].
+- KG PASS:37575 saved cumulative core-call endpoints across nine complete evaluations all equalK;15030 image trajectories imply90180 actual core invocations. Each run has835 clean and835 stress images. All nine final evaluation manifest SHAs equal06d97973fcec14cc113b7c3468d768e1e0a6d9b3d27998fd6aa14cf07c13dc90, the previously passed fp32 cache. Training configurations record the common path, not independent startup fingerprints.
+- Observed group Overall L mean/sample std: P8=0.546191044/0.004415399, W=0.547829775/0.001234945, TVS=0.553847139/0.003901542. Overall LB means/sample std: P8=0.545724229/0.004283748, W=0.547331762/0.001241088, TVS=0.553402245/0.003878223. Sample standard deviations use ddof=1; complete domain/component and paired numbers are in the new JSON.
+- P8-P1: holds; recorded arithmetic: {"CD_mean": 0.5474930980894577, "P8_mean": 0.5461910441140325, "difference": -0.0013020539754251548, "interval": [-0.002, 0.002]}.
+- P8-P2: does_not_hold; recorded arithmetic: {"P8_mean_climb": 0.0018761624963326007, "archived_CD_climb": 0.0021265776012687385, "difference_archived": -0.00025041510493613783, "difference_registered": -0.0002508375036673993, "registered_CD_climb": 0.002127, "threshold": 0.001}.
+- P8-P3: holds; recorded arithmetic: {"CD_urban_climb": 0.0032496932796034494, "P8_urban_climb": 0.006585571487207546, "difference": 0.0033358782076040967}.
+- W-P1: holds; recorded arithmetic: {"CD_sample_std": 0.0023230972460631504, "W_mean": 0.5478297746752709, "W_sample_std": 0.0012349446752835432, "archived_RW_D4_mean": 0.5455151351564688, "difference_archived": 0.002314639518802175, "difference_registered": 0.0023147746752709697, "interval": [0.001, 0.004], "registered_RW_D4_mean": 0.545515}.
+- TVS-P1: holds; recorded arithmetic: {"TVS_mean": 0.5534022453541205, "archived_CD_mean": 0.5469939577009932, "difference_archived": 0.006408287653127287, "difference_registered": 0.006408245354120545, "interval": [0.002, 0.008], "registered_CD_mean": 0.546994}.
+- TVS-P2: does_not_hold; recorded arithmetic: {"mean_LB_gain": {"Overall": 0.006408287653127287, "Rural": 0.019455251819574193, "Urban": -0.0012360395085069253}}.
+- R6-R1 P8: {"LB_threshold": 0.55158, "Val_rep_LB": {"Overall": 0.5501510598908599, "Rural": 0.49194204853924994, "Urban": 0.5817182881278786}, "Val_sel_L": 0.5557036678176571, "candidate": "P8_s2", "difference_from_CD_s0": {"Overall": 0.0005710475874813881, "Rural": -0.0057637235679735, "Urban": 0.004720134188814118}, "domain_tolerance": 0.003, "passed": false, "selection": "Val-sel L", "status": "fail"}.
+- R6-R1 W: {"LB_threshold": 0.55158, "Val_rep_LB": {"Overall": 0.5486669886862746, "Rural": 0.49862557229543336, "Urban": 0.5746155091719222}, "Val_sel_L": 0.5515080738293031, "candidate": "W_s0", "difference_from_CD_s0": {"Overall": -0.0009130236171038808, "Rural": 0.0009198001882099183, "Urban": -0.002382644767142339}, "domain_tolerance": 0.003, "passed": false, "selection": "Val-sel L", "status": "fail"}.
+- R6-R2: {"LB_threshold": 0.55158, "candidate": "TVS_s1", "candidate_LB": 0.557438191266038, "highest_TVS_LB_run": "TVS_s1", "mean_gain": 0.006408287653127287, "mean_gain_threshold": 0.002, "optimistic_candidate_score": true, "paired_positive_count": 3, "paired_required": 2, "passed": true, "selection": "Highest Val-rep LB among TVS seeds after the registered mean/paired gate", "status": "pass", "training_effective": true}.
+- R6-R3: {"optimistic_selection": true, "outcome": "TVS_s1", "passed_groups": ["TVS_s1"], "selection": "Highest Val-rep LB among passing groups; otherwise CD_s0", "status": "adopt TVS_s1"}.
+- Observed R6-R3 selects TVS_s1 at fixed epoch2: Val-rep LB=0.557438191266038, L=0.5579025967186981. LB differences from CD_s0 are Overall+0.007858178962659501, Urban+0.0002606188712553914, Rural+0.02059976373801986. The selected checkpoint is runs/refiner_r6/TVS_s1/checkpoints/epoch_002.pt. TVS seed selection explicitly uses Val-rep LB under R6-R2; its selected score is optimistic and is labeled so in both summary and JSON. No descriptive peak epoch is substituted.
+- Observed TVS Val-rep Overall L peaks at epochs1/2/3 for seeds0/1/2, while Train-only CD Val-sel best epochs are1/1/2. TVS Urban L peaks at3/3/1, Rural L at9/7/7. These curves come from different evaluation pools, so the report describes the shift without assigning a causal interpretation. All30 epoch K1/K2/K4 curves by domain and all descriptive peak/tie lists are preserved.
+- Verified summary/JSON consistency, means/sample standard deviations, all stored TVS epoch A values and unchanged preregistration prefix. files: summary.md=30719 bytes, metrics.json=259743 bytes, both below10MB. Forbidden personal-path scan is empty; no new tracked image/weight is staged. Changes against main under results are restricted to existing wave3/wave4/wave5 plus new wave6. No code or job file is included in this acceptance commit.

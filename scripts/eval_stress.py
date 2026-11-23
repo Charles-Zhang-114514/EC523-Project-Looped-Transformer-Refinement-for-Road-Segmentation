@@ -233,7 +233,10 @@ def load_model(path, device, split_hash):
         raise ValueError('Checkpoint does not match the controlled v2 Val split/head')
     if config['reset_state'] or config['no_mask_feedback']:
         raise ValueError('Expected an unmodified e0_v2 checkpoint')
-    model = runner.LoopRefiner(1024, **{key: config[key] for key in ('dimension', 'layers', 'heads', 'mlp_ratio', 'patch', 'head_type')})
+    settings={key: config[key] for key in ('dimension', 'layers', 'heads', 'mlp_ratio', 'patch', 'head_type')}
+    if config.get('detail_head',False):settings['detail_head']=True
+    if config.get('delta_bound') is not None:settings['delta_bound']=config['delta_bound']
+    model = runner.LoopRefiner(1024, **settings)
     model.load_state_dict(checkpoint['state_dict'])
     model.requires_grad_(False).to(device).eval()
     return model, checkpoint['epoch']

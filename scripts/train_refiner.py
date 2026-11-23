@@ -21,10 +21,14 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 from analysis import y0_error_analysis as y0
 from scripts import train_linear_probe as probe
-from looproad.models.refiner import LoopRefiner
+from looproad.models.refiner import LoopRefiner, load_initial_refiner
+from looproad.models.detail_features import DetailFeatures
 from looproad.models.refiner_losses import RefinerObjective
 from looproad.data.augmentation import D4TrainingDataset
 from looproad.data.draft_cache import CacheIds, DraftCache, frozen_cached_draft
+from looproad.data.d4_cache import D4CacheDataset, D4DraftCache
+from looproad.data.training_controls import CorruptDraftDataset, PreparedDrafts, split_holdout
+from looproad.data.train_valsel import add_valsel_training, fixed_epoch_path
 
 DOMAINS = ("Urban", "Rural")
 INFER_ABLATIONS = ("none", "reset-state", "no-mask-feedback")
@@ -193,16 +197,19 @@ def score_image(domain, image_id, predictions, labels, geometry, eval_extra=Fals
     return domain, image_id, outputs, time.perf_counter() - started
 
 
-def make_loader(dataset, batch_size, workers, shuffle=False, seed=0):
+def make_loader(dataset, batch_size, workers, shuffle=False, seed=0, spawn_workers=False):
     return DataLoader(dataset, batch_size=batch_size, shuffle=shuffle, num_workers=workers,
                       generator=torch.Generator().manual_seed(seed), pin_memory=True,
                       persistent_workers=False, collate_fn=probe.collate_numpy_batch,
-                      worker_init_fn=probe.initialize_data_worker if workers else None)
+                      worker_init_fn=probe.initialize_data_worker if workers else None,
+                      **({"multiprocessing_context":"spawn"} if spawn_workers and workers else {}))
 
 
 def evaluate(encoder, head, model, datasets, ks, device, loader_workers=1, metric_workers=6, geometry=True, eval_extra=False,
              infer_ablations=None, draft_cache=None):
     """One streamed trajectory to max(ks); workers receive only uint8 masks."""
+    if any(isinstance(dataset,CorruptDraftDataset) for dataset in datasets.values()):
+        raise ValueError("Evaluation must never use draft corruption datasets")
     check_untied_limit(model.untied_steps, ks, "evaluation K")
     started = time.perf_counter()
     model.eval()
@@ -256,6 +263,8 @@ def evaluate(encoder, head, model, datasets, ks, device, loader_workers=1, metri
                     features, draft = frozen_draft(encoder, head, image)
                 else:
                     features, draft = frozen_cached_draft(encoder, head, image, image_id, draft_cache)
+                if getattr(model,'detail_head',False):
+                    features = DetailFeatures(features, image)
                 encoder_seconds += stamp(device) - phase
                 predictions = {"y0_draft": (draft.sigmoid().squeeze() >= .5).cpu().numpy().astype(np.uint8)}
                 times[domain]["y0_draft"].append(0.)
@@ -509,6 +518,16 @@ def summary_markdown(report):
         if 'y0_answer_keep_residual' in report['infer_ablations']:
             lines += ['', 'Observed y0_answer_keep_residual uses fixed y0 answer tokens, recurrent memory and the current-logit residual base.']
         return '\n'.join(lines)
+    if report.get('protocol') == 'train_valsel_fixed':
+        primary = dict(report)
+        primary.pop('protocol')
+        text = summary_markdown(primary).replace('# Looped refiner v1','# Train + Val-sel fixed-epoch refiner',1)
+        text = text.replace('Observed results for the final epoch; no Val model selection was performed.',
+                            f"Observed predeclared epoch {report['fixed_epoch']}; Val-sel is training data. Val-rep curves never select epochs.",1)
+        text += '\n## Descriptive Val-rep curve (no checkpoint selection)\n\n| Epoch | Overall L | Urban L | Rural L |\n|---|---|---|---|\n'
+        for point in report['descriptive_curve']:
+            text += '| '+str(point['epoch'])+' | '+' | '.join(f"{point['L_by_domain'][d]:.9f}" for d in ('Overall','Urban','Rural'))+' |\n'
+        return text
     if report.get('protocol') == 'val_sel_rep':
         primary = dict(report)
         primary.pop('protocol')
@@ -638,7 +657,7 @@ def initialize_refiner(model, path, probe_path):
     expected_probe = str(probe_path.resolve().relative_to(ROOT))
     if saved["config"]["probe_ckpt"] != expected_probe:
         raise ValueError("Initialization checkpoint uses a different draft head")
-    model.load_state_dict(saved["state_dict"], strict=True)
+    load_initial_refiner(model, saved["state_dict"])
 
 
 def training_batches(loader, max_steps=None):
@@ -663,6 +682,14 @@ def build_parser():
     parser.add_argument("--lr", type=float, default=3e-4)
     parser.add_argument("--draft-cache", type=Path)
     parser.add_argument("--init-refiner", type=Path)
+    parser.add_argument("--d4-aug", action="store_true")
+    parser.add_argument("--detail-head", action="store_true")
+    parser.add_argument("--draft-corrupt", type=float, default=0.)
+    parser.add_argument("--delta-bound", type=float)
+    parser.add_argument("--train-holdout-per-domain", type=int, default=0)
+    parser.add_argument("--record-selection-domains", action="store_true")
+    parser.add_argument("--train-include-valsel", action="store_true")
+    parser.add_argument("--fixed-epoch", type=int, help="Predeclared checkpoint epoch for Train + Val-sel")
     parser.add_argument("--warmup-steps", type=int, default=500)
     parser.add_argument("--max-steps", type=int, help="Bound total updates, cycling a small dataset if needed")
     parser.add_argument("--pos-weight", type=float, default=4.,
@@ -718,9 +745,34 @@ def build_parser():
     return parser
 
 
+def selection_domains(observed, weights):
+    return {domain:selection_score({k:observed['groups'][domain][k]['scores']['A'] for k in weights},weights)
+            for domain in (*DOMAINS,'Overall')}
+
+
 def main():
     parser = build_parser()
     args = parser.parse_args()
+    if args.train_include_valsel:
+        if (args.val_split is None or args.draft_cache is None or args.eval_only or args.resume
+                or args.train_holdout_per_domain):
+            parser.error('Train + Val-sel requires a split/cache and a fresh run without holdout')
+        if args.fixed_epoch is None or not 1 <= args.fixed_epoch <= args.epochs:
+            parser.error('--fixed-epoch must be in [1, epochs] for Train + Val-sel')
+        if args.max_steps is not None and args.max_steps < args.epochs:
+            parser.error('TVS --max-steps must allow at least one update per epoch')
+    elif args.fixed_epoch is not None:
+        parser.error('--fixed-epoch requires --train-include-valsel')
+    if not math.isfinite(args.draft_corrupt) or not 0<=args.draft_corrupt<=1:
+        parser.error('--draft-corrupt must be a probability in [0,1]')
+    if args.draft_corrupt and (args.draft_cache is None or args.eval_only):
+        parser.error('Draft corruption requires cached drafts in training only')
+    if args.delta_bound is not None and (not math.isfinite(args.delta_bound) or args.delta_bound<=0):
+        parser.error('--delta-bound must be finite and positive')
+    if args.train_holdout_per_domain<0:
+        parser.error('Holdout count must be nonnegative')
+    if args.train_holdout_per_domain and (args.val_split is None or args.select_every!=1 or args.eval_only):
+        parser.error('Train holdout requires a fixed Val split and selection every epoch')
     if args.init_refiner is not None and (args.resume or args.eval_only):
         parser.error("--init-refiner cannot be combined with resume/eval-only")
     if args.warmup_steps < 1:
@@ -759,6 +811,12 @@ def main():
                     'loss', 'aux_weight', 'skeleton_iterations', 'false_add_gradient_ratio',
                     'false_add_warmup_steps', 'false_add_calibration_batches', 'augmentation',
                     'step_weights', 'k_train_choices']
+        if 'delta_bound' in restored['config'] or args.delta_bound is not None:
+            settings.append('delta_bound')
+        new_control_restore = args.resume and any(name in restored['config'] for name in
+                                                 ('draft_corrupt','delta_bound','train_holdout_per_domain'))
+        if new_control_restore:
+            settings += ['draft_corrupt','train_holdout_per_domain','record_selection_domains','d4_aug']
         if args.resume:
             settings += ["batch_size", "lr", "seed", "limit_per_domain", "monitor_every", "monitor_per_domain", "select_every", "select_per_domain"]
         legacy_defaults = {'untied_steps': 0, 'noadd_lambda': 0., 'head_type': 'patch_linear', 'select_every': 0, 'select_per_domain': 100,
@@ -766,6 +824,9 @@ def main():
                            'loss': 'bce', 'aux_weight': .1, 'skeleton_iterations': 20,
                            'false_add_gradient_ratio': .1, 'false_add_warmup_steps': 500,
                            'false_add_calibration_batches': 8, 'augmentation': 'none'}
+        if new_control_restore:
+            legacy_defaults.update(draft_corrupt=0.,train_holdout_per_domain=0,
+                                   record_selection_domains=False,d4_aug=False)
         for name in settings:
             saved = restored["config"].get(name, legacy_defaults.get(name))
             if "--" + name.replace("_", "-") in explicit and getattr(args, name) != saved:
@@ -836,6 +897,16 @@ def main():
         parser.error("Refusing to overwrite a checkpoint from an earlier run")
     if args.select_every and not args.resume and not args.eval_only and (args.ckpt_dir / "best.pt").exists():
         parser.error("Refusing to overwrite an existing best checkpoint")
+    tvs_sets, training_protocol = None, None
+    if args.train_include_valsel:
+        bases = [probe.RoadDataset('Train', domain, limit=args.limit_per_domain, seed=args.seed+i)
+                 for i, domain in enumerate(DOMAINS)]
+        additions = protocol_datasets(split, 'Val-sel', args.limit_per_domain)
+        reports = protocol_datasets(split, 'Val-rep')
+        tvs_sets, training_protocol = add_valsel_training(bases, additions, reports)
+        if args.limit_per_domain is None and any(training_protocol[k] != n for k,n in [('train_count',2522),('valsel_count',834),('valrep_count',835)]):
+            raise ValueError('TG1 full pool sizes must be Train=2522, Val-sel=834, Val-rep=835')
+        print('TG1 ' + json.dumps({k:v for k,v in training_protocol.items() if not k.endswith('_ids')}), flush=True)
     probe.initialize_data_worker(0)
     random.seed(args.seed)
     np.random.seed(args.seed)
@@ -850,12 +921,15 @@ def main():
     model = LoopRefiner(encoder.out_channels, args.dimension, args.layers, args.heads,
                         args.mlp_ratio, args.patch, no_mask_feedback=args.no_mask_feedback,
                         reset_state=args.reset_state, head_type=args.head_type,
-                        untied_steps=args.untied_steps).to(device=device, dtype=torch.float32)
+                        untied_steps=args.untied_steps, detail_head=args.detail_head, delta_bound=args.delta_bound).to(device=device, dtype=torch.float32)
     if restored is not None:
         model.load_state_dict(restored["state_dict"])
     if args.init_refiner is not None:
         initialize_refiner(model, args.init_refiner, args.probe_ckpt)
     cache = DraftCache(args.draft_cache, args.probe_ckpt, args.val_split) if args.draft_cache else None
+    if args.d4_aug and (cache is None or args.augmentation != "none"):
+        raise ValueError("--d4-aug requires --draft-cache and no other augmentation")
+    training_cache = D4DraftCache(cache) if args.d4_aug else cache
     cache_options = {"draft_cache": cache} if cache is not None else {}
     parameters = model.parameter_counts()
     print("PARAMETERS " + json.dumps(parameters), flush=True)
@@ -867,6 +941,16 @@ def main():
               if isinstance(value, Path) else value for key, value in vars(args).items()}
     config.update(weight_decay=.01, warmup_steps=args.warmup_steps, clip_grad_norm=1.,
                   refiner_dtype="float32", encoder=y0.ENCODER, probe_head=checkpoint["head"])
+    for name,disabled in [('draft_corrupt',args.draft_corrupt==0),('delta_bound',args.delta_bound is None),
+                          ('train_holdout_per_domain',args.train_holdout_per_domain==0),
+                          ('record_selection_domains',not args.record_selection_domains),
+                          ('train_include_valsel',not args.train_include_valsel),
+                          ('fixed_epoch',args.fixed_epoch is None)]:
+        if disabled:config.pop(name)
+    if not args.detail_head:
+        config.pop("detail_head")
+    if not args.d4_aug:
+        config.pop('d4_aug')
     if args.infer_ablations is None:
         config.pop('infer_ablations')
     for name in ('step_weights', 'k_train_choices', 'draft_cache', 'init_refiner', 'max_steps'):
@@ -879,13 +963,26 @@ def main():
     config.update(loss_implementation_version=1, objective_state=objective.state)
     if split is not None:
         config['val_split_sha256'] = split_hash
-    train_sets = ([probe.RoadDataset("Train", domain, limit=args.limit_per_domain, seed=args.seed + i)
-                   for i, domain in enumerate(DOMAINS)] if args.epochs and not args.eval_only else [])
+    train_sets = ([probe.RoadDataset("Train", domain, limit=None if args.train_holdout_per_domain else args.limit_per_domain, seed=args.seed + i)
+                   for i, domain in enumerate(DOMAINS)] if args.epochs and not args.eval_only and not args.train_include_valsel else [])
+    if args.train_include_valsel:
+        train_sets = tvs_sets
+    holdout_sets,holdout = ({},None)
+    if args.train_holdout_per_domain:
+        holdout_sets,holdout=split_holdout(train_sets,args.train_holdout_per_domain,args.limit_per_domain)
     if args.augmentation == 'd4':
         train_sets = [D4TrainingDataset(dataset, args.seed + i) for i, dataset in enumerate(train_sets)]
-    if cache is not None:
+    if args.d4_aug:
+        train_sets = [D4CacheDataset(dataset, args.seed+i, **({'allow_valsel':True} if args.train_include_valsel else {})) for i,dataset in enumerate(train_sets)]
+    elif cache is not None:
         train_sets = [CacheIds(dataset) for dataset in train_sets]
-    loader = (make_loader(ConcatDataset(train_sets), args.batch_size, args.loader_workers, True, args.seed)
+    if args.draft_corrupt:
+        if device.type=='cuda' and args.loader_workers<1:
+            parser.error('CUDA draft corruption requires CPU loader workers')
+        train_sets=[CorruptDraftDataset(dataset,cache,args.draft_corrupt,args.seed,i, **({'allow_valsel':True} if args.train_include_valsel else {})) for i,dataset in enumerate(train_sets)]
+        training_cache=PreparedDrafts()
+    loader = (make_loader(ConcatDataset(train_sets), args.batch_size, args.loader_workers, True, args.seed,
+                          **({'spawn_workers':True} if args.draft_corrupt else {}))
               if train_sets else None)
     optimizer = torch.optim.AdamW(model.parameters(), lr=args.lr, weight_decay=.01) if loader else None
     schedule_steps = args.max_steps if args.max_steps is not None else (len(loader)*args.epochs if loader else None)
@@ -895,11 +992,13 @@ def main():
     epochs = list(restored.get("epochs", [])) if restored is not None else []
     curve = list(restored.get("train_curve", [])) if restored is not None else []
     selection_curve = list(restored.get("selection_curve", [])) if restored is not None else []
+    if holdout is not None and restored is not None:
+        holdout=restored.get("holdout",holdout)
     best_score = restored.get("best_score") if restored is not None else None
     best_epoch = restored.get("best_epoch") if restored is not None else None
     selection_sets = ((protocol_datasets(split, 'Val-sel', args.select_per_domain) if split is not None else
                        {domain: probe.RoadDataset("Val", domain, limit=args.select_per_domain, seed=0) for domain in DOMAINS})
-                      if args.select_every and not args.eval_only else {})
+                      if args.select_every and not args.eval_only and not args.train_include_valsel else {})
     selection_files = {domain: [pair[0].name for pair in dataset.pairs] for domain, dataset in selection_sets.items()}
     if split is not None and not selection_files and restored is not None:
         selection_files = restored.get('selection_files', {})
@@ -924,9 +1023,10 @@ def main():
                   "(changed total epoch target; completed steps and current LR preserved)", flush=True)
     if args.eval_only:
         print(f"EVAL_ONLY loaded_epoch={start_epoch}; Train is not constructed", flush=True)
+    descriptive_curve = []
     for epoch in range(start_epoch, args.epochs) if not args.eval_only else ():
         for dataset in train_sets:
-            if isinstance(dataset, D4TrainingDataset):
+            if isinstance(dataset, (D4TrainingDataset, D4CacheDataset, CorruptDraftDataset)):
                 dataset.set_epoch(epoch)
         model.train()
         if device.type == "cuda":
@@ -934,14 +1034,23 @@ def main():
         epoch_started = stamp(device)
         batches, seen = [], 0
         k_distribution = {str(k): 0 for k in (args.k_train_choices or [args.k_train])}
-        for batch_index, (images, targets, valid, image_ids, _) in enumerate(training_batches(loader, args.max_steps)):
+        epoch_steps = args.max_steps
+        if args.train_include_valsel and args.max_steps is not None:
+            quotient, remainder = divmod(args.max_steps, args.epochs)
+            epoch_steps = quotient + (epoch < remainder)
+        for batch_index, (images, targets, valid, image_ids, _) in enumerate(training_batches(loader, epoch_steps)):
             images, targets, valid = (probe.as_device_tensor(value, device) for value in (images, targets, valid))
+            update_started = stamp(device) if args.max_steps is not None else None
+            if args.max_steps is not None and device.type == "cuda":
+                torch.cuda.reset_peak_memory_stats(device)
             optimizer.zero_grad(set_to_none=True)
             phase = stamp(device)
             if cache is None:
                 features, draft = frozen_draft(encoder, head, images)
             else:
-                features, draft = frozen_cached_draft(encoder, head, images, image_ids, cache)
+                features, draft = frozen_cached_draft(encoder, head, images, image_ids, training_cache)
+            if args.detail_head:
+                features = DetailFeatures(features, images)
             encoder_time = stamp(device) - phase
             phase = stamp(device)
             training_k = (choose_training_k(args.k_train_choices, k_generator)
@@ -974,6 +1083,13 @@ def main():
                      "encoder_seconds": encoder_time, "refiner_forward_backward_seconds": refiner_time,
                      "lr": learning_rate, "gradient_norm_before_clip": float(gradient_norm),
                      "loss_terms": loss_terms}
+            if update_started is not None:
+                batch['update_seconds'] = stamp(device)-update_started
+                batch['peak_cuda_bytes'] = (torch.cuda.max_memory_allocated(device) if device.type == 'cuda' else None)
+            if args.draft_corrupt:
+                batch['corruption']=[row['stats'] for row in image_ids]
+            if args.delta_bound is not None:
+                batch['delta_maxima']=[float(x) for x in model._delta_maxima]
             batch['k_train'] = training_k
             if args.loss == 'bce':
                 batch.update(bce=float(bce.detach()), step_bce=batch['step_losses'],
@@ -1020,28 +1136,59 @@ def main():
             print("MONITOR " + json.dumps(point), flush=True)
         args.ckpt_dir.mkdir(parents=True, exist_ok=True)
         improved = False
-        if args.select_every and ((epoch + 1) % args.select_every == 0 or epoch + 1 == args.epochs):
+        if not args.train_include_valsel and args.select_every and ((epoch + 1) % args.select_every == 0 or epoch + 1 == args.epochs):
             selected = evaluate(encoder, head, model, selection_sets, [int(k) for k in args.selection_ks], device,
                                 args.eval_loader_workers, args.metric_workers, geometry=False, **cache_options)
             point = {"epoch": epoch + 1, "seconds": selected["wall_seconds"]}
             point.update({key: selected["groups"]["Overall"][key]["scores"]["A"] for key in ('y0_draft', *args.selection_ks)})
             point["score"] = selection_score(point, args.selection_ks)
+            if args.record_selection_domains or args.train_holdout_per_domain:
+                point['L_by_domain']=selection_domains(selected,args.selection_ks)
+                point['scores_by_domain']={d:{k:selected['groups'][d][k]['scores'] for k in args.selection_ks}
+                                          for d in (*DOMAINS,'Overall')}
+
             improved = is_new_best(point["score"], best_score)
             point["new_best"] = improved
             if improved:
                 best_score, best_epoch = point["score"], epoch + 1
             selection_curve.append(point)
             print("SELECTION " + json.dumps(point), flush=True)
+        if args.train_include_valsel:
+            descriptive_sets = protocol_datasets(split, 'Val-rep', args.limit_per_domain)
+            described = evaluate(encoder, head, model, descriptive_sets, [1,2,4], device,
+                                 args.eval_loader_workers, args.metric_workers, geometry=False, **cache_options)
+            point = dict(epoch=epoch+1, seconds=described['wall_seconds'], descriptive_only=True,
+                         evaluation_corruption_applied=False, L_by_domain=selection_domains(described,args.selection_ks),
+                         scores_by_domain={d:{k:described['groups'][d][k]['scores'] for k in ('1','2','4')}
+                                           for d in (*DOMAINS,'Overall')})
+            descriptive_curve.append(point)
+            print('VAL_REP_DESCRIPTIVE '+json.dumps(point),flush=True)
+        if holdout is not None:
+            held=evaluate(encoder,head,model,holdout_sets,[int(k) for k in args.selection_ks],device,
+                          args.eval_loader_workers,args.metric_workers,geometry=False,**cache_options)
+            heldpoint=dict(epoch=epoch+1,seconds=held['wall_seconds'],L_by_domain=selection_domains(held,args.selection_ks))
+            score=heldpoint['L_by_domain']['Overall']
+            if is_new_best(score,holdout['best_score']):
+                holdout.update(best_score=score,best_epoch=epoch+1)
+            holdout['curve'].append(heldpoint)
+            print('TRAIN_HOLDOUT '+json.dumps(heldpoint),flush=True)
         payload = {"state_dict": model.state_dict(), "optimizer": optimizer.state_dict(),
                     "scheduler": scheduler.state_dict(), "epoch": epoch + 1, "config": config,
                     "epochs": epochs, "train_curve": curve, "rng": capture_rng(loader, k_generator)}
-        if args.select_every:
+        if args.select_every and not args.train_include_valsel:
             payload.update(selection_curve=selection_curve, best_score=best_score, best_epoch=best_epoch,
                            selection_files=selection_files)
+        if holdout is not None:payload["holdout"]=holdout
+        if args.train_include_valsel:
+            payload.update(training_protocol=training_protocol, descriptive_curve=descriptive_curve,
+                           fixed_epoch=args.fixed_epoch)
+            torch.save(payload, fixed_epoch_path(args.ckpt_dir,epoch+1))
+            if epoch+1 == args.fixed_epoch:
+                torch.save(payload,args.ckpt_dir/'best.pt')
         torch.save(payload, args.ckpt_dir / "last.pt")
         if improved:
             torch.save(payload, args.ckpt_dir / "best.pt")
-        if args.max_steps is not None:
+        if args.max_steps is not None and not args.train_include_valsel:
             break
     if args.loss == 'false_add' and not args.eval_only and objective.state.get('effective_aux_weight') is None:
         raise RuntimeError('Training ended before false-add calibration completed; no final report will be written')
@@ -1051,7 +1198,10 @@ def main():
     if split is None and args.limit_per_domain is None and sum(map(len, datasets.values())) != 1669:
         raise ValueError("Full Val must contain 1669 images")
     if split is not None and not args.eval_only:
-        best = torch.load(args.ckpt_dir/'best.pt', map_location='cpu', weights_only=True)
+        source = fixed_epoch_path(args.ckpt_dir,args.fixed_epoch) if args.train_include_valsel else args.ckpt_dir/'best.pt'
+        best = torch.load(source, map_location='cpu', weights_only=True)
+        if args.train_include_valsel and best['epoch'] != args.fixed_epoch:
+            raise AssertionError('Fixed checkpoint epoch differs from the preregistration')
         model.load_state_dict(best['state_dict'])
     evaluation_options = dict(cache_options)
     if args.infer_ablations is not None:
@@ -1087,7 +1237,15 @@ def main():
                       selection_curve=selection_curve, selection_files=selection_files,
                       evaluated_epoch=best_epoch,
                       model_selection="best weighted K1/K2/K4 score on fixed Val subset; optimistic full-Val estimate")
-    if split is not None:
+    if args.train_include_valsel:
+        report.update(protocol='train_valsel_fixed', fixed_epoch=args.fixed_epoch,
+                      evaluated_epoch=args.fixed_epoch, training_protocol=training_protocol,
+                      descriptive_curve=descriptive_curve, selection_curve=[], selection_files={},
+                      evaluation_files={d:[a.name for a,_ in ds.pairs] for d,ds in datasets.items()},
+                      checkpoint_source=fixed_epoch_path(args.ckpt_dir,args.fixed_epoch).name,
+                      model_selection='predeclared fixed epoch; Val-rep curves are descriptive only',
+                      evaluation_corruption_applied=False)
+    elif split is not None:
         report.update(protocol='val_sel_rep', best_epoch=best_epoch, best_score=best_score,
                       selection_curve=selection_curve, selection_files=selection_files,
                       evaluated_epoch=start_epoch if args.eval_only else best_epoch,
@@ -1095,6 +1253,12 @@ def main():
                       model_selection='loaded checkpoint on Val-rep' if args.eval_only else 'best weighted score on Val-sel; report only on Val-rep')
     if args.infer_ablations is not None:
         report['infer_ablations'] = args.infer_ablations
+    if holdout is not None:report['holdout']=holdout
+    if args.draft_corrupt:
+        rows=[row for epoch in epochs for batch in epoch['batches']for row in batch['corruption']]
+        report['training_corruption']=dict(samples=len(rows),selected=sum(x['selected']for x in rows),
+                                           changed_pixels=sum(x['changed_pixels']for x in rows))
+        report['evaluation_corruption_applied']=False
     args.out_dir.mkdir(parents=True, exist_ok=True)
     (args.out_dir / "metrics.json").write_text(json.dumps(report, indent=2, allow_nan=False) + "\n", encoding="utf-8")
     (args.out_dir / "summary.md").write_text(summary_markdown(report), encoding="utf-8")
